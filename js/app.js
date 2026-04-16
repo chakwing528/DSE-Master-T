@@ -5,8 +5,11 @@
 // ==========================================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
-// 🚨 AI 批改系統專用 API Key (在執行環境中系統會自動提供，留空即可)
-const apiKey = ""; 
+// 🚨 AI 批改系統專用 API Key
+const apiKey = "AQ.Ab8RN6JrRo-3w2pJTlUuYKZCVEWJuAV5iu-OJGb5uNEFpogzkQ"; 
+
+// 🛑 手寫 AI 系統開關 (設定為 false 即可在沒有 API Key 的情況下以 100% 選擇題順暢運作)
+const ENABLE_AI_HANDWRITING = true; 
 
 const motivationalQuotes = [
     "未來的你，必定感激今天努力的自己。", "默默耕耘，總有收穫。", "答應自己，每天堅持多 1 分鐘。", "今天的累積，是明天的底氣。"
@@ -201,6 +204,8 @@ function selectTopic(topic) {
 
 // 🌟 手寫題比例分配演算法
 function assignHandwriting(bank) {
+    if (!ENABLE_AI_HANDWRITING) return; // 若關閉 AI 手寫功能，則全數維持 MC 選擇題
+
     let hwCount = 0;
     if (bank.length === 3) hwCount = 1;
     else if (bank.length === 5) hwCount = 2;
