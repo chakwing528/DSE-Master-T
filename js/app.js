@@ -5,6 +5,9 @@
 // ==========================================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
+// 🚨 AI 批改系統專用 API Key (在執行環境中系統會自動提供，留空即可)
+const apiKey = ""; 
+
 const motivationalQuotes = [
     "未來的你，必定感激今天努力的自己。", "默默耕耘，總有收穫。", "答應自己，每天堅持多 1 分鐘。", "今天的累積，是明天的底氣。"
 ];
@@ -196,6 +199,23 @@ function selectTopic(topic) {
     });
 }
 
+// 🌟 手寫題比例分配演算法
+function assignHandwriting(bank) {
+    let hwCount = 0;
+    if (bank.length === 3) hwCount = 1;
+    else if (bank.length === 5) hwCount = 2;
+    else if (bank.length === 10) hwCount = 5;
+    else if (bank.length > 0) hwCount = Math.floor(bank.length / 2);
+
+    // 隨機選出指定數量的題目設定為手寫題
+    let indices = Array.from({length: bank.length}, (_, i) => i);
+    indices = shuffleArray(indices).slice(0, hwCount);
+    
+    for (let i of indices) {
+        bank[i].isHandwriting = true;
+    }
+}
+
 function startGlobalMixed(level) {
     try {
         currentTopic = 'global_mixed';
@@ -229,6 +249,7 @@ function startGlobalMixed(level) {
             if (qArr && qArr.length > 0) { qArr[0].id = idx + 1; questionBank.push(qArr[0]); }
         });
 
+        assignHandwriting(questionBank);
         startQuizSession();
     } catch (error) { alert("🚨 系統錯誤！無法讀取跨課題題庫。\n原因：" + error.message); }
 }
@@ -249,6 +270,7 @@ function startGame(levelPref) {
         else if (currentTopic === 'expansion') questionBank = generateExpansionQuestions(totalQuestionsConfig, currentLevelPref);
         else if (currentTopic === 'alg_frac_mul_div') questionBank = generateAlgFracMulDivQuestions(totalQuestionsConfig, currentLevelPref);
         
+        assignHandwriting(questionBank);
         startQuizSession();
     } catch (error) { alert("🚨 系統錯誤！無法讀取題庫。\n原因：" + error.message); }
 }
@@ -275,20 +297,46 @@ function loadQuestion() {
     document.getElementById('levelBadge').innerHTML = currentTopic === 'global_mixed' ? `綜合挑戰 (難度: ${currentLevelPref})` : `難度: ${q.level}`;
     document.getElementById('progressText').textContent = `完成 ${currentQuestionIndex}/${questionBank.length}`;
     hideFeedback();
-    document.getElementById('questionText').innerHTML = q.question;
+    
+    // UI 標記提示是否為手寫題
+    let typeLabel = q.isHandwriting ? `<span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-sm font-bold align-middle mt-2 sm:mt-0 shadow-sm border border-amber-200">✍️ AI 手寫題</span>` : "";
+    document.getElementById('questionText').innerHTML = q.question + `<div class="mt-2 text-center">${typeLabel}</div>`;
 
     const optionsGrid = document.getElementById('optionsGrid');
-    optionsGrid.innerHTML = ''; 
-    q.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn relative p-3 sm:p-4 bg-white border-2 border-slate-200 rounded-xl text-base sm:text-lg text-slate-700 font-medium hover:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 flex items-center gap-3 text-left w-full overflow-hidden';
-        btn.onclick = () => handleAnswer(opt, btn);
-        btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm shrink-0">${opt.id}</span><span class="overflow-x-auto math-scroll max-w-full flex-1 py-1">${opt.text}</span>`;
-        optionsGrid.appendChild(btn);
-    });
+    const hwArea = document.getElementById('handwritingArea');
+    
+    // 🌟 智能切換：手寫區 vs 選擇題區
+    if (q.isHandwriting) {
+        optionsGrid.classList.add('hidden');
+        if (hwArea) {
+            hwArea.classList.remove('hidden');
+            hwArea.classList.remove('border-4', 'border-green-500', 'border-red-400');
+            document.getElementById('clear-btn').disabled = false;
+            document.getElementById('recognize-btn').disabled = false;
+            
+            // 延遲初始化畫布，確保 CSS 已經顯示正確的尺寸
+            setTimeout(() => {
+                resizeCanvas();
+                initCanvas();
+            }, 50);
+        }
+    } else {
+        optionsGrid.classList.remove('hidden');
+        if (hwArea) hwArea.classList.add('hidden');
+        
+        optionsGrid.innerHTML = ''; 
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn relative p-3 sm:p-4 bg-white border-2 border-slate-200 rounded-xl text-base sm:text-lg text-slate-700 font-medium hover:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 flex items-center gap-3 text-left w-full overflow-hidden';
+            btn.onclick = () => handleAnswer(opt, btn);
+            btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm shrink-0">${opt.id}</span><span class="overflow-x-auto math-scroll max-w-full flex-1 py-1">${opt.text}</span>`;
+            optionsGrid.appendChild(btn);
+        });
+    }
     renderMath();
 }
 
+// 選擇題答題邏輯
 function handleAnswer(selectedOption, buttonElement) {
     attemptsCount++;
     if (selectedOption.isCorrect) {
@@ -309,7 +357,7 @@ function showFeedback(type, message, showNextBtn) {
     const fbArea = document.getElementById('feedbackArea');
     const fbBox = document.getElementById('feedbackBox');
     fbArea.classList.remove('hidden');
-    fbBox.className = type === 'correct' ? 'p-4 rounded-xl border bg-green-50 border-green-200 w-full overflow-hidden' : 'p-4 rounded-xl border bg-orange-50 border-orange-200 w-full overflow-hidden';
+    fbBox.className = type === 'correct' ? 'p-4 rounded-xl border bg-green-50 border-green-200 w-full overflow-hidden shadow-sm' : 'p-4 rounded-xl border bg-orange-50 border-orange-200 w-full overflow-hidden shadow-sm';
     document.getElementById('feedbackMessage').innerHTML = message;
     
     const nextBtn = document.getElementById('nextBtn');
@@ -320,6 +368,218 @@ function showFeedback(type, message, showNextBtn) {
 function hideFeedback() { document.getElementById('feedbackArea').classList.add('hidden'); }
 function disableAllButtons() { document.querySelectorAll('.option-btn').forEach(btn => { if (!btn.classList.contains('border-green-500')) btn.disabled = true; }); }
 function goToNext() { currentQuestionIndex++; if (currentQuestionIndex < questionBank.length) loadQuestion(); else showEndScreen(); }
+
+// ==========================================
+// 🖌️ 畫布繪圖核心邏輯 (Canvas)
+// ==========================================
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+function initCanvas() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+}
+
+function resizeCanvas() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas || !canvas.parentElement) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = canvas.width; 
+    tempCanvas.height = canvas.height;
+    if (canvas.width > 0 && canvas.height > 0) {
+        tempCtx.drawImage(canvas, 0, 0);
+    }
+    
+    canvas.width = rect.width; 
+    canvas.height = rect.height;
+    initCanvas();
+    if (tempCanvas.width > 0 && tempCanvas.height > 0) {
+        canvas.getContext('2d').drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
+    }
+}
+
+function getPos(e) {
+    const canvas = document.getElementById('draw-canvas');
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return { 
+        x: (clientX - rect.left) * scaleX, 
+        y: (clientY - rect.top) * scaleY 
+    };
+}
+
+function startDrawing(e) {
+    e.preventDefault(); 
+    isDrawing = true;
+    const pos = getPos(e); 
+    lastX = pos.x; 
+    lastY = pos.y;
+}
+
+function draw(e) {
+    if (!isDrawing) return; 
+    e.preventDefault();
+    const pos = getPos(e);
+    const ctx = document.getElementById('draw-canvas').getContext('2d');
+    ctx.beginPath(); 
+    ctx.moveTo(lastX, lastY); 
+    ctx.lineTo(pos.x, pos.y); 
+    ctx.stroke();
+    lastX = pos.x; 
+    lastY = pos.y;
+}
+
+function stopDrawing() { 
+    isDrawing = false; 
+}
+
+function setupCanvasEvents() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas) return;
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    canvas.addEventListener('touchstart', startDrawing, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchcancel', stopDrawing);
+    
+    document.getElementById('clear-btn').addEventListener('click', () => {
+        initCanvas();
+        document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
+    });
+    
+    document.getElementById('recognize-btn').addEventListener('click', handleAIGrading);
+    window.addEventListener('resize', resizeCanvas);
+}
+
+// ==========================================
+// 🤖 Gemini AI 智能閱卷系統
+// ==========================================
+async function fetchWithRetry(url, options, maxRetries = 5) {
+    let delays = [1000, 2000, 4000, 8000, 16000];
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, delays[i]));
+        }
+    }
+}
+
+async function handleAIGrading() {
+    const canvas = document.getElementById('draw-canvas');
+    const dataURL = canvas.toDataURL('image/png');
+    const base64Image = dataURL.split(',')[1];
+    
+    document.getElementById('ai-loading').classList.remove('hidden');
+    document.getElementById('recognize-btn').disabled = true;
+    document.getElementById('clear-btn').disabled = true;
+    document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
+    
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        let q = questionBank[currentQuestionIndex];
+        let correctOpt = q.options.find(o => o.isCorrect);
+        
+        // 萃取正確答案的純文字供 AI 參考
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = correctOpt.text;
+        let standardAns = tempDiv.textContent || tempDiv.innerText;
+        
+        const promptText = `你是一位專業的香港中學數學老師。請辨識圖片中學生手寫的數學公式，並判斷其數學意義是否與標準答案「完全相等」（Mathematically Equivalent）。
+
+標準答案為：${standardAns}
+
+規則：
+1. 學生可能會寫出等價的數學式（例如標準答案是 x^2+2x+1，學生寫 (x+1)^2，或者排版順序不同 1+2x+x^2）。只要數學上完全相等，就算是正確。
+2. 忽略微小的格式差異（例如多餘的括號）。
+3. 請務必以純 JSON 格式回傳，絕對不要包含任何 markdown 區塊（例如不要寫 \`\`\`json ）。
+
+回傳 JSON 格式：
+{
+  "recognizedLaTeX": "你辨識出學生的 LaTeX 語法",
+  "isCorrect": true 或 false,
+  "reason": "錯在哪裡？例如：符號錯了、漏了平方等。如果全對請回傳空字串。"
+}`;
+
+        const payload = {
+            contents: [{ role: "user", parts: [{ text: promptText }, { inlineData: { mimeType: "image/png", data: base64Image } }] }],
+            generationConfig: { responseMimeType: "application/json" }
+        };
+
+        const result = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        
+        let textRes = result.candidates[0].content.parts[0].text;
+        textRes = textRes.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
+        let aiResult = JSON.parse(textRes);
+        
+        document.getElementById('ai-loading').classList.add('hidden');
+        
+        attemptsCount++;
+        let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
+            <div class="font-bold text-indigo-700 mb-2">🤖 AI 老師辨識你的手寫為：</div>
+            <div class="text-xl overflow-x-auto math-scroll py-2 bg-white rounded-lg border border-white text-center">\\( \\displaystyle ${aiResult.recognizedLaTeX} \\)</div>
+            ${aiResult.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${aiResult.reason}</div>` : ''}
+        </div>`;
+        
+        let finalHint = feedbackHtml + correctOpt.hint;
+
+        if (aiResult.isCorrect) {
+            if (attemptsCount === 1) { score += 10; updateScoreDisplay(); }
+            showFeedback('correct', finalHint, true);
+            document.getElementById('handwritingArea').classList.add('border-4', 'border-green-500');
+            document.getElementById('clear-btn').disabled = true; 
+            document.getElementById('recognize-btn').disabled = true;
+        } else {
+            showFeedback('incorrect', finalHint, false);
+            document.getElementById('handwritingArea').classList.add('border-4', 'border-red-400');
+            document.getElementById('recognize-btn').disabled = false;
+            document.getElementById('clear-btn').disabled = false;
+            
+            // 如果答錯兩次或以上，給予放棄看答案的選擇
+            if (attemptsCount >= 2) {
+                let giveUpHtml = `<div class="mt-4 text-center"><button onclick="giveUpHandwriting()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">放棄作答並看正確步驟</button></div>`;
+                document.getElementById('feedbackMessage').innerHTML += giveUpHtml;
+            }
+        }
+        
+    } catch (err) {
+        console.error(err);
+        alert("網路異常或 AI 老師目前有點忙碌，請再試一次！");
+        document.getElementById('ai-loading').classList.add('hidden');
+        document.getElementById('recognize-btn').disabled = false;
+        document.getElementById('clear-btn').disabled = false;
+    }
+}
+
+// 讓學生選擇放棄手寫並看解析
+window.giveUpHandwriting = function() {
+    let q = questionBank[currentQuestionIndex];
+    let correctOpt = q.options.find(o => o.isCorrect);
+    showFeedback('incorrect', correctOpt.hint, true); // true 代表顯示下一題按鈕
+    document.getElementById('clear-btn').disabled = true;
+    document.getElementById('recognize-btn').disabled = true;
+};
 
 // ==========================================
 // 結算畫面與動態進度條生成
@@ -431,7 +691,6 @@ function submitToGoogleSheet() {
     formData.append('score', score);
     formData.append('totalScore', totalScoreVal);
     formData.append('percentage', percentageVal);
-    // 註：獎勵由 Google Apps Script 直接決定，前端不再傳送。
 
     fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
         .then(response => response.json())
@@ -440,15 +699,13 @@ function submitToGoogleSheet() {
                 let backendNewTotal = parseInt(data.newTotalScore) || 0;
                 let backendPlayCount = parseInt(data.playCountToday) || 1;
                 let isCrossed = data.crossedThreshold;
-                let officialName = data.officialName || studentName; // 🌟 接收後台回傳的官方白名單名字
+                let officialName = data.officialName || studentName; 
                 
                 // 強制更新本地端排行榜快取，確保下一輪進度顯示精準
                 let student = globalLeaderboard.find(s => String(s.className).toUpperCase().trim() === className.toUpperCase() && String(s.classNum).trim() === classNumber);
                 if (student) { 
                     student.totalScore = backendNewTotal; 
-                    // 🌟 保留官方排行榜中的名字，不被本地輸入覆蓋
-                } 
-                else { 
+                } else { 
                     globalLeaderboard.push({className: className, classNum: classNumber, studentName: officialName, totalScore: backendNewTotal}); 
                 }
                 renderLeaderboards();
@@ -568,4 +825,7 @@ window.onload = () => {
     if(savedClass) document.getElementById('className').value = savedClass;
     if(savedNum) document.getElementById('classNumber').value = savedNum;
     if(savedName) document.getElementById('studentName').value = savedName;
+    
+    // 初始化畫布監聽事件
+    setupCanvasEvents();
 };
