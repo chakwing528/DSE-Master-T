@@ -40,6 +40,9 @@ let globalLeaderboard = [];
 let currentLeaderboardHash = ""; 
 let isFetchingLock = false; 
 
+// 🌟 兩階段辨識所需的全域變數
+let currentRecognizedLaTeX = "";
+
 function getStoredData(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
 function setStoredData(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
 
@@ -204,7 +207,7 @@ function selectTopic(topic) {
 
 // 🌟 手寫題比例分配演算法
 function assignHandwriting(bank) {
-    if (!ENABLE_AI_HANDWRITING) return; // 若關閉 AI 手寫功能，則全數維持 MC 選擇題
+    if (!ENABLE_AI_HANDWRITING) return; 
 
     let hwCount = 0;
     if (bank.length === 3) hwCount = 1;
@@ -212,7 +215,6 @@ function assignHandwriting(bank) {
     else if (bank.length === 10) hwCount = 5;
     else if (bank.length > 0) hwCount = Math.floor(bank.length / 2);
 
-    // 隨機選出指定數量的題目設定為手寫題
     let indices = Array.from({length: bank.length}, (_, i) => i);
     indices = shuffleArray(indices).slice(0, hwCount);
     
@@ -299,11 +301,18 @@ function startQuizSession() {
 
 function loadQuestion() {
     attemptsCount = 0; 
+    currentRecognizedLaTeX = ""; // 重置 AI 辨識字串
+    
     const q = questionBank[currentQuestionIndex];
     document.getElementById('topicBadge').textContent = q.topic;
     document.getElementById('levelBadge').innerHTML = currentTopic === 'global_mixed' ? `綜合挑戰 (難度: ${currentLevelPref})` : `難度: ${q.level}`;
     document.getElementById('progressText').textContent = `完成 ${currentQuestionIndex}/${questionBank.length}`;
     hideFeedback();
+    
+    // 隱藏可能殘留的確認介面
+    if (document.getElementById('hw-confirm-ui')) {
+        document.getElementById('hw-confirm-ui').classList.add('hidden');
+    }
     
     // UI 標記提示是否為手寫題
     let typeLabel = q.isHandwriting ? `<span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-sm font-bold align-middle mt-2 sm:mt-0 shadow-sm border border-amber-200">✍️ AI 手寫題</span>` : "";
@@ -471,12 +480,32 @@ function setupCanvasEvents() {
         document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
     });
     
-    document.getElementById('recognize-btn').addEventListener('click', handleAIGrading);
+    // 綁定兩階段的「階段一：影像辨識 OCR」
+    document.getElementById('recognize-btn').addEventListener('click', startRecognitionPhase);
     window.addEventListener('resize', resizeCanvas);
+    
+    // 動態生成確認介面 (Confirmation UI)
+    const hwArea = document.getElementById('handwritingArea');
+    const canvasContainer = hwArea.querySelector('.relative'); 
+    if (!document.getElementById('hw-confirm-ui')) {
+        const confirmUI = document.createElement('div');
+        confirmUI.id = 'hw-confirm-ui';
+        confirmUI.className = 'hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all';
+        confirmUI.innerHTML = `
+            <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 AI 辨識結果</h3>
+            <div id="hw-confirm-math" class="text-xl sm:text-2xl overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner text-slate-800"></div>
+            <p class="text-sm sm:text-base text-slate-600 font-bold mb-4">請問這是你寫的公式嗎？</p>
+            <div class="flex gap-3 w-full max-w-sm">
+                <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 辨識錯了</button>
+                <button onclick="confirmAndGrade()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md text-sm sm:text-base">✅ 正確，去批改</button>
+            </div>
+        `;
+        canvasContainer.appendChild(confirmUI);
+    }
 }
 
 // ==========================================
-// 🤖 Gemini AI 智能閱卷系統
+// 🤖 兩階段 Gemini AI 智能閱卷系統
 // ==========================================
 async function fetchWithRetry(url, options, maxRetries = 5) {
     let delays = [1000, 2000, 4000, 8000, 16000];
@@ -492,16 +521,73 @@ async function fetchWithRetry(url, options, maxRetries = 5) {
     }
 }
 
-async function handleAIGrading() {
+// 👉 階段一：單純辨識圖像為 LaTeX
+async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     const dataURL = canvas.toDataURL('image/png');
     const base64Image = dataURL.split(',')[1];
     
-    document.getElementById('ai-loading').classList.remove('hidden');
+    const loadingDiv = document.getElementById('ai-loading');
+    loadingDiv.querySelector('p').innerHTML = "AI 老師正在努力看懂你的筆跡...<br><span class='text-sm font-normal text-slate-500'>這可能需要幾秒鐘</span>";
+    loadingDiv.classList.remove('hidden');
+    
     document.getElementById('recognize-btn').disabled = true;
     document.getElementById('clear-btn').disabled = true;
     document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
     
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        const promptText = `你是一個高精準度的數學 OCR 系統。請仔細辨識圖片中學生手寫的數學公式，並將其轉換為 LaTeX 格式。
+規則：
+1. 只回傳純粹的 LaTeX 語法。
+2. 絕對不要加上 Markdown 區塊標記（例如 \`\`\`latex）。
+3. 不要包含任何解釋、計算或額外的文字。
+4. 若有多行，請保留換行或使用適當的 LaTeX 環境。`;
+
+        const payload = {
+            contents: [{ role: "user", parts: [{ text: promptText }, { inlineData: { mimeType: "image/png", data: base64Image } }] }]
+        };
+
+        const result = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        
+        let latexRes = result.candidates[0].content.parts[0].text;
+        currentRecognizedLaTeX = latexRes.replace(/^```(latex|tex)?\n?/i, '').replace(/\n?```$/i, '').trim();
+        
+        loadingDiv.classList.add('hidden');
+        
+        // 顯示確認介面，讓學生校對
+        const confirmUI = document.getElementById('hw-confirm-ui');
+        const mathDiv = document.getElementById('hw-confirm-math');
+        mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
+        confirmUI.classList.remove('hidden');
+        renderMath();
+        
+    } catch (err) {
+        console.error(err);
+        alert("網路異常或 AI 老師目前有點忙碌，請再試一次！");
+        loadingDiv.classList.add('hidden');
+        document.getElementById('recognize-btn').disabled = false;
+        document.getElementById('clear-btn').disabled = false;
+    }
+}
+
+// 學生選擇「重寫」
+window.rewriteHandwriting = function() {
+    document.getElementById('hw-confirm-ui').classList.add('hidden');
+    initCanvas(); // 清空畫布
+    document.getElementById('recognize-btn').disabled = false;
+    document.getElementById('clear-btn').disabled = false;
+};
+
+// 👉 階段二：學生確認 LaTeX 正確，丟給 AI 進行邏輯批改
+window.confirmAndGrade = async function() {
+    document.getElementById('hw-confirm-ui').classList.add('hidden');
+    
+    const loadingDiv = document.getElementById('ai-loading');
+    loadingDiv.querySelector('p').innerHTML = "AI 老師正在進行數學邏輯批改...<br><span class='text-sm font-normal text-slate-500'>比對等價性中</span>";
+    loadingDiv.classList.remove('hidden');
+
     try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         
@@ -513,24 +599,25 @@ async function handleAIGrading() {
         tempDiv.innerHTML = correctOpt.text;
         let standardAns = tempDiv.textContent || tempDiv.innerText;
         
-        const promptText = `你是一位專業的香港中學數學老師。請辨識圖片中學生手寫的數學公式，並判斷其數學意義是否與標準答案「完全相等」（Mathematically Equivalent）。
+        const promptText = `你是一位專業的香港中學數學老師。請判斷學生的作答是否與標準答案「完全相等」（Mathematically Equivalent）。
 
 標準答案為：${standardAns}
+學生的答案為：${currentRecognizedLaTeX}
 
 規則：
-1. 學生可能會寫出等價的數學式（例如標準答案是 x^2+2x+1，學生寫 (x+1)^2，或者排版順序不同 1+2x+x^2）。只要數學上完全相等，就算是正確。
-2. 忽略微小的格式差異（例如多餘的括號）。
+1. 學生可能會寫出等價的數學式（例如 x^2+2x+1 與 (x+1)^2，或排版順序不同）。只要數學上完全相等，即算正確。
+2. 忽略微小的格式差異或多餘括號。
 3. 請務必以純 JSON 格式回傳，絕對不要包含任何 markdown 區塊（例如不要寫 \`\`\`json ）。
 
 回傳 JSON 格式：
 {
-  "recognizedLaTeX": "你辨識出學生的 LaTeX 語法",
   "isCorrect": true 或 false,
   "reason": "錯在哪裡？例如：符號錯了、漏了平方等。如果全對請回傳空字串。"
 }`;
 
+        // 階段二只需傳送純文字，不用耗費圖片資源
         const payload = {
-            contents: [{ role: "user", parts: [{ text: promptText }, { inlineData: { mimeType: "image/png", data: base64Image } }] }],
+            contents: [{ role: "user", parts: [{ text: promptText }] }],
             generationConfig: { responseMimeType: "application/json" }
         };
 
@@ -540,12 +627,12 @@ async function handleAIGrading() {
         textRes = textRes.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
         let aiResult = JSON.parse(textRes);
         
-        document.getElementById('ai-loading').classList.add('hidden');
+        loadingDiv.classList.add('hidden');
         
         attemptsCount++;
         let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
-            <div class="font-bold text-indigo-700 mb-2">🤖 AI 老師辨識你的手寫為：</div>
-            <div class="text-xl overflow-x-auto math-scroll py-2 bg-white rounded-lg border border-white text-center">\\( \\displaystyle ${aiResult.recognizedLaTeX} \\)</div>
+            <div class="font-bold text-indigo-700 mb-2">🤖 你的作答 (AI 辨識)：</div>
+            <div class="text-xl overflow-x-auto math-scroll py-2 bg-white rounded-lg border border-white text-center">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
             ${aiResult.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${aiResult.reason}</div>` : ''}
         </div>`;
         
@@ -555,8 +642,6 @@ async function handleAIGrading() {
             if (attemptsCount === 1) { score += 10; updateScoreDisplay(); }
             showFeedback('correct', finalHint, true);
             document.getElementById('handwritingArea').classList.add('border-4', 'border-green-500');
-            document.getElementById('clear-btn').disabled = true; 
-            document.getElementById('recognize-btn').disabled = true;
         } else {
             showFeedback('incorrect', finalHint, false);
             document.getElementById('handwritingArea').classList.add('border-4', 'border-red-400');
@@ -573,11 +658,11 @@ async function handleAIGrading() {
     } catch (err) {
         console.error(err);
         alert("網路異常或 AI 老師目前有點忙碌，請再試一次！");
-        document.getElementById('ai-loading').classList.add('hidden');
-        document.getElementById('recognize-btn').disabled = false;
-        document.getElementById('clear-btn').disabled = false;
+        loadingDiv.classList.add('hidden');
+        // 批改失敗時，再次叫出確認介面，讓學生能重新點擊遞交
+        document.getElementById('hw-confirm-ui').classList.remove('hidden');
     }
-}
+};
 
 // 讓學生選擇放棄手寫並看解析
 window.giveUpHandwriting = function() {
@@ -627,7 +712,6 @@ function showEndScreen() {
         rewardContainer.classList.remove('hidden');
         rewardContainer.innerHTML = `
             <div id="rewardZone" class="w-full bg-white border-2 border-indigo-100 rounded-xl p-5 shadow-sm relative overflow-hidden transition-all duration-500">
-                <!-- 進度條介面 -->
                 <div id="progressUI" class="block transition-opacity duration-500">
                     <div class="flex justify-between items-end mb-3">
                         <span class="font-bold text-slate-700 text-lg">🎁 刮刮卡解鎖進度</span>
@@ -643,7 +727,6 @@ function showEndScreen() {
                     </div>
                 </div>
 
-                <!-- 刮刮卡介面 (預設隱藏) -->
                 <div id="scratchUI" class="hidden opacity-0 transition-opacity duration-500">
                     <div class="relative w-full h-20 sm:h-24 rounded-xl overflow-hidden border-2 border-amber-200 shadow-sm" style="touch-action:none;">
                         <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-amber-50 to-orange-50 text-orange-600 font-bold px-4 text-center text-sm sm:text-base">🎁 <span id="rewardTextDisplay"></span></div>
