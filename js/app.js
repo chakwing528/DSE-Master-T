@@ -212,7 +212,9 @@ function assignHandwriting(bank) {
     indices = shuffleArray(indices).slice(0, hwCount);
     
     for (let i of indices) {
-        bank[i].isHandwriting = true;
+        if(bank[i]) {
+            bank[i].isHandwriting = true;
+        }
     }
 }
 
