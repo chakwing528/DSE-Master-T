@@ -5,7 +5,7 @@
 // ==========================================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
-// 🛑 終極大絕招版：前端不需要設定任何 API 金鑰，由後台全權代理！
+// 🟢 重新開啟 AI 手寫功能！
 const ENABLE_AI_HANDWRITING = true; 
 
 const motivationalQuotes = [
@@ -20,7 +20,8 @@ const fallbackConfigs = {
     'fractions': { name: '通分母', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '分母為一元一次<br>分子為常數。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S4', desc: '分母為一元二次<br>需先因式分解再通分母。' } ] },
     'binary': { name: '二進制', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '二進制轉十進制<br>只有加法。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '十進制轉二進制<br>只有加法。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '綜合轉換<br>包含加法與減法。' } ] },
     'expansion': { name: '恆等式的展開', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '展開 (x+a)² 或 (x+a)(x-a)<br>基礎展開。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '展開 (bx+a)² 或 (bx+a)(bx-a)<br>b 為正整數。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '展開 (bx+a)² 或 (bx+a)(bx-a)<br>a 與 b 皆可為負數。' } ] },
-    'alg_frac_mul_div': { name: '代數分式的乘除法', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '單項式乘除法<br>指數定律約簡' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2', desc: '二項式乘除法<br>提公因式與變號' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '進階因式分解<br>平方差與完全平方' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '進階因式分解<br>十字相乘法' } ] }
+    'alg_frac_mul_div': { name: '代數分式的乘除法', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '單項式乘除法<br>指數定律約簡' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2', desc: '二項式乘除法<br>提公因式與變號' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '進階因式分解<br>平方差與完全平方' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '進階因式分解<br>十字相乘法' } ] },
+    'triangle_area': { name: '三角形面積', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '包含 1/2absinC 及 希羅公式<br>考驗公式判別與計算。' } ] }
 };
 
 let questionBank = [];
@@ -229,7 +230,7 @@ function startGlobalMixed(level) {
         currentLevelPref = level;
         document.getElementById('questionInstruction').classList.add('hidden');
 
-        let topicsList = ['indices', 'factorization', 'rounding', 'identities', 'fractions', 'binary', 'expansion', 'alg_frac_mul_div'];
+        let topicsList = ['indices', 'factorization', 'rounding', 'identities', 'fractions', 'binary', 'expansion', 'alg_frac_mul_div', 'triangle_area'];
         let numQ = Math.max(totalQuestionsConfig, topicsList.length);
         let selectedTopics = [...topicsList];
         while (selectedTopics.length < numQ) selectedTopics.push(topicsList[Math.floor(Math.random() * topicsList.length)]);
@@ -251,6 +252,7 @@ function startGlobalMixed(level) {
             else if (t === 'binary') qArr = generateBinaryQuestions(1, lvl);
             else if (t === 'expansion') qArr = generateExpansionQuestions(1, lvl);
             else if (t === 'alg_frac_mul_div') qArr = generateAlgFracMulDivQuestions(1, lvl);
+            else if (t === 'triangle_area') qArr = generateTriangleAreaQuestions(1, lvl);
 
             if (qArr && qArr.length > 0) { qArr[0].id = idx + 1; questionBank.push(qArr[0]); }
         });
@@ -275,6 +277,7 @@ function startGame(levelPref) {
         else if (currentTopic === 'binary') questionBank = generateBinaryQuestions(totalQuestionsConfig, currentLevelPref);
         else if (currentTopic === 'expansion') questionBank = generateExpansionQuestions(totalQuestionsConfig, currentLevelPref);
         else if (currentTopic === 'alg_frac_mul_div') questionBank = generateAlgFracMulDivQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'triangle_area') questionBank = generateTriangleAreaQuestions(totalQuestionsConfig, currentLevelPref);
         
         assignHandwriting(questionBank);
         startQuizSession();
@@ -298,7 +301,7 @@ function startQuizSession() {
 
 function loadQuestion() {
     attemptsCount = 0; 
-    currentRecognizedLaTeX = ""; // 重置 AI 辨識字串
+    currentRecognizedLaTeX = ""; 
     
     const q = questionBank[currentQuestionIndex];
     document.getElementById('topicBadge').textContent = q.topic;
@@ -306,12 +309,10 @@ function loadQuestion() {
     document.getElementById('progressText').textContent = `完成 ${currentQuestionIndex}/${questionBank.length}`;
     hideFeedback();
     
-    // 隱藏可能殘留的確認介面
     if (document.getElementById('hw-confirm-ui')) {
         document.getElementById('hw-confirm-ui').classList.add('hidden');
     }
     
-    // UI 標記提示是否為手寫題
     let typeLabel = q.isHandwriting ? `<span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-sm font-bold align-middle mt-2 sm:mt-0 shadow-sm border border-amber-200">✍️ AI 手寫題</span>` : "";
     document.getElementById('questionText').innerHTML = q.question + `<div class="mt-2 text-center">${typeLabel}</div>`;
 
@@ -327,7 +328,6 @@ function loadQuestion() {
             document.getElementById('clear-btn').disabled = false;
             document.getElementById('recognize-btn').disabled = false;
             
-            // 延遲初始化畫布，確保 CSS 已經顯示正確的尺寸
             setTimeout(() => {
                 resizeCanvas();
                 initCanvas();
@@ -477,11 +477,9 @@ function setupCanvasEvents() {
         document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
     });
     
-    // 綁定兩階段的「階段一：影像辨識 OCR」
     document.getElementById('recognize-btn').addEventListener('click', startRecognitionPhase);
     window.addEventListener('resize', resizeCanvas);
     
-    // 動態生成確認介面 (Confirmation UI)
     const hwArea = document.getElementById('handwritingArea');
     const canvasContainer = hwArea.querySelector('.relative'); 
     if (!document.getElementById('hw-confirm-ui')) {
@@ -518,7 +516,6 @@ async function fetchWithRetry(url, options, maxRetries = 5) {
     }
 }
 
-// 👉 階段一：辨識圖像為 LaTeX (傳送給 server.gs 處理)
 async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     const dataURL = canvas.toDataURL('image/png');
@@ -537,7 +534,6 @@ async function startRecognitionPhase() {
         formData.append('action', 'ai_ocr');
         formData.append('image', base64Image);
 
-        // 將圖片發送給 Google Apps Script，由它去呼叫 Google AI
         const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
         
         if (!result.success) throw new Error(result.message);
@@ -567,7 +563,6 @@ window.rewriteHandwriting = function() {
     document.getElementById('clear-btn').disabled = false;
 };
 
-// 👉 階段二：學生確認後，丟給 server.gs 進行邏輯批改
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     
@@ -588,7 +583,6 @@ window.confirmAndGrade = async function() {
         formData.append('studentLatex', currentRecognizedLaTeX);
         formData.append('standardAns', standardAns);
 
-        // 將文字發送給 Google Apps Script，由它去呼叫 Google AI
         const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
         
         if (!result.success) throw new Error(result.message);
