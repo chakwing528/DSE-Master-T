@@ -482,17 +482,19 @@ function setupCanvasEvents() {
     
     const hwArea = document.getElementById('handwritingArea');
     const canvasContainer = hwArea.querySelector('.relative'); 
+    
+    // 🌟 重新升級確認介面：強調「第一階段轉換」與「老師(學生)確認」
     if (!document.getElementById('hw-confirm-ui')) {
         const confirmUI = document.createElement('div');
         confirmUI.id = 'hw-confirm-ui';
         confirmUI.className = 'hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all';
         confirmUI.innerHTML = `
-            <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 AI 辨識結果</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 步驟一：數式轉換確認</h3>
             <div id="hw-confirm-math" class="text-xl sm:text-2xl overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner text-slate-800"></div>
-            <p class="text-sm sm:text-base text-slate-600 font-bold mb-4">請問這是你寫的公式嗎？</p>
+            <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的手寫內容相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
             <div class="flex gap-3 w-full max-w-sm">
-                <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 辨識錯了</button>
-                <button onclick="confirmAndGrade()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md text-sm sm:text-base">✅ 正確，去批改</button>
+                <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新手寫</button>
+                <button onclick="confirmAndGrade()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md text-sm sm:text-base">✅ 確認並批改</button>
             </div>
         `;
         canvasContainer.appendChild(confirmUI);
@@ -518,11 +520,30 @@ async function fetchWithRetry(url, options, maxRetries = 5) {
 
 async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
-    const dataURL = canvas.toDataURL('image/png');
+    
+    // 🌟 終極修復：畫布自動壓縮與白底 JPEG 轉檔 (避免 Base64 撐爆 Google 伺服器)
+    const MAX_WIDTH = 800; // 限制最大寬度，減少體積
+    let scale = 1;
+    if (canvas.width > MAX_WIDTH) {
+        scale = MAX_WIDTH / canvas.width;
+    }
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width * scale;
+    tempCanvas.height = canvas.height * scale;
+    const ctx = tempCanvas.getContext('2d');
+
+    // 填上純白底色 (因為 JPEG 不支援透明，透明會變黑色導致 AI 瞎掉)
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    // 轉成壓縮率 0.8 的 JPEG，將大小從數 MB 瞬間壓縮至 50KB 以下
+    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
     const base64Image = dataURL.split(',')[1];
     
     const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 老師正在努力看懂你的筆跡...<br><span class='text-sm font-normal text-slate-500'>由伺服器代理中，請稍候</span>";
+    loadingDiv.querySelector('p').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>請稍候，轉換後需由你確認</span>";
     loadingDiv.classList.remove('hidden');
     
     document.getElementById('recognize-btn').disabled = true;
@@ -567,7 +588,7 @@ window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     
     const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 老師正在進行數學邏輯批改...<br><span class='text-sm font-normal text-slate-500'>比對等價性中</span>";
+    loadingDiv.querySelector('p').innerHTML = "AI 老師正在進行邏輯批改...<br><span class='text-sm font-normal text-slate-500'>比對等價性中</span>";
     loadingDiv.classList.remove('hidden');
 
     try {
