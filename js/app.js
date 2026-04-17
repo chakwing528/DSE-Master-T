@@ -1,11 +1,15 @@
 // js/app.js
 
 // ==========================================
-// 🚨 老師設定區：請填寫你最新部署的 Google Web App URL
+// 🚨 設定區
 // ==========================================
+// 1. 儲存成績的 Google Apps Script 網址 (維持不變)
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
-// 🟢 重新開啟 AI 手寫功能！
+// 2. 處理 AI 辨識的 Cloudflare Worker 網址 (請填入你的 Cloudflare Worker 網址)
+const CLOUDFLARE_WORKER_URL = "falling-field-afc7.chanchakw-csjss.workers.dev";
+
+// 🟢 開啟 AI 手寫功能
 const ENABLE_AI_HANDWRITING = true; 
 
 const motivationalQuotes = [
@@ -38,7 +42,6 @@ let globalLeaderboard = [];
 let currentLeaderboardHash = ""; 
 let isFetchingLock = false; 
 
-// 🌟 兩階段辨識所需的全域變數
 let currentRecognizedLaTeX = "";
 
 function getStoredData(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
@@ -203,10 +206,8 @@ function selectTopic(topic) {
     });
 }
 
-// 🌟 手寫題比例分配演算法
 function assignHandwriting(bank) {
     if (!ENABLE_AI_HANDWRITING) return; 
-
     let hwCount = 0;
     if (bank.length === 3) hwCount = 1;
     else if (bank.length === 5) hwCount = 2;
@@ -217,9 +218,7 @@ function assignHandwriting(bank) {
     indices = shuffleArray(indices).slice(0, hwCount);
     
     for (let i of indices) {
-        if(bank[i]) {
-            bank[i].isHandwriting = true;
-        }
+        if(bank[i]) { bank[i].isHandwriting = true; }
     }
 }
 
@@ -319,7 +318,6 @@ function loadQuestion() {
     const optionsGrid = document.getElementById('optionsGrid');
     const hwArea = document.getElementById('handwritingArea');
     
-    // 🌟 智能切換：手寫區 vs 選擇題區
     if (q.isHandwriting) {
         optionsGrid.classList.add('hidden');
         if (hwArea) {
@@ -327,16 +325,11 @@ function loadQuestion() {
             hwArea.classList.remove('border-4', 'border-green-500', 'border-red-400');
             document.getElementById('clear-btn').disabled = false;
             document.getElementById('recognize-btn').disabled = false;
-            
-            setTimeout(() => {
-                resizeCanvas();
-                initCanvas();
-            }, 50);
+            setTimeout(() => { resizeCanvas(); initCanvas(); }, 50);
         }
     } else {
         optionsGrid.classList.remove('hidden');
         if (hwArea) hwArea.classList.add('hidden');
-        
         optionsGrid.innerHTML = ''; 
         q.options.forEach(opt => {
             const btn = document.createElement('button');
@@ -349,7 +342,6 @@ function loadQuestion() {
     renderMath();
 }
 
-// 選擇題答題邏輯
 function handleAnswer(selectedOption, buttonElement) {
     attemptsCount++;
     if (selectedOption.isCorrect) {
@@ -408,18 +400,12 @@ function resizeCanvas() {
     
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
-    tempCanvas.width = canvas.width; 
-    tempCanvas.height = canvas.height;
-    if (canvas.width > 0 && canvas.height > 0) {
-        tempCtx.drawImage(canvas, 0, 0);
-    }
+    tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+    if (canvas.width > 0 && canvas.height > 0) { tempCtx.drawImage(canvas, 0, 0); }
     
-    canvas.width = rect.width; 
-    canvas.height = rect.height;
+    canvas.width = rect.width; canvas.height = rect.height;
     initCanvas();
-    if (tempCanvas.width > 0 && tempCanvas.height > 0) {
-        canvas.getContext('2d').drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-    }
+    if (tempCanvas.width > 0 && tempCanvas.height > 0) { canvas.getContext('2d').drawImage(tempCanvas, 0, 0, canvas.width, canvas.height); }
 }
 
 function getPos(e) {
@@ -429,61 +415,26 @@ function getPos(e) {
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    return { 
-        x: (clientX - rect.left) * scaleX, 
-        y: (clientY - rect.top) * scaleY 
-    };
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
 }
 
-function startDrawing(e) {
-    e.preventDefault(); 
-    isDrawing = true;
-    const pos = getPos(e); 
-    lastX = pos.x; 
-    lastY = pos.y;
-}
-
-function draw(e) {
-    if (!isDrawing) return; 
-    e.preventDefault();
-    const pos = getPos(e);
-    const ctx = document.getElementById('draw-canvas').getContext('2d');
-    ctx.beginPath(); 
-    ctx.moveTo(lastX, lastY); 
-    ctx.lineTo(pos.x, pos.y); 
-    ctx.stroke();
-    lastX = pos.x; 
-    lastY = pos.y;
-}
-
-function stopDrawing() { 
-    isDrawing = false; 
-}
+function startDrawing(e) { e.preventDefault(); isDrawing = true; const pos = getPos(e); lastX = pos.x; lastY = pos.y; }
+function draw(e) { if (!isDrawing) return; e.preventDefault(); const pos = getPos(e); const ctx = document.getElementById('draw-canvas').getContext('2d'); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(pos.x, pos.y); ctx.stroke(); lastX = pos.x; lastY = pos.y; }
+function stopDrawing() { isDrawing = false; }
 
 function setupCanvasEvents() {
     const canvas = document.getElementById('draw-canvas');
     if (!canvas) return;
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseout', stopDrawing);
-    canvas.addEventListener('touchstart', startDrawing, { passive: false });
-    canvas.addEventListener('touchmove', draw, { passive: false });
-    canvas.addEventListener('touchend', stopDrawing);
-    canvas.addEventListener('touchcancel', stopDrawing);
+    canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDrawing); canvas.addEventListener('mouseout', stopDrawing);
+    canvas.addEventListener('touchstart', startDrawing, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', stopDrawing); canvas.addEventListener('touchcancel', stopDrawing);
     
-    document.getElementById('clear-btn').addEventListener('click', () => {
-        initCanvas();
-        document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
-    });
-    
+    document.getElementById('clear-btn').addEventListener('click', () => { initCanvas(); document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400'); });
     document.getElementById('recognize-btn').addEventListener('click', startRecognitionPhase);
     window.addEventListener('resize', resizeCanvas);
     
     const hwArea = document.getElementById('handwritingArea');
     const canvasContainer = hwArea.querySelector('.relative'); 
     
-    // 🌟 重新升級確認介面：強調「第一階段轉換」與「老師(學生)確認」
     if (!document.getElementById('hw-confirm-ui')) {
         const confirmUI = document.createElement('div');
         confirmUI.id = 'hw-confirm-ui';
@@ -502,10 +453,10 @@ function setupCanvasEvents() {
 }
 
 // ==========================================
-// 🤖 終極大絕招：透過 Google Apps Script 後台代理呼叫 Gemini AI
+// 🤖 全新連線架構：使用 Cloudflare Worker 呼叫 AI
 // ==========================================
-async function fetchWithRetry(url, options, maxRetries = 5) {
-    let delays = [1000, 2000, 4000, 8000, 16000];
+async function fetchWithRetry(url, options, maxRetries = 3) {
+    let delays = [1000, 2000, 4000];
     for (let i = 0; i < maxRetries; i++) {
         try {
             const response = await fetch(url, options);
@@ -519,31 +470,30 @@ async function fetchWithRetry(url, options, maxRetries = 5) {
 }
 
 async function startRecognitionPhase() {
-    const canvas = document.getElementById('draw-canvas');
-    
-    // 🌟 終極修復：畫布自動壓縮與白底 JPEG 轉檔 (避免 Base64 撐爆 Google 伺服器)
-    const MAX_WIDTH = 800; // 限制最大寬度，減少體積
-    let scale = 1;
-    if (canvas.width > MAX_WIDTH) {
-        scale = MAX_WIDTH / canvas.width;
+    if (!CLOUDFLARE_WORKER_URL || CLOUDFLARE_WORKER_URL.includes("請在此貼上")) {
+        alert("⚠️ 尚未設定 Cloudflare Worker 網址，請先至 js/app.js 填寫！");
+        return;
     }
+
+    const canvas = document.getElementById('draw-canvas');
+    const MAX_WIDTH = 800; 
+    let scale = 1;
+    if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width * scale;
     tempCanvas.height = canvas.height * scale;
     const ctx = tempCanvas.getContext('2d');
 
-    // 填上純白底色 (因為 JPEG 不支援透明，透明會變黑色導致 AI 瞎掉)
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 轉成壓縮率 0.8 的 JPEG，將大小從數 MB 瞬間壓縮至 50KB 以下
     const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
     const base64Image = dataURL.split(',')[1];
     
     const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>請稍候，轉換後需由你確認</span>";
+    loadingDiv.querySelector('p').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>透過跨國安全通道處理中</span>";
     loadingDiv.classList.remove('hidden');
     
     document.getElementById('recognize-btn').disabled = true;
@@ -551,11 +501,13 @@ async function startRecognitionPhase() {
     document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
     
     try {
-        const formData = new URLSearchParams();
-        formData.append('action', 'ai_ocr');
-        formData.append('image', base64Image);
-
-        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+        // 直接向 Cloudflare 發送 JSON
+        const payload = { action: 'ai_ocr', image: base64Image };
+        const result = await fetchWithRetry(CLOUDFLARE_WORKER_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) 
+        });
         
         if (!result.success) throw new Error(result.message);
         
@@ -570,7 +522,7 @@ async function startRecognitionPhase() {
         
     } catch (err) {
         console.error(err);
-        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}\n\n請聯絡老師確認後台設定。`);
+        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}\n\n請檢查 Cloudflare 狀態。`);
         loadingDiv.classList.add('hidden');
         document.getElementById('recognize-btn').disabled = false;
         document.getElementById('clear-btn').disabled = false;
@@ -599,12 +551,13 @@ window.confirmAndGrade = async function() {
         tempDiv.innerHTML = correctOpt.text;
         let standardAns = tempDiv.textContent || tempDiv.innerText;
         
-        const formData = new URLSearchParams();
-        formData.append('action', 'ai_grade');
-        formData.append('studentLatex', currentRecognizedLaTeX);
-        formData.append('standardAns', standardAns);
-
-        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+        // 直接向 Cloudflare 發送 JSON
+        const payload = { action: 'ai_grade', studentLatex: currentRecognizedLaTeX, standardAns: standardAns };
+        const result = await fetchWithRetry(CLOUDFLARE_WORKER_URL, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload) 
+        });
         
         if (!result.success) throw new Error(result.message);
         
@@ -652,7 +605,7 @@ window.giveUpHandwriting = function() {
 };
 
 // ==========================================
-// 結算畫面與動態進度條生成
+// 結算畫面與成績儲存 (維持送往 GAS)
 // ==========================================
 function showEndScreen() {
     document.getElementById('appContainer').classList.add('hidden');
@@ -717,9 +670,6 @@ function showEndScreen() {
 
 function updateScoreDisplay() { document.getElementById('scoreDisplay').textContent = score; }
 
-// ==========================================
-// 安全嚴謹的傳送成績
-// ==========================================
 function submitToGoogleSheet() {
     const btn = document.getElementById('submitRecordBtn');
     const statusText = document.getElementById('submitStatus');
@@ -728,33 +678,23 @@ function submitToGoogleSheet() {
     const studentName = document.getElementById('studentName').value.trim();
 
     if (!className || !classNumber || !studentName) {
-        statusText.textContent = "⚠️ 請填寫所有資料"; 
-        statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; 
-        statusText.classList.remove('hidden'); 
-        return;
+        statusText.textContent = "⚠️ 請填寫所有資料"; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; statusText.classList.remove('hidden'); return;
     }
 
-    setStoredData('dse_className', className);
-    setStoredData('dse_classNumber', classNumber);
-    setStoredData('dse_studentName', studentName);
+    setStoredData('dse_className', className); setStoredData('dse_classNumber', classNumber); setStoredData('dse_studentName', studentName);
 
-    btn.disabled = true; btn.textContent = "傳送中..."; btn.classList.add('opacity-50');
-    statusText.classList.add('hidden');
+    btn.disabled = true; btn.textContent = "傳送中..."; btn.classList.add('opacity-50'); statusText.classList.add('hidden');
     
     let displayLevel = currentLevelPref === 'mixed' ? '綜合挑戰' : currentLevelPref.toString().toUpperCase();
     let totalScoreVal = questionBank.length * 10;
     let percentageVal = ((score / totalScoreVal) * 100).toFixed(0) + "%";
 
     const formData = new URLSearchParams();
-    formData.append('className', className);
-    formData.append('classNumber', classNumber);
-    formData.append('studentName', studentName);
-    formData.append('topic', currentTopicName); 
-    formData.append('level', `程度 ${displayLevel}`);
-    formData.append('score', score);
-    formData.append('totalScore', totalScoreVal);
-    formData.append('percentage', percentageVal);
+    formData.append('className', className); formData.append('classNumber', classNumber); formData.append('studentName', studentName);
+    formData.append('topic', currentTopicName); formData.append('level', `程度 ${displayLevel}`); formData.append('score', score);
+    formData.append('totalScore', totalScoreVal); formData.append('percentage', percentageVal);
 
+    // 成績依然傳給 Google Apps Script
     fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
         .then(response => response.json())
         .then(data => {
@@ -785,24 +725,14 @@ function submitToGoogleSheet() {
                 if (isCrossed) {
                     if (hint) hint.innerHTML = `<span class="text-amber-600 font-bold">🎉 恭喜達成滿百目標！正在解鎖刮刮卡...</span>`;
                     statusText.innerHTML = `✅ 成績傳送成功！(今日第 ${backendPlayCount} 次)<br>🎉 目前總分：${backendNewTotal} 分。邁向下一抽還差 <span class="text-indigo-600 font-bold">${100 - (backendNewTotal % 100)} 分</span>！`;
-                    
                     setTimeout(() => {
-                        const progUI = document.getElementById('progressUI');
-                        const scratchUI = document.getElementById('scratchUI');
-                        const rewardZone = document.getElementById('rewardZone');
-                        
+                        const progUI = document.getElementById('progressUI'); const scratchUI = document.getElementById('scratchUI'); const rewardZone = document.getElementById('rewardZone');
                         if (progUI && scratchUI && rewardZone) {
                             progUI.classList.add('opacity-0');
                             setTimeout(() => {
-                                progUI.classList.add('hidden');
-                                scratchUI.classList.remove('hidden');
-                                void scratchUI.offsetWidth; 
-                                scratchUI.classList.remove('opacity-0');
-                                rewardZone.classList.replace('border-indigo-100', 'border-amber-300');
-                                rewardZone.classList.replace('bg-white', 'bg-amber-50');
-                                
-                                let finalReward = data.reward && data.reward !== "無" ? data.reward : "再接再厲！";
-                                document.getElementById('rewardTextDisplay').textContent = finalReward;
+                                progUI.classList.add('hidden'); scratchUI.classList.remove('hidden'); void scratchUI.offsetWidth; scratchUI.classList.remove('opacity-0');
+                                rewardZone.classList.replace('border-indigo-100', 'border-amber-300'); rewardZone.classList.replace('bg-white', 'bg-amber-50');
+                                document.getElementById('rewardTextDisplay').textContent = data.reward && data.reward !== "無" ? data.reward : "再接再厲！";
                                 renderScratchCard();
                             }, 500);
                         }
@@ -812,22 +742,17 @@ function submitToGoogleSheet() {
                     statusText.innerHTML = `✅ 成績傳送成功！(今日第 ${backendPlayCount} 次)<br>📊 目前總分：${backendNewTotal} 分。`;
                 }
                 
-                statusText.className = "text-center text-sm font-bold mt-3 text-green-600 block leading-relaxed";
-                statusText.classList.remove('hidden');
-                btn.textContent = "✅ 已成功傳送！"; 
-                btn.classList.replace('bg-green-600', 'bg-slate-400');
-                
+                statusText.className = "text-center text-sm font-bold mt-3 text-green-600 block leading-relaxed"; statusText.classList.remove('hidden');
+                btn.textContent = "✅ 已成功傳送！"; btn.classList.replace('bg-green-600', 'bg-slate-400');
                 setTimeout(() => { fetchConfig(true); }, 2000);
             } else {
                 btn.disabled = false; btn.textContent = "重新傳送"; btn.classList.remove('opacity-50');
-                statusText.textContent = data.message; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block";
-                statusText.classList.remove('hidden');
+                statusText.textContent = data.message; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; statusText.classList.remove('hidden');
             }
         })
         .catch(err => {
             btn.disabled = false; btn.textContent = "重新傳送"; btn.classList.remove('opacity-50');
-            statusText.textContent = "❌ 傳送失敗，請檢查網路連線。"; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block";
-            statusText.classList.remove('hidden');
+            statusText.textContent = "❌ 傳送失敗，請檢查網路連線。"; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; statusText.classList.remove('hidden');
         });
 }
 
@@ -839,7 +764,6 @@ function renderScratchCard() {
     ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.font = 'bold 16px sans-serif'; ctx.fillStyle = '#64748b'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('✨ 刮開看獎勵 ✨', canvas.width / 2, canvas.height / 2);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = 25; ctx.globalCompositeOperation = 'destination-out';
-    
     let isDrawing = false;
     function getPos(e) { const rect = canvas.getBoundingClientRect(); const evt = e.touches ? e.touches[0] : e; return { x: evt.clientX - rect.left, y: evt.clientY - rect.top }; }
     canvas.onmousedown = (e) => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
@@ -852,35 +776,15 @@ function renderScratchCard() {
 
 function renderMath() {
     if (typeof renderMathInElement !== 'undefined') {
-        renderMathInElement(document.getElementById('main-wrapper'), { 
-            delimiters: [ {left: '$$', right: '$$', display: true}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false} ], 
-            throwOnError: false 
-        });
+        renderMathInElement(document.getElementById('main-wrapper'), { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false} ], throwOnError: false });
     }
 }
 
-window.setQuestionNum = setQuestionNum;
-window.showTopicScreen = showTopicScreen;
-window.backToLevelSelection = backToLevelSelection;
-window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz;
-window.closeConfirmModal = closeConfirmModal;
-window.confirmBackToLevelSelection = confirmBackToLevelSelection;
-window.selectTopic = selectTopic;
-window.startGame = startGame;
-window.startGlobalMixed = startGlobalMixed;
-window.submitToGoogleSheet = submitToGoogleSheet;
+window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
 
 window.onload = () => { 
-    showTopicScreen(); 
-    fetchConfig(); 
-    setInterval(() => fetchConfig(true), 5000); 
-
-    const savedClass = getStoredData('dse_className');
-    const savedNum = getStoredData('dse_classNumber');
-    const savedName = getStoredData('dse_studentName');
-    if(savedClass) document.getElementById('className').value = savedClass;
-    if(savedNum) document.getElementById('classNumber').value = savedNum;
-    if(savedName) document.getElementById('studentName').value = savedName;
-    
+    showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
+    const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
+    if(savedClass) document.getElementById('className').value = savedClass; if(savedNum) document.getElementById('classNumber').value = savedNum; if(savedName) document.getElementById('studentName').value = savedName;
     setupCanvasEvents();
 };
