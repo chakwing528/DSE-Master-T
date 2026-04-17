@@ -6,7 +6,7 @@
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
 // 🛑 目前關閉 AI 手寫功能：全系統以純 MC (選擇題) 模式穩定運作！
-const ENABLE_AI_HANDWRITING = false; 
+const ENABLE_AI_HANDWRITING = true; 
 
 const motivationalQuotes = [
     "未來的你，必定感激今天努力的自己。", "默默耕耘，總有收穫。", "答應自己，每天堅持多 1 分鐘。", "今天的累積，是明天的底氣。"
