@@ -5,10 +5,7 @@
 // ==========================================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
-// 🚨 AI 批改系統專用 API Key
-const apiKey = "AQ.Ab8RN6JrRo-3w2pJTlUuYKZCVEWJuAV5iu-OJGb5uNEFpogzkQ"; 
-
-// 🛑 手寫 AI 系統開關 (設定為 false 即可在沒有 API Key 的情況下以 100% 選擇題順暢運作)
+// 🛑 終極大絕招版：前端不需要設定任何 API 金鑰，由後台全權代理！
 const ENABLE_AI_HANDWRITING = true; 
 
 const motivationalQuotes = [
@@ -505,14 +502,14 @@ function setupCanvasEvents() {
 }
 
 // ==========================================
-// 🤖 兩階段 Gemini AI 智能閱卷系統
+// 🤖 終極大絕招：透過 Google Apps Script 後台代理呼叫 Gemini AI
 // ==========================================
 async function fetchWithRetry(url, options, maxRetries = 5) {
     let delays = [1000, 2000, 4000, 8000, 16000];
     for (let i = 0; i < maxRetries; i++) {
         try {
             const response = await fetch(url, options);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP 錯誤: ${response.status}`);
             return await response.json();
         } catch (error) {
             if (i === maxRetries - 1) throw error;
@@ -521,14 +518,14 @@ async function fetchWithRetry(url, options, maxRetries = 5) {
     }
 }
 
-// 👉 階段一：單純辨識圖像為 LaTeX
+// 👉 階段一：辨識圖像為 LaTeX (傳送給 server.gs 處理)
 async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     const dataURL = canvas.toDataURL('image/png');
     const base64Image = dataURL.split(',')[1];
     
     const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 老師正在努力看懂你的筆跡...<br><span class='text-sm font-normal text-slate-500'>這可能需要幾秒鐘</span>";
+    loadingDiv.querySelector('p').innerHTML = "AI 老師正在努力看懂你的筆跡...<br><span class='text-sm font-normal text-slate-500'>由伺服器代理中，請稍候</span>";
     loadingDiv.classList.remove('hidden');
     
     document.getElementById('recognize-btn').disabled = true;
@@ -536,27 +533,18 @@ async function startRecognitionPhase() {
     document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
     
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        
-        const promptText = `你是一個高精準度的數學 OCR 系統。請仔細辨識圖片中學生手寫的數學公式，並將其轉換為 LaTeX 格式。
-規則：
-1. 只回傳純粹的 LaTeX 語法。
-2. 絕對不要加上 Markdown 區塊標記（例如 \`\`\`latex）。
-3. 不要包含任何解釋、計算或額外的文字。
-4. 若有多行，請保留換行或使用適當的 LaTeX 環境。`;
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_ocr');
+        formData.append('image', base64Image);
 
-        const payload = {
-            contents: [{ role: "user", parts: [{ text: promptText }, { inlineData: { mimeType: "image/png", data: base64Image } }] }]
-        };
-
-        const result = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        // 將圖片發送給 Google Apps Script，由它去呼叫 Google AI
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
         
-        let latexRes = result.candidates[0].content.parts[0].text;
-        currentRecognizedLaTeX = latexRes.replace(/^```(latex|tex)?\n?/i, '').replace(/\n?```$/i, '').trim();
+        if (!result.success) throw new Error(result.message);
         
+        currentRecognizedLaTeX = result.latex;
         loadingDiv.classList.add('hidden');
         
-        // 顯示確認介面，讓學生校對
         const confirmUI = document.getElementById('hw-confirm-ui');
         const mathDiv = document.getElementById('hw-confirm-math');
         mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
@@ -565,22 +553,21 @@ async function startRecognitionPhase() {
         
     } catch (err) {
         console.error(err);
-        alert("網路異常或 AI 老師目前有點忙碌，請再試一次！");
+        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}\n\n請聯絡老師確認後台設定。`);
         loadingDiv.classList.add('hidden');
         document.getElementById('recognize-btn').disabled = false;
         document.getElementById('clear-btn').disabled = false;
     }
 }
 
-// 學生選擇「重寫」
 window.rewriteHandwriting = function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
-    initCanvas(); // 清空畫布
+    initCanvas(); 
     document.getElementById('recognize-btn').disabled = false;
     document.getElementById('clear-btn').disabled = false;
 };
 
-// 👉 階段二：學生確認 LaTeX 正確，丟給 AI 進行邏輯批改
+// 👉 階段二：學生確認後，丟給 server.gs 進行邏輯批改
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     
@@ -589,56 +576,35 @@ window.confirmAndGrade = async function() {
     loadingDiv.classList.remove('hidden');
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        
         let q = questionBank[currentQuestionIndex];
         let correctOpt = q.options.find(o => o.isCorrect);
         
-        // 萃取正確答案的純文字供 AI 參考
         let tempDiv = document.createElement('div');
         tempDiv.innerHTML = correctOpt.text;
         let standardAns = tempDiv.textContent || tempDiv.innerText;
         
-        const promptText = `你是一位專業的香港中學數學老師。請判斷學生的作答是否與標準答案「完全相等」（Mathematically Equivalent）。
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_grade');
+        formData.append('studentLatex', currentRecognizedLaTeX);
+        formData.append('standardAns', standardAns);
 
-標準答案為：${standardAns}
-學生的答案為：${currentRecognizedLaTeX}
-
-規則：
-1. 學生可能會寫出等價的數學式（例如 x^2+2x+1 與 (x+1)^2，或排版順序不同）。只要數學上完全相等，即算正確。
-2. 忽略微小的格式差異或多餘括號。
-3. 請務必以純 JSON 格式回傳，絕對不要包含任何 markdown 區塊（例如不要寫 \`\`\`json ）。
-
-回傳 JSON 格式：
-{
-  "isCorrect": true 或 false,
-  "reason": "錯在哪裡？例如：符號錯了、漏了平方等。如果全對請回傳空字串。"
-}`;
-
-        // 階段二只需傳送純文字，不用耗費圖片資源
-        const payload = {
-            contents: [{ role: "user", parts: [{ text: promptText }] }],
-            generationConfig: { responseMimeType: "application/json" }
-        };
-
-        const result = await fetchWithRetry(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        // 將文字發送給 Google Apps Script，由它去呼叫 Google AI
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
         
-        let textRes = result.candidates[0].content.parts[0].text;
-        textRes = textRes.replace(/^```json\n?/i, '').replace(/\n?```$/i, '').trim();
-        let aiResult = JSON.parse(textRes);
+        if (!result.success) throw new Error(result.message);
         
         loadingDiv.classList.add('hidden');
-        
         attemptsCount++;
+        
         let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
             <div class="font-bold text-indigo-700 mb-2">🤖 你的作答 (AI 辨識)：</div>
             <div class="text-xl overflow-x-auto math-scroll py-2 bg-white rounded-lg border border-white text-center">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
-            ${aiResult.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${aiResult.reason}</div>` : ''}
+            ${result.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${result.reason}</div>` : ''}
         </div>`;
         
         let finalHint = feedbackHtml + correctOpt.hint;
 
-        if (aiResult.isCorrect) {
+        if (result.isCorrect) {
             if (attemptsCount === 1) { score += 10; updateScoreDisplay(); }
             showFeedback('correct', finalHint, true);
             document.getElementById('handwritingArea').classList.add('border-4', 'border-green-500');
@@ -648,7 +614,6 @@ window.confirmAndGrade = async function() {
             document.getElementById('recognize-btn').disabled = false;
             document.getElementById('clear-btn').disabled = false;
             
-            // 如果答錯兩次或以上，給予放棄看答案的選擇
             if (attemptsCount >= 2) {
                 let giveUpHtml = `<div class="mt-4 text-center"><button onclick="giveUpHandwriting()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">放棄作答並看正確步驟</button></div>`;
                 document.getElementById('feedbackMessage').innerHTML += giveUpHtml;
@@ -657,18 +622,16 @@ window.confirmAndGrade = async function() {
         
     } catch (err) {
         console.error(err);
-        alert("網路異常或 AI 老師目前有點忙碌，請再試一次！");
+        alert(`⚠️ 批改失敗！\n\n詳細錯誤：${err.message}`);
         loadingDiv.classList.add('hidden');
-        // 批改失敗時，再次叫出確認介面，讓學生能重新點擊遞交
         document.getElementById('hw-confirm-ui').classList.remove('hidden');
     }
 };
 
-// 讓學生選擇放棄手寫並看解析
 window.giveUpHandwriting = function() {
     let q = questionBank[currentQuestionIndex];
     let correctOpt = q.options.find(o => o.isCorrect);
-    showFeedback('incorrect', correctOpt.hint, true); // true 代表顯示下一題按鈕
+    showFeedback('incorrect', correctOpt.hint, true); 
     document.getElementById('clear-btn').disabled = true;
     document.getElementById('recognize-btn').disabled = true;
 };
@@ -694,7 +657,6 @@ function showEndScreen() {
     }
     document.getElementById('motivationalQuote').textContent = selectedQuote.text;
     
-    // 計算目前的舊積分
     const savedClass = String(getStoredData('dse_className')).toUpperCase().trim();
     const savedNum = String(getStoredData('dse_classNumber')).trim();
     let oldScore = 0;
@@ -706,7 +668,6 @@ function showEndScreen() {
     let currentProgress = oldScore % 100;
     let nextThresholdDist = 100 - currentProgress;
 
-    // 將進度條準確渲染到 index.html 中預留的 placeholder
     let rewardContainer = document.getElementById('rewardContainer');
     if (rewardContainer) {
         rewardContainer.classList.remove('hidden');
@@ -742,7 +703,7 @@ function showEndScreen() {
 function updateScoreDisplay() { document.getElementById('scoreDisplay').textContent = score; }
 
 // ==========================================
-// 安全嚴謹的傳送成績 (支援無限次數與進度條動畫)
+// 安全嚴謹的傳送成績
 // ==========================================
 function submitToGoogleSheet() {
     const btn = document.getElementById('submitRecordBtn');
@@ -761,9 +722,6 @@ function submitToGoogleSheet() {
     setStoredData('dse_className', className);
     setStoredData('dse_classNumber', classNumber);
     setStoredData('dse_studentName', studentName);
-
-    const todayStr = new Date().toDateString();
-    let localCount = parseInt(getStoredData('dse_playCount_' + todayStr)) || 0;
 
     btn.disabled = true; btn.textContent = "傳送中..."; btn.classList.add('opacity-50');
     statusText.classList.add('hidden');
@@ -791,21 +749,16 @@ function submitToGoogleSheet() {
                 let isCrossed = data.crossedThreshold;
                 let officialName = data.officialName || studentName; 
                 
-                // 強制更新本地端排行榜快取，確保下一輪進度顯示精準
                 let student = globalLeaderboard.find(s => String(s.className).toUpperCase().trim() === className.toUpperCase() && String(s.classNum).trim() === classNumber);
-                if (student) { 
-                    student.totalScore = backendNewTotal; 
-                } else { 
-                    globalLeaderboard.push({className: className, classNum: classNumber, studentName: officialName, totalScore: backendNewTotal}); 
-                }
+                if (student) { student.totalScore = backendNewTotal; } 
+                else { globalLeaderboard.push({className: className, classNum: classNumber, studentName: officialName, totalScore: backendNewTotal}); }
                 renderLeaderboards();
 
-                // 計算最新進度
                 let pointsNeeded = 100 - (backendNewTotal % 100);
                 if (pointsNeeded === 0) pointsNeeded = 100;
                 
                 let targetProgress = backendNewTotal % 100;
-                if (isCrossed) targetProgress = 100; // 如果跨越門檻，先將動畫跑滿 100%
+                if (isCrossed) targetProgress = 100; 
                 
                 const fill = document.getElementById('progressBarFill');
                 const textUI = document.getElementById('progressTextUI');
@@ -818,7 +771,6 @@ function submitToGoogleSheet() {
                     if (hint) hint.innerHTML = `<span class="text-amber-600 font-bold">🎉 恭喜達成滿百目標！正在解鎖刮刮卡...</span>`;
                     statusText.innerHTML = `✅ 成績傳送成功！(今日第 ${backendPlayCount} 次)<br>🎉 目前總分：${backendNewTotal} 分。邁向下一抽還差 <span class="text-indigo-600 font-bold">${100 - (backendNewTotal % 100)} 分</span>！`;
                     
-                    // 延遲動畫，讓學生看完進度條填滿的爽快感，再翻轉為刮刮卡
                     setTimeout(() => {
                         const progUI = document.getElementById('progressUI');
                         const scratchUI = document.getElementById('scratchUI');
@@ -829,12 +781,11 @@ function submitToGoogleSheet() {
                             setTimeout(() => {
                                 progUI.classList.add('hidden');
                                 scratchUI.classList.remove('hidden');
-                                void scratchUI.offsetWidth; // 觸發重繪
+                                void scratchUI.offsetWidth; 
                                 scratchUI.classList.remove('opacity-0');
                                 rewardZone.classList.replace('border-indigo-100', 'border-amber-300');
                                 rewardZone.classList.replace('bg-white', 'bg-amber-50');
                                 
-                                // 顯示後台決定的獎勵
                                 let finalReward = data.reward && data.reward !== "無" ? data.reward : "再接再厲！";
                                 document.getElementById('rewardTextDisplay').textContent = finalReward;
                                 renderScratchCard();
@@ -916,6 +867,5 @@ window.onload = () => {
     if(savedNum) document.getElementById('classNumber').value = savedNum;
     if(savedName) document.getElementById('studentName').value = savedName;
     
-    // 初始化畫布監聽事件
     setupCanvasEvents();
 };
