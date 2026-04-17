@@ -7,7 +7,7 @@
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
 // 2. 處理 AI 辨識的 Cloudflare Worker 網址 (請填入你的 Cloudflare Worker 網址)
-const CLOUDFLARE_WORKER_URL = "falling-field-afc7.chanchakw-csjss.workers.dev";
+const CLOUDFLARE_WORKER_URL = "https://falling-field-afc7.chanchakw-csjss.workers.dev";
 
 // 🟢 開啟 AI 手寫功能
 const ENABLE_AI_HANDWRITING = true; 
