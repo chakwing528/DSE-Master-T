@@ -1,13 +1,10 @@
 // js/app.js
 
 // ==========================================
-// 🚨 設定區
+// 🚨 老師設定區
 // ==========================================
-// 1. 儲存成績的 Google Apps Script 網址 (維持不變)
+// 請填寫你最新部署的 Google Apps Script 網址 (V31)
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
-
-// 2. 處理 AI 辨識的 Cloudflare Worker 網址 (請填入你的 Cloudflare Worker 網址)
-const CLOUDFLARE_WORKER_URL = "https://falling-field-afc7.chanchakw-csjss.workers.dev";
 
 // 🟢 開啟 AI 手寫功能
 const ENABLE_AI_HANDWRITING = true; 
@@ -453,7 +450,7 @@ function setupCanvasEvents() {
 }
 
 // ==========================================
-// 🤖 全新連線架構：使用 Cloudflare Worker 呼叫 AI
+// 🤖 全新連線架構：使用 Google Apps Script (美國伺服器)
 // ==========================================
 async function fetchWithRetry(url, options, maxRetries = 3) {
     let delays = [1000, 2000, 4000];
@@ -470,12 +467,9 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
 }
 
 async function startRecognitionPhase() {
-    if (!CLOUDFLARE_WORKER_URL || CLOUDFLARE_WORKER_URL.includes("請在此貼上")) {
-        alert("⚠️ 尚未設定 Cloudflare Worker 網址，請先至 js/app.js 填寫！");
-        return;
-    }
-
     const canvas = document.getElementById('draw-canvas');
+    
+    // 前端畫布壓縮：將超高解析度圖片壓縮以確保傳送穩定
     const MAX_WIDTH = 800; 
     let scale = 1;
     if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
@@ -485,15 +479,17 @@ async function startRecognitionPhase() {
     tempCanvas.height = canvas.height * scale;
     const ctx = tempCanvas.getContext('2d');
 
+    // 填上純白底色 (JPEG 不支援透明)
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
+    // 轉成壓縮率 0.8 的 JPEG
     const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
     const base64Image = dataURL.split(',')[1];
     
     const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>透過跨國安全通道處理中</span>";
+    loadingDiv.querySelector('p').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>傳送至 Google 雲端處理中</span>";
     loadingDiv.classList.remove('hidden');
     
     document.getElementById('recognize-btn').disabled = true;
@@ -501,12 +497,14 @@ async function startRecognitionPhase() {
     document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
     
     try {
-        // 直接向 Cloudflare 發送 JSON
-        const payload = { action: 'ai_ocr', image: base64Image };
-        const result = await fetchWithRetry(CLOUDFLARE_WORKER_URL, { 
+        // 🌟 傳送給 Google Apps Script 進行 OCR 辨識
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_ocr');
+        formData.append('image', base64Image);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { 
             method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload) 
+            body: formData
         });
         
         if (!result.success) throw new Error(result.message);
@@ -522,7 +520,7 @@ async function startRecognitionPhase() {
         
     } catch (err) {
         console.error(err);
-        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}\n\n請檢查 Cloudflare 狀態。`);
+        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}`);
         loadingDiv.classList.add('hidden');
         document.getElementById('recognize-btn').disabled = false;
         document.getElementById('clear-btn').disabled = false;
@@ -551,12 +549,15 @@ window.confirmAndGrade = async function() {
         tempDiv.innerHTML = correctOpt.text;
         let standardAns = tempDiv.textContent || tempDiv.innerText;
         
-        // 直接向 Cloudflare 發送 JSON
-        const payload = { action: 'ai_grade', studentLatex: currentRecognizedLaTeX, standardAns: standardAns };
-        const result = await fetchWithRetry(CLOUDFLARE_WORKER_URL, { 
+        // 🌟 傳送給 Google Apps Script 進行 AI 邏輯批改
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_grade');
+        formData.append('studentLatex', currentRecognizedLaTeX);
+        formData.append('standardAns', standardAns);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { 
             method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload) 
+            body: formData
         });
         
         if (!result.success) throw new Error(result.message);
@@ -605,7 +606,7 @@ window.giveUpHandwriting = function() {
 };
 
 // ==========================================
-// 結算畫面與成績儲存 (維持送往 GAS)
+// 結算畫面與成績儲存
 // ==========================================
 function showEndScreen() {
     document.getElementById('appContainer').classList.add('hidden');
@@ -694,7 +695,6 @@ function submitToGoogleSheet() {
     formData.append('topic', currentTopicName); formData.append('level', `程度 ${displayLevel}`); formData.append('score', score);
     formData.append('totalScore', totalScoreVal); formData.append('percentage', percentageVal);
 
-    // 成績依然傳給 Google Apps Script
     fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
         .then(response => response.json())
         .then(data => {
