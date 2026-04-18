@@ -610,7 +610,7 @@ window.confirmAndGrade = async function() {
         
     } catch (err) {
         console.error(err);
-        alert(`⚠️ 批改失敗！\n\n詳細錯誤：${err.message}`);
+        alert(`⚠️ 批改失敗！\n\n詳細錯誤：${err.message}\n\n(若顯示 GAS 崩潰，請確認已部署最新版 server.gs)`);
         loadingDiv.classList.add('hidden');
         document.getElementById('hw-confirm-ui').classList.remove('hidden');
     }
