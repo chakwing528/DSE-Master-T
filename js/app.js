@@ -385,7 +385,7 @@ function initCanvas() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "black";
-    ctx.lineWidth = 5; // 🖌️ 筆觸由 3 加粗為 5，讓 AI 更容易看懂字跡
+    ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 }
@@ -470,8 +470,8 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
 async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     
-    // 🚀 前端畫布極限壓縮：提升傳輸速度與降低延遲
-    const MAX_WIDTH = 800; // 將最大寬度由 800 降至 400
+    // 前端畫布壓縮：回復至 800，讓 Pro 模型能看清楚長算式
+    const MAX_WIDTH = 800; 
     let scale = 1;
     if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
 
@@ -485,8 +485,8 @@ async function startRecognitionPhase() {
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 🚀 壓縮率由 0.8 降至 0.5，體積大幅減少，極速上傳
-    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.5);
+    // 轉成壓縮率 0.8 的 JPEG
+    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
     const base64Image = dataURL.split(',')[1];
     
     const loadingDiv = document.getElementById('ai-loading');
@@ -515,6 +515,16 @@ async function startRecognitionPhase() {
         
         const confirmUI = document.getElementById('hw-confirm-ui');
         const mathDiv = document.getElementById('hw-confirm-math');
+
+        // 🌟 新增：檢查是否降級並顯示警告
+        let existingWarning = document.getElementById('model-warning-ocr');
+        if (existingWarning) existingWarning.remove();
+
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-3 text-sm font-bold text-center shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，系統已自動降級使用「${result.usedModel}」。請檢查 Google Cloud 的 API 或帳單狀態。</div>`;
+            mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
+        }
+
         mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
         confirmUI.classList.remove('hidden');
         renderMath();
@@ -566,11 +576,18 @@ window.confirmAndGrade = async function() {
         loadingDiv.classList.add('hidden');
         attemptsCount++;
         
+        // 🌟 新增：檢查是否降級並組合警告
+        let warningHtml = "";
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+            warningHtml = `<div class="mt-3 text-red-700 font-bold border-t border-red-200 pt-3 bg-red-50 p-3 rounded-lg shadow-inner text-sm text-center">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，批改功能已降級使用「${result.usedModel}」。</div>`;
+        }
+
         // 🌟 UI 升級：讓批改結果的字體也完全同步題庫
         let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
             <div class="font-bold text-indigo-700 mb-2">🤖 你的作答 (AI 辨識)：</div>
             <div class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 bg-white rounded-lg border border-white text-center whitespace-nowrap shadow-inner">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
             ${result.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${result.reason}</div>` : ''}
+            ${warningHtml}
         </div>`;
         
         let finalHint = feedbackHtml + correctOpt.hint;
