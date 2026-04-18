@@ -471,7 +471,7 @@ async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     
     // 🚀 前端畫布極限壓縮：提升傳輸速度與降低延遲
-    const MAX_WIDTH = 400; // 將最大寬度由 800 降至 400
+    const MAX_WIDTH = 800; // 將最大寬度由 800 降至 400
     let scale = 1;
     if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
 
