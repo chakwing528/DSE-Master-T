@@ -385,7 +385,7 @@ function initCanvas() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "black";
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 5; // 🖌️ 筆觸由 3 加粗為 5，讓 AI 更容易看懂字跡
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 }
@@ -470,8 +470,8 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
 async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     
-    // 前端畫布壓縮：將超高解析度圖片壓縮以確保傳送穩定
-    const MAX_WIDTH = 800; 
+    // 🚀 前端畫布極限壓縮：提升傳輸速度與降低延遲
+    const MAX_WIDTH = 400; // 將最大寬度由 800 降至 400
     let scale = 1;
     if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
 
@@ -485,8 +485,8 @@ async function startRecognitionPhase() {
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 轉成壓縮率 0.8 的 JPEG
-    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
+    // 🚀 壓縮率由 0.8 降至 0.5，體積大幅減少，極速上傳
+    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.5);
     const base64Image = dataURL.split(',')[1];
     
     const loadingDiv = document.getElementById('ai-loading');
