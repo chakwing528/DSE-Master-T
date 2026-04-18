@@ -3,7 +3,7 @@
 // ==========================================
 // 🚨 老師設定區
 // ==========================================
-// 請填寫你最新部署的 Google Apps Script 網址 (V31)
+// 請填寫你最新部署的 Google Apps Script 網址
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
 // 🟢 開啟 AI 手寫功能
@@ -432,13 +432,14 @@ function setupCanvasEvents() {
     const hwArea = document.getElementById('handwritingArea');
     const canvasContainer = hwArea.querySelector('.relative'); 
     
+    // 🌟 UI 升級：將確認視窗的字體樣式完全同步於題庫 (加粗、深藍色)
     if (!document.getElementById('hw-confirm-ui')) {
         const confirmUI = document.createElement('div');
         confirmUI.id = 'hw-confirm-ui';
         confirmUI.className = 'hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all';
         confirmUI.innerHTML = `
             <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 步驟一：數式轉換確認</h3>
-            <div id="hw-confirm-math" class="text-xl sm:text-2xl overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner text-slate-800"></div>
+            <div id="hw-confirm-math" class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner whitespace-nowrap"></div>
             <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的手寫內容相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
             <div class="flex gap-3 w-full max-w-sm">
                 <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新手寫</button>
@@ -565,9 +566,10 @@ window.confirmAndGrade = async function() {
         loadingDiv.classList.add('hidden');
         attemptsCount++;
         
+        // 🌟 UI 升級：讓批改結果的字體也完全同步題庫
         let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
             <div class="font-bold text-indigo-700 mb-2">🤖 你的作答 (AI 辨識)：</div>
-            <div class="text-xl overflow-x-auto math-scroll py-2 bg-white rounded-lg border border-white text-center">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
+            <div class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 bg-white rounded-lg border border-white text-center whitespace-nowrap shadow-inner">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
             ${result.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${result.reason}</div>` : ''}
         </div>`;
         
