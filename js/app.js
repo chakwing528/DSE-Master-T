@@ -516,12 +516,13 @@ async function startRecognitionPhase() {
         const confirmUI = document.getElementById('hw-confirm-ui');
         const mathDiv = document.getElementById('hw-confirm-math');
 
-        // 🌟 新增：檢查是否降級並顯示警告
+        // 🌟 升級版：檢查降級並顯示詳細的偵錯紀錄 (X光)
         let existingWarning = document.getElementById('model-warning-ocr');
         if (existingWarning) existingWarning.remove();
 
         if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
-            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg mb-3 text-sm font-bold text-center shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，系統已自動降級使用「${result.usedModel}」。請檢查 Google Cloud 的 API 或帳單狀態。</div>`;
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 text-left block mt-1">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
             mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
         }
 
@@ -576,10 +577,11 @@ window.confirmAndGrade = async function() {
         loadingDiv.classList.add('hidden');
         attemptsCount++;
         
-        // 🌟 新增：檢查是否降級並組合警告
+        // 🌟 升級版：檢查降級並組合包含偵錯紀錄的警告
         let warningHtml = "";
         if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
-            warningHtml = `<div class="mt-3 text-red-700 font-bold border-t border-red-200 pt-3 bg-red-50 p-3 rounded-lg shadow-inner text-sm text-center">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，批改功能已降級使用「${result.usedModel}」。</div>`;
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 mt-1 block text-left">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            warningHtml = `<div class="mt-3 text-red-700 font-bold border-t border-red-200 pt-3 bg-red-50 p-3 rounded-lg shadow-inner text-sm text-center">⚠️ 批改降級警告：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
         }
 
         // 🌟 UI 升級：讓批改結果的字體也完全同步題庫
