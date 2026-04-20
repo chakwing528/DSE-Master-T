@@ -1,384 +1,906 @@
-<!DOCTYPE html>
-<html lang="zh-HK">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DSE 修練所</title>
-    
-    <!-- PWA Settings -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="DSE修練所">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="manifest" href="manifest.json">
+// js/app.js
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- KaTeX for Math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
-    
-    <style>
-        .math-scroll { overflow-x: auto; overflow-y: hidden; }
-        .math-scroll::-webkit-scrollbar { height: 6px; }
-        .math-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
-        /* 防止手寫畫布上的觸控滾動行為 */
-        #draw-canvas { touch-action: none; }
-    </style>
-</head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+// ==========================================
+// 🚨 老師設定區
+// ==========================================
+// 請填寫你最新部署的 Google Apps Script 網址
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
-    <main class="max-w-3xl mx-auto p-4 mt-6" id="main-wrapper">
+// 🟢 開啟 AI 手寫與鍵盤雙模輸入功能
+const ENABLE_AI_HANDWRITING = true; 
+
+const motivationalQuotes = [
+    "未來的你，必定感激今天努力的自己。", "默默耕耘，總有收穫。", "答應自己，每天堅持多 1 分鐘。", "今天的累積，是明天的底氣。"
+];
+
+const fallbackConfigs = {
+    'indices': { name: '指數定律', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S1', desc: '只有 1 個運算步驟<br>鞏固單一法則。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3', desc: '只有 2 個運算步驟<br>學習法則轉換。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '包含 2 個變數<br>嚴格只有 2 步。' } ] },
+    'factorization': { name: '因式分解', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '提公因式<br>學習抽出共同因子。' }, { id: 'L2A', title: '⭐⭐ 程度 2A', badge: 'S2', desc: '一元二次公式分解<br>單一變數完全平方與平方差。' }, { id: 'L2B', title: '⭐⭐ 程度 2B', badge: 'S2', desc: '二元二次公式分解<br>雙變數完全平方與平方差。' }, { id: 'L3A', title: '⭐⭐⭐ 程度 3A', badge: 'S3、DSE', desc: '一元二次因式分解<br>單變數十字相乘法。' }, { id: 'L3B', title: '⭐⭐⭐ 程度 3B', badge: 'S3、DSE', desc: '二元二次因式分解<br>包含雙變數的十字相乘。' } ] },
+    'rounding': { name: '近似值與捨入', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S1、DSE', desc: '基本捨入<br>小數點與有效數字的基本四捨五入。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S1、DSE', desc: '上捨入與下捨入<br>進階要求：強制進位或捨去。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S1、DSE', desc: '綜合應用<br>包含前導零小數及大整數陷阱。' } ] },
+    'identities': { name: '恆等式', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '展開與比較係數<br>基礎一元一次恆等式。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2、DSE', desc: '二次恆等式<br>進階代入與比較係數。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S2、DSE', desc: '比例問題<br>求取多個未知數的比例。' } ] },
+    'fractions': { name: '通分母', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '分母為一元一次<br>分子為常數。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S4', desc: '分母為一元二次<br>需先因式分解再通分母。' } ] },
+    'binary': { name: '二進制', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '二進制轉十進制<br>只有加法。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '十進制轉二進制<br>只有加法。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '綜合轉換<br>包含加法與減法。' } ] },
+    'expansion': { name: '恆等式的展開', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '展開 (x+a)² 或 (x+a)(x-a)<br>基礎展開。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '展開 (bx+a)² 或 (bx+a)(bx-a)<br>b 為正整數。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '展開 (bx+a)² 或 (bx+a)(bx-a)<br>a 與 b 皆可為負數。' } ] },
+    'alg_frac_mul_div': { name: '代數分式的乘除法', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '單項式乘除法<br>指數定律約簡' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2', desc: '二項式乘除法<br>提公因式與變號' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '進階因式分解<br>平方差與完全平方' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '進階因式分解<br>十字相乘法' } ] },
+    'triangle_area': { name: '三角形面積', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '包含 1/2absinC 及 希羅公式<br>考驗公式判別與計算。' } ] }
+};
+
+let questionBank = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let attemptsCount = 0; 
+let currentLevelPref = 1; 
+let currentTopic = 'indices'; 
+let currentTopicName = '指數定律';
+let totalQuestionsConfig = 3; 
+let dynamicQuotes = [];
+let dynamicTopicConfig = [];
+let globalLeaderboard = []; 
+let currentLeaderboardHash = ""; 
+let isFetchingLock = false; 
+
+let currentRecognizedLaTeX = "";
+
+function getStoredData(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
+function setStoredData(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
+async function fetchConfig(isSilent = false) {
+    if (isFetchingLock) return; 
+    try {
+        if (GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("請在此貼上")) {
+            const cacheBusterUrl = GOOGLE_SCRIPT_URL + (GOOGLE_SCRIPT_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+            const response = await fetch(cacheBusterUrl);
+            const data = await response.json();
+            
+            if (data && data.leaderboard) {
+                const newHash = JSON.stringify(data.leaderboard);
+                if (newHash !== currentLeaderboardHash) {
+                    globalLeaderboard = data.leaderboard;
+                    currentLeaderboardHash = newHash;
+                    renderLeaderboards(); 
+                }
+            } else if (currentLeaderboardHash !== "empty") {
+                globalLeaderboard = [];
+                currentLeaderboardHash = "empty";
+                renderLeaderboards();
+            }
+            if (data.topicConfig) dynamicTopicConfig = data.topicConfig;
+            if (data.quotes) dynamicQuotes = data.quotes;
+        }
+    } catch (e) {
+        if (!isSilent) console.warn("⚠️ 讀取設定失敗", e);
+        if (currentLeaderboardHash === "") {
+            globalLeaderboard = [];
+            currentLeaderboardHash = "error";
+            renderLeaderboards();
+        }
+    }
+}
+
+function renderLeaderboards(overrideClass = null, overrideNum = null) {
+    const homeContainer = document.getElementById('leaderboard-home-container');
+    const endContainer = document.getElementById('leaderboard-end-container');
+    const myRankHome = document.getElementById('my-rank-home');
+    const myRankEnd = document.getElementById('my-rank-end');
+
+    if (!globalLeaderboard || globalLeaderboard.length === 0) {
+        const emptyHtml = `<div class="col-span-full text-center py-6 text-slate-500 font-bold">目前尚無排名數據，或網路連線異常。</div>`;
+        if (homeContainer) homeContainer.innerHTML = emptyHtml;
+        if (endContainer) endContainer.innerHTML = emptyHtml;
         
-        <!-- ========================================== -->
-        <!-- 畫面 1：選擇課題 (首頁) -->
-        <!-- ========================================== -->
-        <div id="topicScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+        const myRankHtml = `<div class="bg-slate-50 border border-slate-200 p-3 rounded-lg text-center text-sm text-slate-500 shadow-sm mb-4">💡 遞交成績後，即可顯示專屬排名狀態。</div>`;
+        if (myRankHome) myRankHome.innerHTML = myRankHtml;
+        if (myRankEnd) myRankEnd.innerHTML = myRankHtml;
+        return;
+    }
+    
+    const currentUserClass = String(overrideClass || getStoredData('dse_className')).toUpperCase().trim();
+    const currentUserNum = String(overrideNum || getStoredData('dse_classNumber')).trim();
+
+    let html = '';
+    let userRank = -1;
+    let userScore = 0;
+    let userMatched = false;
+
+    globalLeaderboard.forEach((student, index) => {
+        const sClass = String(student.className).toUpperCase().trim();
+        const sNum = String(student.classNum).trim();
+        if (sClass === currentUserClass && sNum === currentUserNum && !userMatched) {
+            userRank = index + 1;
+            userScore = student.totalScore;
+            userMatched = true;
+        }
+    });
+
+    globalLeaderboard.slice(0, 20).forEach((student, index) => {
+        let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
+        const isHighestMe = (String(student.className).toUpperCase().trim() === currentUserClass && String(student.classNum).trim() === currentUserNum) && (index + 1 === userRank);
+
+        const bgClass = isHighestMe ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' : 'bg-white border-slate-100';
+        const textClass = isHighestMe ? 'text-amber-800' : 'text-slate-700';
+        const scoreClass = isHighestMe ? 'text-amber-700' : 'text-indigo-600';
+        const highlightBadge = isHighestMe ? `<span class="ml-2 text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full">你</span>` : '';
+
+        html += `<div class="flex justify-between items-center ${bgClass} p-3 rounded-lg border shadow-sm transition-all"><div class="flex items-center gap-2">${rankIcon}<span class="font-bold ${textClass}">${student.className} (${student.classNum}) ${student.studentName}${highlightBadge}</span></div><div class="${scoreClass} font-bold">${student.totalScore} 分</div></div>`;
+    });
+
+    if (homeContainer) homeContainer.innerHTML = html;
+    if (endContainer) endContainer.innerHTML = html;
+
+    let myRankHtml = '';
+    if (currentUserClass && currentUserNum) {
+        if (userRank !== -1) {
+            myRankHtml = `<div class="bg-amber-100 border border-amber-400 p-3 rounded-lg flex justify-between items-center shadow-sm mb-4"><span class="font-bold text-amber-800">👉 你的目前排名：第 ${userRank} 名</span><span class="text-amber-700 font-bold">${userScore} 分</span></div>`;
+        } else {
+            myRankHtml = `<div class="bg-slate-100 border border-slate-300 p-3 rounded-lg flex justify-between items-center shadow-sm mb-4"><span class="font-bold text-slate-600">👉 你的目前排名：未上榜</span><span class="text-slate-500 font-bold text-sm">繼續刷題累積積分吧！</span></div>`;
+        }
+    }
+    if (myRankHome) myRankHome.innerHTML = myRankHtml;
+    if (myRankEnd) myRankEnd.innerHTML = myRankHtml;
+}
+
+function setQuestionNum(num) {
+    totalQuestionsConfig = num;
+    document.querySelectorAll('.num-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+        btn.classList.add('bg-transparent', 'text-slate-600');
+    });
+    const activeBtn = document.getElementById('btn-num-' + num);
+    if (activeBtn) { activeBtn.classList.remove('bg-transparent', 'text-slate-600'); activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md'); }
+    if (document.getElementById('displayQNum')) document.getElementById('displayQNum').textContent = num;
+}
+
+function showTopicScreen() {
+    document.getElementById('topicScreen').classList.remove('hidden');
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('appContainer').classList.add('hidden');
+    document.getElementById('endScreen').classList.add('hidden');
+}
+
+function backToLevelSelection() {
+    document.getElementById('appContainer').classList.add('hidden');
+    document.getElementById('endScreen').classList.add('hidden');
+    if (currentTopic === 'global_mixed') showTopicScreen(); else selectTopic(currentTopic);
+}
+
+function backToLevelSelectionFromQuiz() { document.getElementById('confirmModal').classList.remove('hidden'); }
+function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
+function confirmBackToLevelSelection() { closeConfirmModal(); backToLevelSelection(); }
+
+function selectTopic(topic) {
+    currentTopic = topic;
+    document.getElementById('topicScreen').classList.add('hidden');
+    document.getElementById('startScreen').classList.remove('hidden');
+    
+    ['btnL1', 'btnL2', 'btnL3', 'btnL4', 'btnL2A', 'btnL2B', 'btnL3A', 'btnL3B'].forEach(id => {
+        if (document.getElementById(id)) document.getElementById(id).classList.add('hidden');
+    });
+
+    let config = fallbackConfigs[topic];
+    if (!config) return;
+    currentTopicName = config.name;
+    document.getElementById('levelTitle').textContent = config.name + ' - 請選擇難度';
+
+    config.levels.forEach(lvl => {
+        let title = lvl.title, badge = lvl.badge, desc = lvl.desc;
+        
+        if (typeof dynamicTopicConfig !== 'undefined' && dynamicTopicConfig.length > 0) {
+            let custom = dynamicTopicConfig.find(c => c.topic === topic && c.levelId === lvl.id);
+            if (custom) {
+                if (custom.title) title = custom.title;
+                if (custom.badge) badge = custom.badge;
+                if (custom.desc) desc = custom.desc;
+            }
+        }
+        
+        const btn = document.getElementById('btn' + lvl.id.toUpperCase());
+        if (btn) {
+            btn.classList.remove('hidden');
+            let colorClass = lvl.id.includes('1') ? 'bg-green-100 text-green-700' : (lvl.id.includes('2') ? 'bg-blue-100 text-blue-700' : (lvl.id.includes('3') ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'));
+            btn.querySelector('.font-bold').innerHTML = title + `<div class="mt-1"><span class="inline-block px-2 py-0.5 ${colorClass} text-xs rounded-md font-bold">${badge}</span></div>`;
+            btn.lastElementChild.innerHTML = desc;
+        }
+    });
+}
+
+function assignHandwriting(bank) {
+    if (!ENABLE_AI_HANDWRITING) return; 
+    let hwCount = 0;
+    if (bank.length === 3) hwCount = 1;
+    else if (bank.length === 5) hwCount = 2;
+    else if (bank.length === 10) hwCount = 5;
+    else if (bank.length > 0) hwCount = Math.floor(bank.length / 2);
+
+    let indices = Array.from({length: bank.length}, (_, i) => i);
+    indices = shuffleArray(indices).slice(0, hwCount);
+    
+    for (let i of indices) {
+        if(bank[i]) { bank[i].isHandwriting = true; }
+    }
+}
+
+function startGlobalMixed(level) {
+    try {
+        currentTopic = 'global_mixed';
+        currentTopicName = '跨課題綜合挑戰';
+        currentLevelPref = level;
+        document.getElementById('questionInstruction').classList.add('hidden');
+
+        let topicsList = ['indices', 'factorization', 'rounding', 'identities', 'fractions', 'binary', 'expansion', 'alg_frac_mul_div', 'triangle_area'];
+        let numQ = Math.max(totalQuestionsConfig, topicsList.length);
+        let selectedTopics = [...topicsList];
+        while (selectedTopics.length < numQ) selectedTopics.push(topicsList[Math.floor(Math.random() * topicsList.length)]);
+        selectedTopics = shuffleArray(selectedTopics);
+
+        questionBank = [];
+        selectedTopics.forEach((t, idx) => {
+            let qArr = [];
+            let lvl = String(level);
+            let supportedIds = fallbackConfigs[t].levels.map(l => l.id);
+            let maxSupported = supportedIds.some(id => id.includes('4')) ? 4 : (supportedIds.some(id => id.includes('3')) ? 3 : 2);
+            if (parseInt(lvl) > maxSupported) lvl = String(maxSupported);
             
-            <div class="flex justify-center items-center gap-3 mb-8">
-                <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">DSE 修練所 <span class="text-base sm:text-lg text-indigo-600 align-top ml-1">(Beta)</span></h1>
-            </div>
+            if (t === 'indices') qArr = generateIndicesQuestions(1, lvl);
+            else if (t === 'factorization') qArr = generateFactorizationQuestions(1, lvl);
+            else if (t === 'rounding') qArr = generateRoundingQuestions(1, lvl);
+            else if (t === 'identities') qArr = generateIdentitiesQuestions(1, lvl);
+            else if (t === 'fractions') qArr = generateFractionsQuestions(1, lvl);
+            else if (t === 'binary') qArr = generateBinaryQuestions(1, lvl);
+            else if (t === 'expansion') qArr = generateExpansionQuestions(1, lvl);
+            else if (t === 'alg_frac_mul_div') qArr = generateAlgFracMulDivQuestions(1, lvl);
+            else if (t === 'triangle_area') qArr = generateTriangleAreaQuestions(1, lvl);
 
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">請選擇練習課題</h2>
-            <p class="text-slate-500 mb-6">點擊下方按鈕進入該課題的難度選擇</p>
+            if (qArr && qArr.length > 0) { qArr[0].id = idx + 1; questionBank.push(qArr[0]); }
+        });
+
+        assignHandwriting(questionBank);
+        startQuizSession();
+    } catch (error) { alert("🚨 系統錯誤！無法讀取跨課題題庫。\n原因：" + error.message); }
+}
+
+function startGame(levelPref) {
+    try {
+        if (currentTopic === 'global_mixed') return startGlobalMixed(levelPref);
+
+        currentLevelPref = levelPref;
+        document.getElementById('questionInstruction').classList.add('hidden');
+        
+        if (currentTopic === 'indices') questionBank = generateIndicesQuestions(totalQuestionsConfig, currentLevelPref); 
+        else if (currentTopic === 'factorization') questionBank = generateFactorizationQuestions(totalQuestionsConfig, currentLevelPref); 
+        else if (currentTopic === 'rounding') questionBank = generateRoundingQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'identities') questionBank = generateIdentitiesQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'fractions') questionBank = generateFractionsQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'binary') questionBank = generateBinaryQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'expansion') questionBank = generateExpansionQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'alg_frac_mul_div') questionBank = generateAlgFracMulDivQuestions(totalQuestionsConfig, currentLevelPref);
+        else if (currentTopic === 'triangle_area') questionBank = generateTriangleAreaQuestions(totalQuestionsConfig, currentLevelPref);
+        
+        assignHandwriting(questionBank);
+        startQuizSession();
+    } catch (error) { alert("🚨 系統錯誤！無法讀取題庫。\n原因：" + error.message); }
+}
+
+function startQuizSession() {
+    currentQuestionIndex = 0; score = 0; updateScoreDisplay();
+    document.getElementById('topicScreen').classList.add('hidden');
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('endScreen').classList.add('hidden'); 
+    document.getElementById('appContainer').classList.remove('hidden');
+    
+    const btn = document.getElementById('submitRecordBtn');
+    btn.disabled = false; btn.textContent = "傳送成績";
+    btn.classList.remove('bg-slate-400'); btn.classList.add('bg-green-600');
+    document.getElementById('submitStatus').classList.add('hidden');
+
+    loadQuestion();
+}
+
+// 🌟 雙模切換邏輯
+window.switchInputMode = function(mode) {
+    const drawZone = document.getElementById('draw-input-zone');
+    const kbZone = document.getElementById('keyboard-input-zone');
+    const tabDraw = document.getElementById('tab-draw');
+    const tabKb = document.getElementById('tab-keyboard');
+    
+    if (mode === 'draw') {
+        drawZone.classList.remove('hidden');
+        kbZone.classList.add('hidden');
+        tabDraw.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+        tabKb.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
+        setTimeout(() => { resizeCanvas(); }, 50); 
+    } else {
+        drawZone.classList.add('hidden');
+        kbZone.classList.remove('hidden');
+        tabKb.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+        tabDraw.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
+    }
+};
+
+function loadQuestion() {
+    attemptsCount = 0; 
+    currentRecognizedLaTeX = ""; 
+    
+    const q = questionBank[currentQuestionIndex];
+    document.getElementById('topicBadge').textContent = q.topic;
+    document.getElementById('levelBadge').innerHTML = currentTopic === 'global_mixed' ? `綜合挑戰 (難度: ${currentLevelPref})` : `難度: ${q.level}`;
+    document.getElementById('progressText').textContent = `完成 ${currentQuestionIndex}/${questionBank.length}`;
+    hideFeedback();
+    
+    if (document.getElementById('hw-confirm-ui')) {
+        document.getElementById('hw-confirm-ui').classList.add('hidden');
+    }
+    
+    let typeLabel = q.isHandwriting ? `<span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-sm font-bold align-middle mt-2 sm:mt-0 shadow-sm border border-amber-200">🤖 AI 輔助作答</span>` : "";
+    document.getElementById('questionText').innerHTML = q.question + `<div class="mt-2 text-center">${typeLabel}</div>`;
+
+    const optionsGrid = document.getElementById('optionsGrid');
+    const hwArea = document.getElementById('handwritingArea');
+    
+    if (q.isHandwriting) {
+        optionsGrid.classList.add('hidden');
+        if (hwArea) {
+            hwArea.classList.remove('hidden');
             
-            <div class="space-y-6">
-                <!-- S1-S3 核心課題區塊 -->
-                <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
-                    <button onclick="selectTopic('indices')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-indigo-700 leading-tight">指數定律</div>
-                    </button>
-                    <button onclick="selectTopic('factorization')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-emerald-700 leading-tight">因式分解</div>
-                    </button>
-                    <button onclick="selectTopic('rounding')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-sky-500 hover:bg-sky-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-sky-700 leading-tight">近似值與捨入</div>
-                    </button>
-                    <button onclick="selectTopic('identities')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-purple-700 leading-tight">恆等式</div>
-                    </button>
-                    <button onclick="selectTopic('fractions')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-pink-500 hover:bg-pink-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-pink-700 leading-tight">通分母</div>
-                    </button>
-                    <button onclick="selectTopic('binary')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-teal-500 hover:bg-teal-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-teal-700 leading-tight">二進制</div>
-                    </button>
-                    <button onclick="selectTopic('expansion')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-rose-500 hover:bg-rose-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-rose-700 leading-tight">恆等式的展開</div>
-                    </button>
-                    <button onclick="selectTopic('alg_frac_mul_div')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-amber-700 leading-tight">代數分式乘除法</div>
-                    </button>
-                    <button onclick="selectTopic('triangle_area')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-lime-500 hover:bg-lime-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                        <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-lime-700 leading-tight">三角形面積</div>
-                    </button>
-                </div>
+            // 重置所有邊框與按鈕狀態
+            document.getElementById('draw-container').classList.remove('border-green-500', 'border-red-400');
+            document.getElementById('kb-container').classList.remove('border-green-500', 'border-red-400');
+            document.getElementById('clear-btn').disabled = false;
+            document.getElementById('recognize-btn').disabled = false;
+            document.getElementById('kb-clear-btn').disabled = false;
+            document.getElementById('kb-recognize-btn').disabled = false;
+            document.getElementById('keyboard-math-input').value = ""; // 清空文字
 
-                <!-- 跨課題綜合挑戰區塊 -->
-                <div class="max-w-2xl mx-auto mt-4">
-                    <button onclick="startGlobalMixed('mixed')" class="w-full py-4 px-4 bg-slate-800 text-white border-2 border-slate-800 rounded-xl hover:bg-slate-700 transition-all group shadow-md flex justify-center items-center gap-2">
-                        <span class="text-lg">🔥</span>
-                        <div class="text-base sm:text-lg font-bold leading-tight">隨機跨課題綜合挑戰 (Mixed)</div>
-                    </button>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-2">系統將從以上所有課題中隨機挑選題目，模擬真實考試情況。</p>
-                </div>
+            // 預設回到手寫模式
+            switchInputMode('draw');
+            setTimeout(() => { resizeCanvas(); initCanvas(); }, 50);
+        }
+    } else {
+        optionsGrid.classList.remove('hidden');
+        if (hwArea) hwArea.classList.add('hidden');
+        optionsGrid.innerHTML = ''; 
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn relative p-3 sm:p-4 bg-white border-2 border-slate-200 rounded-xl text-base sm:text-lg text-slate-700 font-medium hover:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-100 flex items-center gap-3 text-left w-full overflow-hidden';
+            btn.onclick = () => handleAnswer(opt, btn);
+            btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm shrink-0">${opt.id}</span><span class="overflow-x-auto math-scroll max-w-full flex-1 py-1">${opt.text}</span>`;
+            optionsGrid.appendChild(btn);
+        });
+    }
+    renderMath();
+}
+
+function handleAnswer(selectedOption, buttonElement) {
+    attemptsCount++;
+    if (selectedOption.isCorrect) {
+        buttonElement.classList.add('border-green-500', 'bg-green-50');
+        buttonElement.querySelector('span').classList.replace('bg-slate-100', 'bg-green-500');
+        buttonElement.querySelector('span').classList.replace('text-slate-500', 'text-white');
+        if (attemptsCount === 1) { score += 10; updateScoreDisplay(); }
+        showFeedback('correct', selectedOption.hint, true);
+        disableAllButtons();
+    } else {
+        buttonElement.classList.add('border-red-300', 'bg-red-50');
+        buttonElement.disabled = true;
+        showFeedback('incorrect', selectedOption.hint, false);
+    }
+}
+
+function showFeedback(type, message, showNextBtn) {
+    const fbArea = document.getElementById('feedbackArea');
+    const fbBox = document.getElementById('feedbackBox');
+    fbArea.classList.remove('hidden');
+    fbBox.className = type === 'correct' ? 'p-4 rounded-xl border bg-green-50 border-green-200 w-full overflow-hidden shadow-sm' : 'p-4 rounded-xl border bg-orange-50 border-orange-200 w-full overflow-hidden shadow-sm';
+    document.getElementById('feedbackMessage').innerHTML = message;
+    
+    const nextBtn = document.getElementById('nextBtn');
+    if (showNextBtn) { nextBtn.classList.remove('hidden'); nextBtn.onclick = goToNext; } else { nextBtn.classList.add('hidden'); }
+    renderMath();
+}
+
+function hideFeedback() { document.getElementById('feedbackArea').classList.add('hidden'); }
+function disableAllButtons() { document.querySelectorAll('.option-btn').forEach(btn => { if (!btn.classList.contains('border-green-500')) btn.disabled = true; }); }
+function goToNext() { currentQuestionIndex++; if (currentQuestionIndex < questionBank.length) loadQuestion(); else showEndScreen(); }
+
+// ==========================================
+// 🖌️ 畫布繪圖核心邏輯 (Canvas)
+// ==========================================
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+
+function initCanvas() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+}
+
+function resizeCanvas() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas || !canvas.parentElement) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
+    if (canvas.width > 0 && canvas.height > 0) { tempCtx.drawImage(canvas, 0, 0); }
+    
+    canvas.width = rect.width; canvas.height = rect.height;
+    initCanvas();
+    if (tempCanvas.width > 0 && tempCanvas.height > 0) { canvas.getContext('2d').drawImage(tempCanvas, 0, 0, canvas.width, canvas.height); }
+}
+
+function getPos(e) {
+    const canvas = document.getElementById('draw-canvas');
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+function startDrawing(e) { e.preventDefault(); isDrawing = true; const pos = getPos(e); lastX = pos.x; lastY = pos.y; }
+function draw(e) { if (!isDrawing) return; e.preventDefault(); const pos = getPos(e); const ctx = document.getElementById('draw-canvas').getContext('2d'); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(pos.x, pos.y); ctx.stroke(); lastX = pos.x; lastY = pos.y; }
+function stopDrawing() { isDrawing = false; }
+
+function setupCanvasEvents() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas) return;
+    canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDrawing); canvas.addEventListener('mouseout', stopDrawing);
+    canvas.addEventListener('touchstart', startDrawing, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', stopDrawing); canvas.addEventListener('touchcancel', stopDrawing);
+    
+    document.getElementById('clear-btn').addEventListener('click', () => { 
+        initCanvas(); 
+        document.getElementById('draw-container').classList.remove('border-green-500', 'border-red-400');
+    });
+    document.getElementById('recognize-btn').addEventListener('click', startRecognitionPhase);
+    
+    document.getElementById('kb-clear-btn').addEventListener('click', () => {
+        document.getElementById('keyboard-math-input').value = "";
+        document.getElementById('kb-container').classList.remove('border-green-500', 'border-red-400');
+    });
+    document.getElementById('kb-recognize-btn').addEventListener('click', startKeyboardRecognitionPhase);
+
+    window.addEventListener('resize', resizeCanvas);
+    
+    const inputContainer = document.getElementById('input-container'); 
+    
+    if (!document.getElementById('hw-confirm-ui')) {
+        const confirmUI = document.createElement('div');
+        confirmUI.id = 'hw-confirm-ui';
+        confirmUI.className = 'hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all rounded-xl border border-slate-200';
+        confirmUI.innerHTML = `
+            <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 步驟一：數式轉換確認</h3>
+            <div id="hw-confirm-math" class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner whitespace-nowrap"></div>
+            <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的輸入相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
+            <div class="flex gap-3 w-full max-w-sm">
+                <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新輸入</button>
+                <button onclick="confirmAndGrade()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md text-sm sm:text-base">✅ 確認並批改</button>
             </div>
+        `;
+        inputContainer.appendChild(confirmUI);
+    }
+}
 
-            <!-- 全局排行榜區塊 (整合入主畫面) -->
-            <div class="mt-12 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-2xl mx-auto">
-                <div class="bg-slate-50 border-b border-slate-200 p-4">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center justify-center gap-2">
-                        🏆 DSE 修練所英雄榜 (Top 20)
-                    </h3>
-                </div>
-                <div class="p-4">
-                    <div id="my-rank-home"></div>
-                    <div id="leaderboard-home-container" class="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                        <div class="text-center py-4 text-slate-500">連線中，請稍候...</div>
+// ==========================================
+// 🤖 全新連線架構：使用 Google Apps Script (美國伺服器)
+// ==========================================
+async function fetchWithRetry(url, options, maxRetries = 3) {
+    let delays = [1000, 2000, 4000];
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error(`HTTP 錯誤: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            await new Promise(resolve => setTimeout(resolve, delays[i]));
+        }
+    }
+}
+
+// 🌟 處理「手寫圖片」上傳
+async function startRecognitionPhase() {
+    const canvas = document.getElementById('draw-canvas');
+    
+    const MAX_WIDTH = 800; 
+    let scale = 1;
+    if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width * scale;
+    tempCanvas.height = canvas.height * scale;
+    const ctx = tempCanvas.getContext('2d');
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
+    const base64Image = dataURL.split(',')[1];
+    
+    const loadingDiv = document.getElementById('global-loading');
+    document.getElementById('global-loading-text').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>傳送至 Google 雲端處理中</span>";
+    loadingDiv.classList.remove('hidden');
+    
+    document.getElementById('recognize-btn').disabled = true;
+    document.getElementById('clear-btn').disabled = true;
+    document.getElementById('draw-container').classList.remove('border-green-500', 'border-red-400');
+    
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_ocr');
+        formData.append('image', base64Image);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { 
+            method: 'POST', 
+            body: formData
+        });
+        
+        if (!result.success) throw new Error(result.message);
+        
+        currentRecognizedLaTeX = result.latex;
+        loadingDiv.classList.add('hidden');
+        
+        const confirmUI = document.getElementById('hw-confirm-ui');
+        const mathDiv = document.getElementById('hw-confirm-math');
+
+        let existingWarning = document.getElementById('model-warning-ocr');
+        if (existingWarning) existingWarning.remove();
+
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 text-left block mt-1">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
+            mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
+        }
+
+        mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
+        confirmUI.classList.remove('hidden');
+        renderMath();
+        
+    } catch (err) {
+        console.error(err);
+        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}`);
+        loadingDiv.classList.add('hidden');
+        document.getElementById('recognize-btn').disabled = false;
+        document.getElementById('clear-btn').disabled = false;
+    }
+}
+
+// 🌟 處理「鍵盤文字」上傳
+async function startKeyboardRecognitionPhase() {
+    const kbInput = document.getElementById('keyboard-math-input').value.trim();
+    if (!kbInput) {
+        alert("請先輸入數學算式！");
+        return;
+    }
+    
+    const loadingDiv = document.getElementById('global-loading');
+    document.getElementById('global-loading-text').innerHTML = "AI 正在將文字轉換為標準數式...<br><span class='text-sm font-normal text-slate-500'>傳送至 Google 雲端處理中</span>";
+    loadingDiv.classList.remove('hidden');
+    
+    document.getElementById('kb-recognize-btn').disabled = true;
+    document.getElementById('kb-clear-btn').disabled = true;
+    document.getElementById('kb-container').classList.remove('border-green-500', 'border-red-400');
+    
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_text_to_latex');
+        formData.append('text', kbInput);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { 
+            method: 'POST', 
+            body: formData
+        });
+        
+        if (!result.success) throw new Error(result.message);
+        
+        currentRecognizedLaTeX = result.latex;
+        loadingDiv.classList.add('hidden');
+        
+        const confirmUI = document.getElementById('hw-confirm-ui');
+        const mathDiv = document.getElementById('hw-confirm-math');
+
+        let existingWarning = document.getElementById('model-warning-ocr');
+        if (existingWarning) existingWarning.remove();
+
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 text-left block mt-1">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
+            mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
+        }
+
+        mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
+        confirmUI.classList.remove('hidden');
+        renderMath();
+        
+    } catch (err) {
+        console.error(err);
+        alert(`⚠️ 轉換失敗！\n\n詳細錯誤：${err.message}`);
+        loadingDiv.classList.add('hidden');
+        document.getElementById('kb-recognize-btn').disabled = false;
+        document.getElementById('kb-clear-btn').disabled = false;
+    }
+}
+
+window.rewriteHandwriting = function() {
+    document.getElementById('hw-confirm-ui').classList.add('hidden');
+    initCanvas(); 
+    document.getElementById('recognize-btn').disabled = false;
+    document.getElementById('clear-btn').disabled = false;
+    document.getElementById('kb-recognize-btn').disabled = false;
+    document.getElementById('kb-clear-btn').disabled = false;
+};
+
+window.confirmAndGrade = async function() {
+    document.getElementById('hw-confirm-ui').classList.add('hidden');
+    
+    const loadingDiv = document.getElementById('global-loading');
+    document.getElementById('global-loading-text').innerHTML = "AI 老師正在進行邏輯批改...<br><span class='text-sm font-normal text-slate-500'>比對等價性中</span>";
+    loadingDiv.classList.remove('hidden');
+
+    try {
+        let q = questionBank[currentQuestionIndex];
+        let correctOpt = q.options.find(o => o.isCorrect);
+        
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = correctOpt.text;
+        let standardAns = tempDiv.textContent || tempDiv.innerText;
+        
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_grade');
+        formData.append('studentLatex', currentRecognizedLaTeX);
+        formData.append('standardAns', standardAns);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { 
+            method: 'POST', 
+            body: formData
+        });
+        
+        if (!result.success) throw new Error(result.message);
+        
+        loadingDiv.classList.add('hidden');
+        attemptsCount++;
+        
+        let warningHtml = "";
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 mt-1 block text-left">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            warningHtml = `<div class="mt-3 text-red-700 font-bold border-t border-red-200 pt-3 bg-red-50 p-3 rounded-lg shadow-inner text-sm text-center">⚠️ 批改降級警告：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
+        }
+
+        let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
+            <div class="font-bold text-indigo-700 mb-2">🤖 你的作答 (AI 辨識)：</div>
+            <div class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 bg-white rounded-lg border border-white text-center whitespace-nowrap shadow-inner">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
+            ${result.reason ? `<div class="mt-3 text-red-600 font-bold border-t border-indigo-100 pt-2">💡 老師點評：${result.reason}</div>` : ''}
+            ${warningHtml}
+        </div>`;
+        
+        let finalHint = feedbackHtml + correctOpt.hint;
+
+        if (result.isCorrect) {
+            if (attemptsCount === 1) { score += 10; updateScoreDisplay(); }
+            showFeedback('correct', finalHint, true);
+            document.getElementById('draw-container').classList.add('border-green-500');
+            document.getElementById('kb-container').classList.add('border-green-500');
+        } else {
+            showFeedback('incorrect', finalHint, false);
+            document.getElementById('draw-container').classList.add('border-red-400');
+            document.getElementById('kb-container').classList.add('border-red-400');
+            document.getElementById('recognize-btn').disabled = false;
+            document.getElementById('clear-btn').disabled = false;
+            document.getElementById('kb-recognize-btn').disabled = false;
+            document.getElementById('kb-clear-btn').disabled = false;
+            
+            if (attemptsCount >= 2) {
+                let giveUpHtml = `<div class="mt-4 text-center"><button onclick="giveUpHandwriting()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">放棄作答並看正確步驟</button></div>`;
+                document.getElementById('feedbackMessage').innerHTML += giveUpHtml;
+            }
+        }
+        
+    } catch (err) {
+        console.error(err);
+        alert(`⚠️ 批改失敗！\n\n詳細錯誤：${err.message}\n\n(若顯示 GAS 崩潰，請確認已部署最新版 server.gs)`);
+        loadingDiv.classList.add('hidden');
+        document.getElementById('hw-confirm-ui').classList.remove('hidden');
+    }
+};
+
+window.giveUpHandwriting = function() {
+    let q = questionBank[currentQuestionIndex];
+    let correctOpt = q.options.find(o => o.isCorrect);
+    showFeedback('incorrect', correctOpt.hint, true); 
+    document.getElementById('clear-btn').disabled = true;
+    document.getElementById('recognize-btn').disabled = true;
+    document.getElementById('kb-recognize-btn').disabled = true;
+    document.getElementById('kb-clear-btn').disabled = true;
+};
+
+// ==========================================
+// 結算畫面與成績儲存
+// ==========================================
+function showEndScreen() {
+    document.getElementById('appContainer').classList.add('hidden');
+    document.getElementById('endScreen').classList.remove('hidden');
+    document.getElementById('finalScore').textContent = score;
+    document.getElementById('totalQuestions').textContent = questionBank.length * 10;
+    
+    let selectedQuote = { text: "今天的累積，是明天的底氣。" };
+    let pool = dynamicQuotes.length > 0 ? dynamicQuotes : motivationalQuotes.map(q => ({text: q, weight: 1}));
+    
+    let totalWeight = pool.reduce((sum, q) => sum + (parseFloat(q.weight) || 1), 0);
+    let randomNum = Math.random() * totalWeight;
+    for (let q of pool) {
+        let w = parseFloat(q.weight) || 1;
+        if (randomNum < w) { selectedQuote = q; break; }
+        randomNum -= w;
+    }
+    document.getElementById('motivationalQuote').textContent = selectedQuote.text;
+    
+    const savedClass = String(getStoredData('dse_className')).toUpperCase().trim();
+    const savedNum = String(getStoredData('dse_classNumber')).trim();
+    let oldScore = 0;
+    if (savedClass && savedNum && globalLeaderboard && globalLeaderboard.length > 0) {
+        let student = globalLeaderboard.find(s => String(s.className).toUpperCase().trim() === savedClass && String(s.classNum).trim() === savedNum);
+        if (student) oldScore = student.totalScore;
+    }
+    
+    let currentProgress = oldScore % 100;
+    let nextThresholdDist = 100 - currentProgress;
+
+    let rewardContainer = document.getElementById('rewardContainer');
+    if (rewardContainer) {
+        rewardContainer.classList.remove('hidden');
+        rewardContainer.innerHTML = `
+            <div id="rewardZone" class="w-full bg-white border-2 border-indigo-100 rounded-xl p-5 shadow-sm relative overflow-hidden transition-all duration-500">
+                <div id="progressUI" class="block transition-opacity duration-500">
+                    <div class="flex justify-between items-end mb-3">
+                        <span class="font-bold text-slate-700 text-lg">🎁 刮刮卡解鎖進度</span>
+                        <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md" id="progressTextUI">${currentProgress} / 100</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-5 mb-2 overflow-hidden border border-slate-200 shadow-inner relative">
+                        <div id="progressBarFill" class="bg-gradient-to-r from-indigo-400 to-indigo-600 h-5 rounded-full transition-all duration-1000 ease-out relative" style="width: ${currentProgress}%">
+                            <div class="absolute inset-0 bg-white/20 w-full h-full animate-[pulse_2s_infinite]"></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-500 text-center mt-3 font-medium" id="progressHint">
+                        還差 <span class="text-indigo-600 font-bold">${nextThresholdDist} 分</span> 即可獲得抽獎機會！傳送成績後更新進度。
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- ========================================== -->
-        <!-- 畫面 2：選擇難度 (Start Screen) -->
-        <!-- ========================================== -->
-        <div id="startScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center hidden relative">
-            <button onclick="showTopicScreen()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 transition-colors p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-            </button>
-            <h2 id="levelTitle" class="text-2xl font-bold text-slate-800 mb-6">請選擇難度</h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto mb-8">
-                <!-- 一般難度 -->
-                <button id="btnL1" onclick="startGame(1)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐ 程度 1</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-                <button id="btnL2" onclick="startGame(2)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐ 程度 2</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-                <button id="btnL3" onclick="startGame(3)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐ 程度 3</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-                <button id="btnL4" onclick="startGame(4)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐⭐ 程度 4</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-
-                <!-- 細分難度 (用於因式分解) -->
-                <button id="btnL2A" onclick="startGame('2a')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐ 程度 2A</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-                <button id="btnL2B" onclick="startGame('2b')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐ 程度 2B</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-                <button id="btnL3A" onclick="startGame('3a')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐ 程度 3A</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
-                <button id="btnL3B" onclick="startGame('3b')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors hidden">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐ 程度 3B</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
-                </button>
+                <div id="scratchUI" class="hidden opacity-0 transition-opacity duration-500">
+                    <div class="relative w-full h-20 sm:h-24 rounded-xl overflow-hidden border-2 border-amber-200 shadow-sm" style="touch-action:none;">
+                        <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-amber-50 to-orange-50 text-orange-600 font-bold px-4 text-center text-sm sm:text-base">🎁 <span id="rewardTextDisplay"></span></div>
+                        <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full z-10 cursor-pointer"></canvas>
+                    </div>
+                    <div class="text-xs sm:text-sm text-amber-600 mt-3 text-center font-bold animate-pulse">✨ 恭喜達成滿百目標，快刮開上方塗層看看！✨</div>
+                </div>
             </div>
-            
-            <div id="questionInstruction" class="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl hidden">
-                <p class="text-slate-600">系統將自動產生 <span id="displayQNum" class="font-bold text-indigo-600">3</span> 條題目供你練習。</p>
-            </div>
+        `;
+    }
+}
 
-            <div class="flex justify-center gap-2 items-center text-sm mb-4">
-                <span class="text-slate-500 mr-2 font-medium">題數設定：</span>
-                <button id="btn-num-3" onclick="setQuestionNum(3)" class="num-btn px-4 py-2 rounded-lg font-bold bg-indigo-600 text-white shadow-md transition-colors">3 題</button>
-                <button id="btn-num-5" onclick="setQuestionNum(5)" class="num-btn px-4 py-2 rounded-lg font-bold bg-transparent text-slate-600 border border-slate-300 hover:bg-slate-100 transition-colors">5 題</button>
-                <button id="btn-num-10" onclick="setQuestionNum(10)" class="num-btn px-4 py-2 rounded-lg font-bold bg-transparent text-slate-600 border border-slate-300 hover:bg-slate-100 transition-colors">10 題</button>
-            </div>
-        </div>
+function updateScoreDisplay() { document.getElementById('scoreDisplay').textContent = score; }
 
-        <!-- ========================================== -->
-        <!-- 畫面 3：答題區 (App Container) -->
-        <!-- ========================================== -->
-        <div id="appContainer" class="hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8">
+function submitToGoogleSheet() {
+    const btn = document.getElementById('submitRecordBtn');
+    const statusText = document.getElementById('submitStatus');
+    const className = document.getElementById('className').value.trim();
+    const classNumber = document.getElementById('classNumber').value.trim();
+    const studentName = document.getElementById('studentName').value.trim();
+
+    if (!className || !classNumber || !studentName) {
+        statusText.textContent = "⚠️ 請填寫所有資料"; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; statusText.classList.remove('hidden'); return;
+    }
+
+    setStoredData('dse_className', className); setStoredData('dse_classNumber', classNumber); setStoredData('dse_studentName', studentName);
+
+    btn.disabled = true; btn.textContent = "傳送中..."; btn.classList.add('opacity-50'); statusText.classList.add('hidden');
+    
+    let displayLevel = currentLevelPref === 'mixed' ? '綜合挑戰' : currentLevelPref.toString().toUpperCase();
+    let totalScoreVal = questionBank.length * 10;
+    let percentageVal = ((score / totalScoreVal) * 100).toFixed(0) + "%";
+
+    const formData = new URLSearchParams();
+    formData.append('className', className); formData.append('classNumber', classNumber); formData.append('studentName', studentName);
+    formData.append('topic', currentTopicName); formData.append('level', `程度 ${displayLevel}`); formData.append('score', score);
+    formData.append('totalScore', totalScoreVal); formData.append('percentage', percentageVal);
+
+    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                let backendNewTotal = parseInt(data.newTotalScore) || 0;
+                let backendPlayCount = parseInt(data.playCountToday) || 1;
+                let isCrossed = data.crossedThreshold;
+                let officialName = data.officialName || studentName; 
                 
-                <!-- 確認返回彈窗 -->
-                <div id="confirmModal" class="hidden absolute inset-0 bg-slate-900/50 z-50 flex items-center justify-center rounded-2xl">
-                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full mx-4 border border-slate-100">
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">確定要離開嗎？</h3>
-                        <p class="text-slate-600 mb-6">目前的作答進度將不會被保留，成績也不會上傳。</p>
-                        <div class="flex gap-3 justify-end">
-                            <button onclick="closeConfirmModal()" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">取消</button>
-                            <button onclick="confirmBackToLevelSelection()" class="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors shadow-sm">確定離開</button>
-                        </div>
-                    </div>
-                </div>
+                let student = globalLeaderboard.find(s => String(s.className).toUpperCase().trim() === className.toUpperCase() && String(s.classNum).trim() === classNumber);
+                if (student) { student.totalScore = backendNewTotal; } 
+                else { globalLeaderboard.push({className: className, classNum: classNumber, studentName: officialName, totalScore: backendNewTotal}); }
+                renderLeaderboards();
 
-                <div class="flex justify-between items-center mb-4">
-                    <button onclick="backToLevelSelectionFromQuiz()" class="text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1 group">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                        <span class="text-sm font-medium">放棄作答</span>
-                    </button>
-                </div>
-
-                <!-- 答題 Header -->
-                <div class="flex justify-between items-start mb-6 border-b border-slate-100 pb-4">
-                    <div class="flex flex-col gap-2">
-                        <span id="topicBadge" class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold w-max">
-                            課題載入中...
-                        </span>
-                        <span id="levelBadge" class="text-slate-500 font-medium text-sm ml-1">
-                            難度: 載入中...
-                        </span>
-                    </div>
-                    
-                    <div class="text-right">
-                        <div id="progressText" class="text-slate-500 font-bold text-base mb-1">
-                            完成 0/3
-                        </div>
-                        <div class="text-indigo-600 font-bold text-lg bg-indigo-50 px-3 py-1 rounded-lg inline-block shadow-sm">
-                            分數: <span id="scoreDisplay">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="questionContainer" class="mb-8">
-                    <!-- 題目顯示區 -->
-                    <div id="questionText" class="w-full text-center"></div>
-                    
-                    <!-- 智能切換：選擇題區 vs 雙模輸入區 -->
-                    
-                    <!-- 選擇題區塊 -->
-                    <div id="optionsGrid" class="grid grid-cols-1 gap-3 sm:gap-4 mt-6"></div>
-
-                    <!-- 雙模輸入區塊 (手寫/鍵盤) -->
-                    <div id="handwritingArea" class="hidden mt-6 flex flex-col items-center w-full">
-                        
-                        <!-- 模式切換標籤 -->
-                        <div class="flex w-full max-w-[500px] mb-3 bg-slate-200 p-1 rounded-lg">
-                            <button id="tab-draw" onclick="switchInputMode('draw')" class="flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all">✍️ 手寫輸入</button>
-                            <button id="tab-keyboard" onclick="switchInputMode('keyboard')" class="flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all">⌨️ 鍵盤輸入</button>
-                        </div>
-
-                        <!-- 容器區塊 (設定 relative 讓確認視窗與 Loading 可以蓋住整個區域) -->
-                        <div id="input-container" class="w-full max-w-[500px] relative">
-                            
-                            <!-- ✍️ 手寫區 -->
-                            <div id="draw-input-zone" class="w-full flex flex-col items-center">
-                                <div id="draw-container" class="w-full border-4 border-slate-300 rounded-xl overflow-hidden shadow-inner relative h-64 sm:h-72 touch-none bg-white transition-colors">
-                                    <canvas id="draw-canvas" class="absolute inset-0 w-full h-full cursor-crosshair touch-none"></canvas>
-                                </div>
-                                <div class="flex gap-4 mt-4 w-full">
-                                    <button id="clear-btn" class="flex-1 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">清除重畫</button>
-                                    <button id="recognize-btn" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md flex justify-center items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                        辨識並提交
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- ⌨️ 鍵盤區 -->
-                            <div id="keyboard-input-zone" class="w-full flex flex-col items-center hidden">
-                                <div id="kb-container" class="w-full border-4 border-slate-300 rounded-xl overflow-hidden shadow-inner relative p-4 bg-slate-50 h-64 sm:h-72 flex flex-col transition-colors">
-                                    <label class="block text-sm font-bold text-slate-600 mb-2">請使用鍵盤輸入數式：</label>
-                                    <textarea id="keyboard-math-input" placeholder="例如：(x-2)(x+3) 或 3x^2/2y" class="w-full flex-1 p-3 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-lg font-mono resize-none shadow-inner"></textarea>
-                                </div>
-                                <div class="flex gap-4 mt-4 w-full">
-                                    <button id="kb-clear-btn" class="flex-1 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">清空</button>
-                                    <button id="kb-recognize-btn" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md flex justify-center items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                        轉換並提交
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- 全局 Loading 遮罩 -->
-                            <div id="global-loading" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm z-30 flex flex-col items-center justify-center rounded-xl border border-slate-200 shadow-sm">
-                                <svg class="animate-spin h-10 w-10 text-indigo-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <p id="global-loading-text" class="text-indigo-700 font-bold text-center px-4 leading-relaxed">載入中...</p>
-                            </div>
-                            
-                            <!-- JavaScript 將自動把「確認視窗」掛載在這裡 -->
-
-                        </div>
-                        <div class="mt-3 text-slate-500 text-sm text-center">💡 提示：你可以自由切換上方標籤，選擇手寫或鍵盤輸入。</div>
-                    </div>
-                </div>
-
-                <div id="feedbackArea" class="hidden">
-                    <div id="feedbackBox" class="p-4 rounded-xl border w-full overflow-hidden shadow-sm">
-                        <div id="feedbackMessage" class="flex flex-col w-full text-center"></div>
-                    </div>
-                    <button id="nextBtn" class="mt-6 w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all transform hover:scale-[1.02] shadow-md text-lg">
-                        下一題 ➡️
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- 畫面 4：結算畫面 (End Screen) -->
-        <!-- ========================================== -->
-        <div id="endScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center hidden">
-            <h2 class="text-3xl font-bold text-slate-800 mb-6">🎉 恭喜完成訓練！</h2>
-            
-            <div class="inline-block p-6 rounded-2xl bg-indigo-50 border-2 border-indigo-100 mb-8 w-full max-w-sm shadow-inner">
-                <div class="text-slate-500 font-medium mb-2">本次得分</div>
-                <div class="text-6xl font-black text-indigo-600 drop-shadow-sm"><span id="finalScore">0</span><span class="text-2xl text-indigo-400 ml-1">/ <span id="totalQuestions">30</span></span></div>
-            </div>
-            
-            <div class="mb-8 max-w-md mx-auto p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100 shadow-sm">
-                <div class="text-amber-500 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                </div>
-                <div id="motivationalQuote" class="text-lg font-bold text-slate-700 leading-relaxed tracking-wide">
-                    讀取中...
-                </div>
-            </div>
-
-            <!-- 成績傳送區塊 -->
-            <div class="mt-8 pt-8 border-t border-slate-100 max-w-md mx-auto text-left">
-                <h3 class="text-xl font-bold text-slate-800 mb-4 text-center flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-                    記錄成績以解鎖獎勵
-                </h3>
+                let pointsNeeded = 100 - (backendNewTotal % 100);
+                if (pointsNeeded === 0) pointsNeeded = 100;
                 
-                <div id="rewardContainer" class="hidden mb-6"></div>
-
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div class="col-span-1">
-                        <label class="block text-sm font-bold text-slate-600 mb-1 pl-1">班別 (Class)</label>
-                        <select id="className" class="w-full p-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white transition-colors">
-                            <option value="">請選擇</option>
-                            <option value="4A">4A</option><option value="4B">4B</option><option value="4C">4C</option><option value="4D">4D</option>
-                        </select>
-                    </div>
-                    <div class="col-span-1">
-                        <label class="block text-sm font-bold text-slate-600 mb-1 pl-1">學號 (No.)</label>
-                        <input type="number" id="classNumber" min="1" max="40" placeholder="如: 12" class="w-full p-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white transition-colors text-center">
-                    </div>
-                </div>
-                <div class="mb-5">
-                    <label class="block text-sm font-bold text-slate-600 mb-1 pl-1">姓名 (Name)</label>
-                    <input type="text" id="studentName" placeholder="請輸入全名" class="w-full p-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white transition-colors">
-                </div>
+                let targetProgress = backendNewTotal % 100;
+                if (isCrossed) targetProgress = 100; 
                 
-                <button id="submitRecordBtn" onclick="submitToGoogleSheet()" class="w-full py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-all shadow-md flex justify-center items-center gap-2 text-lg">
-                    傳送成績
-                </button>
-                <div id="submitStatus" class="mt-3 text-center text-sm font-bold hidden"></div>
-            </div>
+                const fill = document.getElementById('progressBarFill');
+                const textUI = document.getElementById('progressTextUI');
+                const hint = document.getElementById('progressHint');
+                
+                if (fill) fill.style.width = targetProgress + '%';
+                if (textUI) textUI.textContent = isCrossed ? '100 / 100' : `${backendNewTotal % 100} / 100`;
 
-            <!-- 全局排行榜區塊 (結算畫面) -->
-            <div class="mt-8 bg-white border-2 border-indigo-50 rounded-xl overflow-hidden shadow-sm max-w-md mx-auto">
-                <div class="bg-indigo-50 py-3 text-center border-b border-indigo-100">
-                    <span class="font-bold text-indigo-800 flex items-center justify-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" /></svg>
-                        最新即時排名
-                    </span>
-                </div>
-                <div class="p-3">
-                    <div id="my-rank-end"></div>
-                    <div id="leaderboard-end-container" class="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar text-sm">
-                        <!-- 動態插入 -->
-                    </div>
-                </div>
-            </div>
+                if (isCrossed) {
+                    if (hint) hint.innerHTML = `<span class="text-amber-600 font-bold">🎉 恭喜達成滿百目標！正在解鎖刮刮卡...</span>`;
+                    statusText.innerHTML = `✅ 成績傳送成功！(今日第 ${backendPlayCount} 次)<br>🎉 目前總分：${backendNewTotal} 分。邁向下一抽還差 <span class="text-indigo-600 font-bold">${100 - (backendNewTotal % 100)} 分</span>！`;
+                    setTimeout(() => {
+                        const progUI = document.getElementById('progressUI'); const scratchUI = document.getElementById('scratchUI'); const rewardZone = document.getElementById('rewardZone');
+                        if (progUI && scratchUI && rewardZone) {
+                            progUI.classList.add('opacity-0');
+                            setTimeout(() => {
+                                progUI.classList.add('hidden'); scratchUI.classList.remove('hidden'); void scratchUI.offsetWidth; scratchUI.classList.remove('opacity-0');
+                                rewardZone.classList.replace('border-indigo-100', 'border-amber-300'); rewardZone.classList.replace('bg-white', 'bg-amber-50');
+                                document.getElementById('rewardTextDisplay').textContent = data.reward && data.reward !== "無" ? data.reward : "再接再厲！";
+                                renderScratchCard();
+                            }, 500);
+                        }
+                    }, 1500);
+                } else {
+                    if (hint) hint.innerHTML = `還差 <span class="text-indigo-600 font-bold">${pointsNeeded} 分</span> 即可獲得抽獎機會！傳送成績後更新進度。`;
+                    statusText.innerHTML = `✅ 成績傳送成功！(今日第 ${backendPlayCount} 次)<br>📊 目前總分：${backendNewTotal} 分。`;
+                }
+                
+                statusText.className = "text-center text-sm font-bold mt-3 text-green-600 block leading-relaxed"; statusText.classList.remove('hidden');
+                btn.textContent = "✅ 已成功傳送！"; btn.classList.replace('bg-green-600', 'bg-slate-400');
+                setTimeout(() => { fetchConfig(true); }, 2000);
+            } else {
+                btn.disabled = false; btn.textContent = "重新傳送"; btn.classList.remove('opacity-50');
+                statusText.textContent = data.message; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; statusText.classList.remove('hidden');
+            }
+        })
+        .catch(err => {
+            btn.disabled = false; btn.textContent = "重新傳送"; btn.classList.remove('opacity-50');
+            statusText.textContent = "❌ 傳送失敗，請檢查網路連線。"; statusText.className = "text-center text-sm font-bold mt-3 text-red-500 block"; statusText.classList.remove('hidden');
+        });
+}
 
-            <div class="mt-8 pt-6">
-                <button onclick="showTopicScreen()" class="text-slate-500 hover:text-slate-700 font-medium underline underline-offset-4 transition-colors">
-                    返回課題選擇
-                </button>
-            </div>
-        </div>
-    </main>
+function renderScratchCard() {
+    const canvas = document.getElementById('scratchCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+    ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 16px sans-serif'; ctx.fillStyle = '#64748b'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('✨ 刮開看獎勵 ✨', canvas.width / 2, canvas.height / 2);
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = 25; ctx.globalCompositeOperation = 'destination-out';
+    let isDrawing = false;
+    function getPos(e) { const rect = canvas.getBoundingClientRect(); const evt = e.touches ? e.touches[0] : e; return { x: evt.clientX - rect.left, y: evt.clientY - rect.top }; }
+    canvas.onmousedown = (e) => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+    canvas.onmousemove = (e) => { if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
+    window.onmouseup = () => isDrawing = false;
+    canvas.ontouchstart = (e) => { e.preventDefault(); isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+    canvas.ontouchmove = (e) => { e.preventDefault(); if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
+    canvas.ontouchend = () => isDrawing = false;
+}
 
-    <!-- ========================================== -->
-    <!-- 引入模組化腳本 -->
-    <!-- ========================================== -->
-    <script src="js/utils.js?v=75"></script>
-    <script src="js/topics/indices.js?v=75"></script>
-    <script src="js/topics/factorization.js?v=75"></script>
-    <script src="js/topics/rounding.js?v=75"></script>
-    <script src="js/topics/identities.js?v=75"></script>
-    <script src="js/topics/fractions.js?v=75"></script>
-    <script src="js/topics/binary.js?v=75"></script>
-    <script src="js/topics/expansion.js?v=75"></script>
-    <script src="js/topics/algebraic_fractions_mul_div.js?v=75"></script>
-    <script src="js/topics/triangle_area.js?v=75"></script>
-    <script src="js/app.js?v=75"></script>
+function renderMath() {
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(document.getElementById('main-wrapper'), { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false} ], throwOnError: false });
+    }
+}
 
-</body>
-</html>
+window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
+
+window.onload = () => { 
+    showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
+    const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
+    if(savedClass) document.getElementById('className').value = savedClass; if(savedNum) document.getElementById('classNumber').value = savedNum; if(savedName) document.getElementById('studentName').value = savedName;
+    setupCanvasEvents();
+};
