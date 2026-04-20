@@ -6,7 +6,7 @@
 // 請填寫你最新部署的 Google Apps Script 網址
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
-// 🟢 開啟 AI 手寫功能
+// 🟢 開啟 AI 手寫與鍵盤雙模輸入功能
 const ENABLE_AI_HANDWRITING = true; 
 
 const motivationalQuotes = [
@@ -295,6 +295,27 @@ function startQuizSession() {
     loadQuestion();
 }
 
+// 🌟 雙模切換邏輯
+window.switchInputMode = function(mode) {
+    const drawZone = document.getElementById('draw-input-zone');
+    const kbZone = document.getElementById('keyboard-input-zone');
+    const tabDraw = document.getElementById('tab-draw');
+    const tabKb = document.getElementById('tab-keyboard');
+    
+    if (mode === 'draw') {
+        drawZone.classList.remove('hidden');
+        kbZone.classList.add('hidden');
+        tabDraw.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+        tabKb.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
+        setTimeout(() => { resizeCanvas(); }, 50); 
+    } else {
+        drawZone.classList.add('hidden');
+        kbZone.classList.remove('hidden');
+        tabKb.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+        tabDraw.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
+    }
+};
+
 function loadQuestion() {
     attemptsCount = 0; 
     currentRecognizedLaTeX = ""; 
@@ -309,7 +330,7 @@ function loadQuestion() {
         document.getElementById('hw-confirm-ui').classList.add('hidden');
     }
     
-    let typeLabel = q.isHandwriting ? `<span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-sm font-bold align-middle mt-2 sm:mt-0 shadow-sm border border-amber-200">✍️ AI 手寫題</span>` : "";
+    let typeLabel = q.isHandwriting ? `<span class="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-md text-sm font-bold align-middle mt-2 sm:mt-0 shadow-sm border border-amber-200">🤖 AI 輔助作答</span>` : "";
     document.getElementById('questionText').innerHTML = q.question + `<div class="mt-2 text-center">${typeLabel}</div>`;
 
     const optionsGrid = document.getElementById('optionsGrid');
@@ -319,9 +340,18 @@ function loadQuestion() {
         optionsGrid.classList.add('hidden');
         if (hwArea) {
             hwArea.classList.remove('hidden');
-            hwArea.classList.remove('border-4', 'border-green-500', 'border-red-400');
+            
+            // 重置所有邊框與按鈕狀態
+            document.getElementById('draw-container').classList.remove('border-green-500', 'border-red-400');
+            document.getElementById('kb-container').classList.remove('border-green-500', 'border-red-400');
             document.getElementById('clear-btn').disabled = false;
             document.getElementById('recognize-btn').disabled = false;
+            document.getElementById('kb-clear-btn').disabled = false;
+            document.getElementById('kb-recognize-btn').disabled = false;
+            document.getElementById('keyboard-math-input').value = ""; // 清空文字
+
+            // 預設回到手寫模式
+            switchInputMode('draw');
             setTimeout(() => { resizeCanvas(); initCanvas(); }, 50);
         }
     } else {
@@ -425,28 +455,36 @@ function setupCanvasEvents() {
     canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDrawing); canvas.addEventListener('mouseout', stopDrawing);
     canvas.addEventListener('touchstart', startDrawing, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', stopDrawing); canvas.addEventListener('touchcancel', stopDrawing);
     
-    document.getElementById('clear-btn').addEventListener('click', () => { initCanvas(); document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400'); });
+    document.getElementById('clear-btn').addEventListener('click', () => { 
+        initCanvas(); 
+        document.getElementById('draw-container').classList.remove('border-green-500', 'border-red-400');
+    });
     document.getElementById('recognize-btn').addEventListener('click', startRecognitionPhase);
+    
+    document.getElementById('kb-clear-btn').addEventListener('click', () => {
+        document.getElementById('keyboard-math-input').value = "";
+        document.getElementById('kb-container').classList.remove('border-green-500', 'border-red-400');
+    });
+    document.getElementById('kb-recognize-btn').addEventListener('click', startKeyboardRecognitionPhase);
+
     window.addEventListener('resize', resizeCanvas);
     
-    const hwArea = document.getElementById('handwritingArea');
-    const canvasContainer = hwArea.querySelector('.relative'); 
+    const inputContainer = document.getElementById('input-container'); 
     
-    // 🌟 UI 升級：將確認視窗的字體樣式完全同步於題庫 (加粗、深藍色)
     if (!document.getElementById('hw-confirm-ui')) {
         const confirmUI = document.createElement('div');
         confirmUI.id = 'hw-confirm-ui';
-        confirmUI.className = 'hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all';
+        confirmUI.className = 'hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all rounded-xl border border-slate-200';
         confirmUI.innerHTML = `
             <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 步驟一：數式轉換確認</h3>
             <div id="hw-confirm-math" class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner whitespace-nowrap"></div>
-            <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的手寫內容相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
+            <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的輸入相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
             <div class="flex gap-3 w-full max-w-sm">
-                <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新手寫</button>
+                <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新輸入</button>
                 <button onclick="confirmAndGrade()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md text-sm sm:text-base">✅ 確認並批改</button>
             </div>
         `;
-        canvasContainer.appendChild(confirmUI);
+        inputContainer.appendChild(confirmUI);
     }
 }
 
@@ -467,10 +505,10 @@ async function fetchWithRetry(url, options, maxRetries = 3) {
     }
 }
 
+// 🌟 處理「手寫圖片」上傳
 async function startRecognitionPhase() {
     const canvas = document.getElementById('draw-canvas');
     
-    // 前端畫布壓縮：回復至 800，讓 Pro 模型能看清楚長算式
     const MAX_WIDTH = 800; 
     let scale = 1;
     if (canvas.width > MAX_WIDTH) scale = MAX_WIDTH / canvas.width;
@@ -480,25 +518,22 @@ async function startRecognitionPhase() {
     tempCanvas.height = canvas.height * scale;
     const ctx = tempCanvas.getContext('2d');
 
-    // 填上純白底色 (JPEG 不支援透明)
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 轉成壓縮率 0.8 的 JPEG
     const dataURL = tempCanvas.toDataURL('image/jpeg', 0.8);
     const base64Image = dataURL.split(',')[1];
     
-    const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>傳送至 Google 雲端處理中</span>";
+    const loadingDiv = document.getElementById('global-loading');
+    document.getElementById('global-loading-text').innerHTML = "AI 正在將你的手寫筆跡轉換為數式...<br><span class='text-sm font-normal text-slate-500'>傳送至 Google 雲端處理中</span>";
     loadingDiv.classList.remove('hidden');
     
     document.getElementById('recognize-btn').disabled = true;
     document.getElementById('clear-btn').disabled = true;
-    document.getElementById('handwritingArea').classList.remove('border-4', 'border-green-500', 'border-red-400');
+    document.getElementById('draw-container').classList.remove('border-green-500', 'border-red-400');
     
     try {
-        // 🌟 傳送給 Google Apps Script 進行 OCR 辨識
         const formData = new URLSearchParams();
         formData.append('action', 'ai_ocr');
         formData.append('image', base64Image);
@@ -516,7 +551,6 @@ async function startRecognitionPhase() {
         const confirmUI = document.getElementById('hw-confirm-ui');
         const mathDiv = document.getElementById('hw-confirm-math');
 
-        // 🌟 升級版：檢查降級並顯示詳細的偵錯紀錄 (X光)
         let existingWarning = document.getElementById('model-warning-ocr');
         if (existingWarning) existingWarning.remove();
 
@@ -539,18 +573,76 @@ async function startRecognitionPhase() {
     }
 }
 
+// 🌟 處理「鍵盤文字」上傳
+async function startKeyboardRecognitionPhase() {
+    const kbInput = document.getElementById('keyboard-math-input').value.trim();
+    if (!kbInput) {
+        alert("請先輸入數學算式！");
+        return;
+    }
+    
+    const loadingDiv = document.getElementById('global-loading');
+    document.getElementById('global-loading-text').innerHTML = "AI 正在將文字轉換為標準數式...<br><span class='text-sm font-normal text-slate-500'>傳送至 Google 雲端處理中</span>";
+    loadingDiv.classList.remove('hidden');
+    
+    document.getElementById('kb-recognize-btn').disabled = true;
+    document.getElementById('kb-clear-btn').disabled = true;
+    document.getElementById('kb-container').classList.remove('border-green-500', 'border-red-400');
+    
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_text_to_latex');
+        formData.append('text', kbInput);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { 
+            method: 'POST', 
+            body: formData
+        });
+        
+        if (!result.success) throw new Error(result.message);
+        
+        currentRecognizedLaTeX = result.latex;
+        loadingDiv.classList.add('hidden');
+        
+        const confirmUI = document.getElementById('hw-confirm-ui');
+        const mathDiv = document.getElementById('hw-confirm-math');
+
+        let existingWarning = document.getElementById('model-warning-ocr');
+        if (existingWarning) existingWarning.remove();
+
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 text-left block mt-1">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
+            mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
+        }
+
+        mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
+        confirmUI.classList.remove('hidden');
+        renderMath();
+        
+    } catch (err) {
+        console.error(err);
+        alert(`⚠️ 轉換失敗！\n\n詳細錯誤：${err.message}`);
+        loadingDiv.classList.add('hidden');
+        document.getElementById('kb-recognize-btn').disabled = false;
+        document.getElementById('kb-clear-btn').disabled = false;
+    }
+}
+
 window.rewriteHandwriting = function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     initCanvas(); 
     document.getElementById('recognize-btn').disabled = false;
     document.getElementById('clear-btn').disabled = false;
+    document.getElementById('kb-recognize-btn').disabled = false;
+    document.getElementById('kb-clear-btn').disabled = false;
 };
 
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     
-    const loadingDiv = document.getElementById('ai-loading');
-    loadingDiv.querySelector('p').innerHTML = "AI 老師正在進行邏輯批改...<br><span class='text-sm font-normal text-slate-500'>比對等價性中</span>";
+    const loadingDiv = document.getElementById('global-loading');
+    document.getElementById('global-loading-text').innerHTML = "AI 老師正在進行邏輯批改...<br><span class='text-sm font-normal text-slate-500'>比對等價性中</span>";
     loadingDiv.classList.remove('hidden');
 
     try {
@@ -561,7 +653,6 @@ window.confirmAndGrade = async function() {
         tempDiv.innerHTML = correctOpt.text;
         let standardAns = tempDiv.textContent || tempDiv.innerText;
         
-        // 🌟 傳送給 Google Apps Script 進行 AI 邏輯批改
         const formData = new URLSearchParams();
         formData.append('action', 'ai_grade');
         formData.append('studentLatex', currentRecognizedLaTeX);
@@ -577,14 +668,12 @@ window.confirmAndGrade = async function() {
         loadingDiv.classList.add('hidden');
         attemptsCount++;
         
-        // 🌟 升級版：檢查降級並組合包含偵錯紀錄的警告
         let warningHtml = "";
         if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
             const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 mt-1 block text-left">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
             warningHtml = `<div class="mt-3 text-red-700 font-bold border-t border-red-200 pt-3 bg-red-50 p-3 rounded-lg shadow-inner text-sm text-center">⚠️ 批改降級警告：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
         }
 
-        // 🌟 UI 升級：讓批改結果的字體也完全同步題庫
         let feedbackHtml = `<div class="mb-3 p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-slate-800 shadow-sm">
             <div class="font-bold text-indigo-700 mb-2">🤖 你的作答 (AI 辨識)：</div>
             <div class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 bg-white rounded-lg border border-white text-center whitespace-nowrap shadow-inner">\\( \\displaystyle ${currentRecognizedLaTeX} \\)</div>
@@ -597,12 +686,16 @@ window.confirmAndGrade = async function() {
         if (result.isCorrect) {
             if (attemptsCount === 1) { score += 10; updateScoreDisplay(); }
             showFeedback('correct', finalHint, true);
-            document.getElementById('handwritingArea').classList.add('border-4', 'border-green-500');
+            document.getElementById('draw-container').classList.add('border-green-500');
+            document.getElementById('kb-container').classList.add('border-green-500');
         } else {
             showFeedback('incorrect', finalHint, false);
-            document.getElementById('handwritingArea').classList.add('border-4', 'border-red-400');
+            document.getElementById('draw-container').classList.add('border-red-400');
+            document.getElementById('kb-container').classList.add('border-red-400');
             document.getElementById('recognize-btn').disabled = false;
             document.getElementById('clear-btn').disabled = false;
+            document.getElementById('kb-recognize-btn').disabled = false;
+            document.getElementById('kb-clear-btn').disabled = false;
             
             if (attemptsCount >= 2) {
                 let giveUpHtml = `<div class="mt-4 text-center"><button onclick="giveUpHandwriting()" class="px-5 py-2 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">放棄作答並看正確步驟</button></div>`;
@@ -624,6 +717,8 @@ window.giveUpHandwriting = function() {
     showFeedback('incorrect', correctOpt.hint, true); 
     document.getElementById('clear-btn').disabled = true;
     document.getElementById('recognize-btn').disabled = true;
+    document.getElementById('kb-recognize-btn').disabled = true;
+    document.getElementById('kb-clear-btn').disabled = true;
 };
 
 // ==========================================
