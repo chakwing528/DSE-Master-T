@@ -39,7 +39,7 @@
 
     <!-- 🌟 版本檢測雷達 -->
     <div class="fixed bottom-2 right-2 bg-slate-800 text-white text-xs px-2 py-1 rounded-md opacity-60 z-50 pointer-events-none">
-        V57
+        V58
     </div>
 
     <!-- 主容器 -->
@@ -231,6 +231,11 @@
                     <!-- 選擇題區塊 -->
                     <div id="optionsGrid" class="grid grid-cols-1 gap-3 sm:gap-4 mt-6"></div>
 
+                    <!-- 🌟 新增：選擇題專用的跳過本題按鈕 -->
+                    <button id="skip-btn-mc" onclick="skipQuestion()" class="skip-action-btn hidden w-full mt-4 py-3 bg-slate-100 text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm flex justify-center items-center gap-2">
+                        <span>⏭️ 跳過本題 (0分)</span>
+                    </button>
+
                     <!-- 雙模輸入區塊 (手寫/鍵盤) -->
                     <div id="handwritingArea" class="hidden mt-6 flex flex-col items-center w-full">
                         
@@ -378,19 +383,19 @@
     </main>
 
     <!-- ========================================== -->
-    <!-- 🌟 強制破除快取 (v=57) 加上 defer 確保載入順序 -->
+    <!-- 🌟 強制破除快取 (v=58) 加上 defer 確保載入順序 -->
     <!-- ========================================== -->
-    <script src="js/utils.js?v=57" defer></script>
-    <script src="js/topics/indices.js?v=57" defer></script>
-    <script src="js/topics/factorization.js?v=57" defer></script>
-    <script src="js/topics/rounding.js?v=57" defer></script>
-    <script src="js/topics/identities.js?v=57" defer></script>
-    <script src="js/topics/fractions.js?v=57" defer></script>
-    <script src="js/topics/binary.js?v=57" defer></script>
-    <script src="js/topics/expansion.js?v=57" defer></script>
-    <script src="js/topics/algebraic_fractions_mul_div.js?v=57" defer></script>
-    <script src="js/topics/triangle_area.js?v=57" defer></script>
-    <script src="js/app.js?v=57" defer></script>
+    <script src="js/utils.js?v=58" defer></script>
+    <script src="js/topics/indices.js?v=58" defer></script>
+    <script src="js/topics/factorization.js?v=58" defer></script>
+    <script src="js/topics/rounding.js?v=58" defer></script>
+    <script src="js/topics/identities.js?v=58" defer></script>
+    <script src="js/topics/fractions.js?v=58" defer></script>
+    <script src="js/topics/binary.js?v=58" defer></script>
+    <script src="js/topics/expansion.js?v=58" defer></script>
+    <script src="js/topics/algebraic_fractions_mul_div.js?v=58" defer></script>
+    <script src="js/topics/triangle_area.js?v=58" defer></script>
+    <script src="js/app.js?v=58" defer></script>
 
 </body>
 </html>
