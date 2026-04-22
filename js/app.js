@@ -1,6 +1,6 @@
 // js/app.js
 
-console.log("App.js V56 成功載入！已加裝防彈裝甲，並支援多重跳過按鈕！");
+console.log("App.js V57 成功載入！已完美復原所有經典排版，並加裝防彈裝甲！");
 
 // ==========================================
 // 🚨 老師設定區
@@ -113,54 +113,38 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
         }
     });
 
+    // 🌟 首頁：雙欄排版，完全對應截圖
     let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
     globalLeaderboard.slice(0, 20).forEach((student, index) => {
         let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
-        const isHighestMe = (String(student.className).toUpperCase().trim() === currentUserClass && String(student.classNum).trim() === currentUserNum) && (index + 1 === userRank);
-
-        const bgClass = isHighestMe ? 'bg-amber-100 border-amber-300 ring-2 ring-amber-200' : 'bg-white border-slate-100';
-        const textClass = isHighestMe ? 'text-amber-900' : 'text-slate-700';
-        const scoreClass = isHighestMe ? 'text-amber-700' : 'text-indigo-600';
-        const highlightBadge = isHighestMe ? `<span class="ml-2 text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full">你</span>` : '';
-
-        html += `<div class="flex justify-between items-center ${bgClass} p-4 rounded-xl border shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-3">${rankIcon}<span class="font-bold ${textClass} text-base">${student.className} (${student.classNum}) ${student.studentName}${highlightBadge}</span></div><div class="${scoreClass} font-bold text-lg">${student.totalScore} 分</div></div>`;
+        
+        html += `<div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-3">${rankIcon}<span class="font-bold text-slate-700 text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="text-indigo-600 font-bold text-base">${student.totalScore} 分</div></div>`;
     });
     html += '</div>';
 
     if (homeContainer) homeContainer.innerHTML = html;
     
-    let endHtml = '<div class="space-y-2">';
+    // 🌟 結算畫面：同樣使用雙欄排版 (截圖 3 顯示為左右兩排)
+    let endHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
     globalLeaderboard.slice(0, 20).forEach((student, index) => {
         let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
-        const isHighestMe = (String(student.className).toUpperCase().trim() === currentUserClass && String(student.classNum).trim() === currentUserNum) && (index + 1 === userRank);
-
-        const bgClass = isHighestMe ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' : 'bg-white border-slate-100';
-        const textClass = isHighestMe ? 'text-amber-800' : 'text-slate-700';
-        const scoreClass = isHighestMe ? 'text-amber-700' : 'text-indigo-600';
-        const highlightBadge = isHighestMe ? `<span class="ml-2 text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full">你</span>` : '';
-
-        endHtml += `<div class="flex justify-between items-center ${bgClass} p-3 rounded-lg border shadow-sm transition-all"><div class="flex items-center gap-2">${rankIcon}<span class="font-bold ${textClass}">${student.className} (${student.classNum}) ${student.studentName}${highlightBadge}</span></div><div class="${scoreClass} font-bold">${student.totalScore} 分</div></div>`;
+        
+        endHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-2">${rankIcon}<span class="font-bold text-slate-700 text-sm sm:text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="text-indigo-600 font-bold text-sm sm:text-base">${student.totalScore} 分</div></div>`;
     });
     endHtml += '</div>';
     if (endContainer) endContainer.innerHTML = endHtml;
 
+    // 🌟 完全復原截圖的黃色背景排名區塊
     let myRankHtml = '';
     if (currentUserClass && currentUserNum) {
         if (userRank !== -1) {
-            myRankHtml = `<div class="bg-amber-100 border-2 border-amber-300 p-4 rounded-xl flex justify-between items-center shadow-md mb-6"><span class="font-bold text-amber-800 text-lg">👉 你的目前排名：第 ${userRank} 名</span><span class="text-amber-700 font-bold text-xl">${userScore} 分</span></div>`;
+            myRankHtml = `<div class="bg-[#FFF3C4] border border-[#FDE68A] p-4 rounded-xl flex justify-between items-center shadow-sm mb-6"><span class="font-bold text-amber-800 text-base flex items-center gap-2"><span class="text-xl">👉</span> 你的目前排名：第 ${userRank} 名</span><span class="text-amber-800 font-bold text-lg">${userScore} 分</span></div>`;
         } else {
-            myRankHtml = `<div class="bg-slate-100 border border-slate-300 p-3 rounded-lg flex justify-between items-center shadow-sm mb-4"><span class="font-bold text-slate-600">👉 你的目前排名：未上榜</span><span class="text-slate-500 font-bold text-sm">繼續刷題累積積分吧！</span></div>`;
+            myRankHtml = `<div class="bg-slate-100 border border-slate-300 p-3 rounded-lg flex justify-between items-center shadow-sm mb-6"><span class="font-bold text-slate-600">👉 你的目前排名：未上榜</span><span class="text-slate-500 font-bold text-sm">繼續刷題累積積分吧！</span></div>`;
         }
     }
     if (myRankHome) myRankHome.innerHTML = myRankHtml;
-    
-    if (myRankEnd) {
-        if (currentUserClass && currentUserNum && userRank !== -1) {
-            myRankEnd.innerHTML = `<div class="bg-amber-100 border border-amber-400 p-3 rounded-lg flex justify-between items-center shadow-sm mb-4"><span class="font-bold text-amber-800">👉 你的目前排名：第 ${userRank} 名</span><span class="text-amber-700 font-bold">${userScore} 分</span></div>`;
-        } else if (currentUserClass && currentUserNum) {
-            myRankEnd.innerHTML = `<div class="bg-slate-100 border border-slate-300 p-3 rounded-lg flex justify-between items-center shadow-sm mb-4"><span class="font-bold text-slate-600">👉 你的目前排名：未上榜</span><span class="text-slate-500 font-bold text-sm">繼續刷題累積積分吧！</span></div>`;
-        }
-    }
+    if (myRankEnd) myRankEnd.innerHTML = myRankHtml;
 }
 
 function setQuestionNum(num) {
@@ -190,6 +174,11 @@ function backToLevelSelection() {
     document.getElementById('endScreen')?.classList.add('hidden');
     if (currentTopic === 'global_mixed') showTopicScreen(); else selectTopic(currentTopic);
 }
+
+// 🌟 新增重做此難度的函數 (對應截圖底部的藍色按鈕)
+window.restartLevel = function() {
+    startGame(currentLevelPref);
+};
 
 function backToLevelSelectionFromQuiz() { document.getElementById('confirmModal')?.classList.remove('hidden'); }
 function closeConfirmModal() { document.getElementById('confirmModal')?.classList.add('hidden'); }
@@ -369,7 +358,7 @@ function startQuizSession() {
     const btn = document.getElementById('submitRecordBtn');
     if (btn) {
         btn.disabled = false; btn.textContent = "傳送成績";
-        btn.classList.remove('bg-slate-400'); btn.classList.add('bg-green-600');
+        btn.classList.replace('bg-slate-400', 'bg-[#44994d]');
     }
     document.getElementById('submitStatus')?.classList.add('hidden');
 
@@ -396,7 +385,6 @@ window.switchInputMode = function(mode) {
     }
 };
 
-// 🌟 修改：跳過本題功能 (針對 Class 進行控制)
 window.skipQuestion = function() {
     if (confirm("確定要跳過這題嗎？\n(跳過本題將獲得 0 分，並會直接顯示正確解答供您參考)")) {
         let q = questionBank[currentQuestionIndex];
@@ -414,7 +402,6 @@ window.skipQuestion = function() {
         
         disableAllButtons();
         
-        // 🌟 使用 querySelectorAll 停用手寫區及鍵盤區的所有跳過按鈕
         const skipBtns = document.querySelectorAll('.skip-action-btn');
         skipBtns.forEach(btn => {
             btn.disabled = true;
@@ -450,7 +437,6 @@ function loadQuestion() {
     
     hideFeedback();
     
-    // 🌟 使用 querySelectorAll 啟用所有的跳過按鈕
     const skipBtns = document.querySelectorAll('.skip-action-btn');
     skipBtns.forEach(btn => {
         btn.disabled = false;
@@ -507,7 +493,6 @@ function loadQuestion() {
 function handleAnswer(selectedOption, buttonElement) {
     attemptsCount++;
     
-    // 🌟 作答後停用所有的跳過按鈕
     const skipBtns = document.querySelectorAll('.skip-action-btn');
     skipBtns.forEach(btn => {
         btn.disabled = true;
@@ -796,7 +781,6 @@ window.rewriteHandwriting = function() {
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui')?.classList.add('hidden');
     
-    // 🌟 確認批改後停用所有的跳過按鈕
     const skipBtns = document.querySelectorAll('.skip-action-btn');
     skipBtns.forEach(btn => {
         btn.disabled = true;
@@ -900,6 +884,15 @@ function showEndScreen() {
     const tQs = document.getElementById('totalQuestions');
     if (tQs) tQs.textContent = totalPossibleScore;
     
+    // 🌟 動態改變副標題
+    const subtitle = document.getElementById('endSubtitle');
+    if (subtitle) {
+        let ratio = score / totalPossibleScore;
+        if (ratio >= 0.8) subtitle.textContent = "AI 分析顯示你對這個單元的概念掌握得非常出色！";
+        else if (ratio >= 0.5) subtitle.textContent = "AI 分析顯示你對這個單元的概念掌握得不錯！";
+        else subtitle.textContent = "AI 分析顯示你還需要多加練習，不要灰心，繼續努力！";
+    }
+    
     let selectedQuote = { text: "今天的累積，是明天的底氣。" };
     let pool = dynamicQuotes.length > 0 ? dynamicQuotes : motivationalQuotes.map(q => ({text: q, weight: 1}));
     
@@ -928,18 +921,16 @@ function showEndScreen() {
     if (rewardContainer) {
         rewardContainer.classList.remove('hidden');
         rewardContainer.innerHTML = `
-            <div id="rewardZone" class="w-full bg-white border-2 border-indigo-100 rounded-xl p-5 shadow-sm relative overflow-hidden transition-all duration-500">
+            <div id="rewardZone" class="w-full bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-sm relative overflow-hidden transition-all duration-500 text-left">
                 <div id="progressUI" class="block transition-opacity duration-500">
-                    <div class="flex justify-between items-end mb-3">
-                        <span class="font-bold text-slate-700 text-lg">🎁 刮刮卡解鎖進度</span>
-                        <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md" id="progressTextUI">${currentProgress} / 100</span>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-bold text-slate-700 text-lg flex items-center gap-2">🎁 刮刮卡解鎖進度</span>
+                        <span class="text-sm font-bold text-indigo-800 bg-indigo-100 px-3 py-1 rounded-lg" id="progressTextUI">${currentProgress} / 100</span>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-5 mb-2 overflow-hidden border border-slate-200 shadow-inner relative">
-                        <div id="progressBarFill" class="bg-gradient-to-r from-indigo-400 to-indigo-600 h-5 rounded-full transition-all duration-1000 ease-out relative" style="width: ${currentProgress}%">
-                            <div class="absolute inset-0 bg-white/20 w-full h-full animate-[pulse_2s_infinite]"></div>
-                        </div>
+                    <div class="w-full bg-slate-100 rounded-full h-4 mb-3 overflow-hidden shadow-inner relative">
+                        <div id="progressBarFill" class="bg-indigo-500 h-4 rounded-full transition-all duration-1000 ease-out relative" style="width: ${currentProgress}%"></div>
                     </div>
-                    <div class="text-sm text-slate-500 text-center mt-3 font-medium" id="progressHint">
+                    <div class="text-sm text-slate-500 text-center font-medium" id="progressHint">
                         還差 <span class="text-indigo-600 font-bold">${nextThresholdDist} 分</span> 即可獲得抽獎機會！傳送成績後更新進度。
                     </div>
                 </div>
@@ -970,7 +961,6 @@ function submitToGoogleSheet() {
     
     if (!classNameEl || !classNumberEl || !studentNameEl || !statusText || !btn) return;
 
-    // 🌟 獲取班別輸入時強制轉為大寫，確保統一格式
     const className = classNameEl.value.trim().toUpperCase();
     const classNumber = classNumberEl.value.trim();
     const studentName = studentNameEl.value.trim();
@@ -1029,7 +1019,7 @@ function submitToGoogleSheet() {
                             progUI.classList.add('opacity-0');
                             setTimeout(() => {
                                 progUI.classList.add('hidden'); scratchUI.classList.remove('hidden'); void scratchUI.offsetWidth; scratchUI.classList.remove('opacity-0');
-                                rewardZone.classList.replace('border-indigo-100', 'border-amber-300'); rewardZone.classList.replace('bg-white', 'bg-amber-50');
+                                rewardZone.classList.replace('border-slate-200', 'border-amber-300'); rewardZone.classList.replace('bg-white', 'bg-amber-50');
                                 const rewardDisp = document.getElementById('rewardTextDisplay');
                                 if (rewardDisp) rewardDisp.textContent = data.reward && data.reward !== "無" ? data.reward : "再接再厲！";
                                 renderScratchCard();
@@ -1044,7 +1034,7 @@ function submitToGoogleSheet() {
                 statusText.className = "text-center text-sm font-bold mt-3 text-green-600 block leading-relaxed"; statusText.classList.remove('hidden');
                 if (btn) {
                     btn.textContent = "✅ 已成功傳送！"; 
-                    btn.classList.replace('bg-green-600', 'bg-slate-400');
+                    btn.classList.replace('bg-[#44994d]', 'bg-slate-400');
                 }
                 setTimeout(() => { fetchConfig(true); }, 2000);
             } else {
@@ -1090,7 +1080,7 @@ function renderMath() {
 window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
 
 document.addEventListener('DOMContentLoaded', () => { 
-    console.log("🚀 App.js V56 初始化執行... DOM 載入完成，已啟動終極防彈裝甲與多重跳過按鈕支援！");
+    console.log("🚀 App.js V57 初始化執行... DOM 載入完成，已啟動終極防彈裝甲與多重跳過按鈕支援！");
     showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
     const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
     const classNameEl = document.getElementById('className'); if (classNameEl && savedClass) classNameEl.value = savedClass; 
