@@ -20,23 +20,32 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     
+    <!-- 🚨 系統診斷工具：攔截並顯示任何遺漏括號或載入失敗的錯誤 -->
+    <script>
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            alert("🚨 系統偵測到程式碼有誤：\n" + msg + "\n\n這通常是因為複製 app.js 時遺漏了最後一行的括號，或是檔案上傳失敗！");
+            return false;
+        };
+    </script>
+
     <style>
         .math-scroll { overflow-x: auto; overflow-y: hidden; }
         .math-scroll::-webkit-scrollbar { height: 6px; }
         .math-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        /* 防止手寫畫布上的觸控滾動行為 */
         #draw-canvas { touch-action: none; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-800">
 
-    <main class="max-w-3xl mx-auto p-4 mt-6" id="main-wrapper">
+    <main class="max-w-4xl mx-auto p-3 sm:p-5 mt-4" id="main-wrapper">
         
         <!-- ========================================== -->
-        <!-- 畫面 1：選擇課題 (首頁 - 還原經典排版) -->
+        <!-- 畫面 1：選擇課題 (首頁) -->
         <!-- ========================================== -->
-        <div id="topicScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
+        <div id="topicScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-8 text-center max-w-4xl mx-auto">
             
-            <div class="flex justify-center items-center gap-3 mb-8">
+            <div class="flex justify-center items-center gap-3 mb-6">
                 <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -45,53 +54,35 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">DSE 修練所 <span class="text-base sm:text-lg text-indigo-600 align-top ml-1">(Beta)</span></h1>
             </div>
 
-            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">請選擇練習課題</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 mt-4">請選擇練習課題</h2>
             <p class="text-slate-500 mb-8 font-medium">每天進步一點點，時間會看見</p>
-
-            <!-- 🌟 題數設定回歸首頁 -->
-            <div class="mb-6 flex justify-center gap-2 items-center text-sm">
-                <span class="text-slate-500 mr-2 font-medium">每回合題數：</span>
-                <button id="btn-num-3" onclick="setQuestionNum(3)" class="num-btn px-4 py-2 rounded-lg font-bold bg-indigo-600 text-white shadow-md transition-colors">3 題</button>
-                <button id="btn-num-5" onclick="setQuestionNum(5)" class="num-btn px-4 py-2 rounded-lg font-bold bg-transparent text-slate-600 border border-slate-300 hover:bg-slate-100 transition-colors">5 題</button>
-                <button id="btn-num-10" onclick="setQuestionNum(10)" class="num-btn px-4 py-2 rounded-lg font-bold bg-transparent text-slate-600 border border-slate-300 hover:bg-slate-100 transition-colors">10 題</button>
+            
+            <!-- 題數設定膠囊 -->
+            <div class="mb-10 max-w-lg mx-auto bg-slate-50 p-2 rounded-full border border-slate-200 flex items-center justify-center gap-1 sm:gap-2 shadow-sm">
+                <span class="text-slate-600 font-bold text-sm sm:text-base ml-4 mr-2 hidden sm:inline-block">每回合題數：</span>
+                <button id="btn-num-3" onclick="setQuestionNum(3)" class="num-btn flex-1 py-2 rounded-full font-bold bg-indigo-600 text-white shadow-md transition-colors text-sm sm:text-base">3 題</button>
+                <button id="btn-num-5" onclick="setQuestionNum(5)" class="num-btn flex-1 py-2 rounded-full font-bold bg-transparent text-slate-600 hover:bg-slate-200 transition-colors text-sm sm:text-base">5 題</button>
+                <button id="btn-num-10" onclick="setQuestionNum(10)" class="num-btn flex-1 py-2 rounded-full font-bold bg-transparent text-slate-600 hover:bg-slate-200 transition-colors text-sm sm:text-base">10 題</button>
             </div>
             
             <!-- 九宮格課題區塊 -->
-            <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto mb-10">
-                <button onclick="selectTopic('indices')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-indigo-700 leading-tight">指數定律</div>
-                </button>
-                <button onclick="selectTopic('factorization')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-emerald-700 leading-tight">因式分解</div>
-                </button>
-                <button onclick="selectTopic('rounding')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-sky-500 hover:bg-sky-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-sky-700 leading-tight">近似值與捨入</div>
-                </button>
-                <button onclick="selectTopic('identities')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-purple-700 leading-tight">恆等式</div>
-                </button>
-                <button onclick="selectTopic('fractions')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-pink-500 hover:bg-pink-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-pink-700 leading-tight">通分母</div>
-                </button>
-                <button onclick="selectTopic('binary')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-teal-500 hover:bg-teal-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-teal-700 leading-tight">二進制</div>
-                </button>
-                <button onclick="selectTopic('expansion')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-rose-500 hover:bg-rose-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-rose-700 leading-tight">恆等式的展開</div>
-                </button>
-                <button onclick="selectTopic('alg_frac_mul_div')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-amber-700 leading-tight">代數分式乘除法</div>
-                </button>
-                <button onclick="selectTopic('triangle_area')" class="py-5 px-2 border-2 border-slate-200 rounded-xl hover:border-lime-500 hover:bg-lime-50 transition-all group shadow-sm flex justify-center items-center text-center bg-white min-h-[70px]">
-                    <div class="text-sm sm:text-base font-bold text-slate-700 group-hover:text-lime-700 leading-tight">4B第10章 三角形面積</div>
-                </button>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto mb-10">
+                <button onclick="selectTopic('indices')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">指數定律</button>
+                <button onclick="selectTopic('factorization')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">因式分解</button>
+                <button onclick="selectTopic('rounding')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">近似值與捨入</button>
+                <button onclick="selectTopic('identities')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">恆等式</button>
+                <button onclick="selectTopic('fractions')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">通分母</button>
+                <button onclick="selectTopic('binary')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">二進制</button>
+                <button onclick="selectTopic('expansion')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">恆等式的展開</button>
+                <button onclick="selectTopic('alg_frac_mul_div')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">代數分式乘除法</button>
+                <button onclick="selectTopic('triangle_area')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">4B第10章 三角形面積</button>
             </div>
 
-            <!-- 🌟 升級：按程度分拆跨課題綜合挑戰 -->
-            <div class="mt-10 border-t border-slate-100 pt-8 max-w-2xl mx-auto">
+            <!-- 跨課題綜合挑戰四格排版 (含動態配分) -->
+            <div class="mt-10 border-t border-slate-100 pt-8 max-w-4xl mx-auto">
                 <h3 class="text-xl sm:text-2xl font-bold text-orange-600 mb-2 flex justify-center items-center gap-2">🏆 跨課題綜合挑戰</h3>
                 <p class="text-slate-500 text-sm sm:text-base mb-6">系統將從所有課題中隨機挑選題目，模擬真實考試情況。</p>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto">
                     <button onclick="startGlobalMixed(1)" class="py-4 px-2 border-2 border-green-200 bg-green-50 rounded-xl hover:border-green-400 hover:shadow-md transition-all flex flex-col items-center justify-center shadow-sm">
                         <span class="text-green-500 font-bold text-lg mb-1">⭐</span>
                         <span class="text-green-700 font-bold">程度 1</span>
@@ -115,18 +106,16 @@
                 </div>
             </div>
 
-            <!-- 🌟 還原：單欄位排行榜 -->
-            <div class="mt-12 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden max-w-2xl mx-auto">
-                <div class="bg-slate-50 border-b border-slate-200 p-4">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center justify-center gap-2">
-                        🏆 DSE 修練所英雄榜 (Top 20)
-                    </h3>
-                </div>
-                <div class="p-4">
-                    <div id="my-rank-home"></div>
-                    <div id="leaderboard-home-container" class="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                        <div class="text-center py-4 text-slate-500">連線中，請稍候...</div>
-                    </div>
+            <!-- 雙欄位排行榜 -->
+            <div class="mt-14 pt-8 border-t border-slate-100 max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold text-orange-600 mb-2 flex justify-center items-center gap-2">
+                    🏆 勤學排行榜 (Top 20)
+                </h3>
+                <p class="text-slate-500 text-sm mb-6">全校最強刷題王者，累積最高分的勤學生都在這裡！</p>
+                
+                <div id="my-rank-home"></div>
+                <div id="leaderboard-home-container" class="max-h-[500px] overflow-y-auto custom-scrollbar px-1">
+                    <div class="text-center py-4 text-slate-500">連線中，請稍候...</div>
                 </div>
             </div>
         </div>
@@ -378,19 +367,19 @@
     </main>
 
     <!-- ========================================== -->
-    <!-- 引入模組化腳本 -->
+    <!-- 🌟 強制破除快取 (v=100) 加上 defer 確保載入順序 -->
     <!-- ========================================== -->
-    <script src="js/utils.js?v=78"></script>
-    <script src="js/topics/indices.js?v=78"></script>
-    <script src="js/topics/factorization.js?v=78"></script>
-    <script src="js/topics/rounding.js?v=78"></script>
-    <script src="js/topics/identities.js?v=78"></script>
-    <script src="js/topics/fractions.js?v=78"></script>
-    <script src="js/topics/binary.js?v=78"></script>
-    <script src="js/topics/expansion.js?v=78"></script>
-    <script src="js/topics/algebraic_fractions_mul_div.js?v=78"></script>
-    <script src="js/topics/triangle_area.js?v=78"></script>
-    <script src="js/app.js?v=78"></script>
+    <script src="js/utils.js?v=100" defer></script>
+    <script src="js/topics/indices.js?v=100" defer></script>
+    <script src="js/topics/factorization.js?v=100" defer></script>
+    <script src="js/topics/rounding.js?v=100" defer></script>
+    <script src="js/topics/identities.js?v=100" defer></script>
+    <script src="js/topics/fractions.js?v=100" defer></script>
+    <script src="js/topics/binary.js?v=100" defer></script>
+    <script src="js/topics/expansion.js?v=100" defer></script>
+    <script src="js/topics/algebraic_fractions_mul_div.js?v=100" defer></script>
+    <script src="js/topics/triangle_area.js?v=100" defer></script>
+    <script src="js/app.js?v=100" defer></script>
 
 </body>
 </html>
