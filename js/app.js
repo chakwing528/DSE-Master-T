@@ -1,10 +1,9 @@
-```javascript
 // js/app.js
 
 // ==========================================
 // 🚨 老師設定區
 // ==========================================
-// 請填寫你最新部署的 Google Apps Script 網址
+// 你的 Google Apps Script 網址 (V43/V44 以後版本)
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
 // 🟢 開啟 AI 手寫與鍵盤雙模輸入功能
@@ -112,7 +111,7 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
         }
     });
 
-    // 🌟 雙欄排版 (Grid cols-2)
+    // 🌟 首頁雙欄排版
     let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
     globalLeaderboard.slice(0, 20).forEach((student, index) => {
         let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
@@ -129,7 +128,7 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
 
     if (homeContainer) homeContainer.innerHTML = html;
     
-    // 結算畫面緊湊單欄排版
+    // 結算畫面單欄緊湊排版
     let endHtml = '<div class="space-y-2">';
     globalLeaderboard.slice(0, 20).forEach((student, index) => {
         let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
@@ -171,7 +170,10 @@ function setQuestionNum(num) {
         btn.classList.add('bg-transparent', 'text-slate-600');
     });
     const activeBtn = document.getElementById('btn-num-' + num);
-    if (activeBtn) { activeBtn.classList.remove('bg-transparent', 'text-slate-600'); activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md'); }
+    if (activeBtn) { 
+        activeBtn.classList.remove('bg-transparent', 'text-slate-600'); 
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md'); 
+    }
 }
 
 function showTopicScreen() {
@@ -191,7 +193,7 @@ function backToLevelSelectionFromQuiz() { document.getElementById('confirmModal'
 function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
 function confirmBackToLevelSelection() { closeConfirmModal(); backToLevelSelection(); }
 
-// 🌟 核心：為所有題目動態賦予分數值
+// 🌟 動態配分系統 (程度1=5分, 程度2=8分, 程度3=12分, 程度4=15分)
 function assignQuestionScores() {
     questionBank.forEach(q => {
         let lvlStr = q.level || "";
@@ -199,7 +201,7 @@ function assignQuestionScores() {
         else if (lvlStr.includes('3')) q.scoreVal = 12;
         else if (lvlStr.includes('2')) q.scoreVal = 8;
         else if (lvlStr.includes('1')) q.scoreVal = 5;
-        else q.scoreVal = 10; // 防呆
+        else q.scoreVal = 10; 
     });
 }
 
@@ -240,7 +242,6 @@ function selectTopic(topic) {
             let colorClass = lvl.id.includes('1') ? 'bg-green-100 text-green-700' : (lvl.id.includes('2') ? 'bg-blue-100 text-blue-700' : (lvl.id.includes('3') ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'));
             
             btn.querySelector('.font-bold').innerHTML = title + `<div class="mt-1"><span class="inline-block px-2 py-0.5 ${colorClass} text-xs rounded-md font-bold">${badge}</span></div>`;
-            // 🌟 於難度選擇頁面清楚顯示配分
             btn.lastElementChild.innerHTML = desc + `<div class="mt-3 text-indigo-600 font-bold text-sm bg-indigo-50 inline-block px-3 py-1 rounded-full shadow-sm border border-indigo-100">🎯 答對得 ${scoreVal} 分</div>`;
         }
     });
@@ -262,6 +263,7 @@ function assignHandwriting(bank) {
     }
 }
 
+// 🌟 修復與分離跨課題挑戰
 function startGlobalMixed(level) {
     try {
         currentTopic = 'global_mixed';
@@ -269,26 +271,32 @@ function startGlobalMixed(level) {
         currentLevelPref = level;
 
         let topicsList = ['indices', 'factorization', 'rounding', 'identities', 'fractions', 'binary', 'expansion', 'alg_frac_mul_div', 'triangle_area'];
-        let numQ = topicsList.length; // 確保涵蓋所有課題
-        let selectedTopics = shuffleArray([...topicsList]);
+        
+        let numQ = totalQuestionsConfig;
+        let selectedTopics = [];
+        
+        while (selectedTopics.length < numQ) {
+            selectedTopics.push(topicsList[Math.floor(Math.random() * topicsList.length)]);
+        }
+        selectedTopics = shuffleArray(selectedTopics);
 
         questionBank = [];
         selectedTopics.forEach((t, idx) => {
             let qArr = [];
             let lvl = String(level);
             
-            // 防呆：確保各單元不會呼叫超出其設計的難度
             let supportedIds = fallbackConfigs[t].levels.map(l => l.id.toLowerCase());
             let maxSupported = supportedIds.some(id => id.includes('4')) ? 4 : (supportedIds.some(id => id.includes('3')) ? 3 : 2);
-            if (parseInt(lvl) > maxSupported) lvl = String(maxSupported);
+            
+            if (lvl !== 'mixed' && parseInt(lvl) > maxSupported) lvl = String(maxSupported);
             
             try {
                 if (t === 'indices') qArr = generateIndicesQuestions(1, lvl);
                 else if (t === 'factorization') {
                     let fLvl = lvl;
-                    // 因式分解需要加上 a/b 後綴
                     if (lvl === '2') fLvl = Math.random() > 0.5 ? '2a' : '2b';
-                    if (lvl === '3' || lvl === '4') fLvl = Math.random() > 0.5 ? '3a' : '3b';
+                    else if (lvl === '3' || lvl === '4') fLvl = Math.random() > 0.5 ? '3a' : '3b';
+                    else if (lvl === 'mixed') fLvl = 'mixed';
                     qArr = generateFactorizationQuestions(1, fLvl);
                 }
                 else if (t === 'rounding') qArr = generateRoundingQuestions(1, lvl);
@@ -304,12 +312,13 @@ function startGlobalMixed(level) {
 
             if (qArr && qArr.length > 0) { 
                 qArr[0].id = idx + 1; 
+                if (level !== 'mixed') qArr[0].level = `程度 ${level}`;
                 questionBank.push(qArr[0]); 
             } else {
-                // 萬一某個課題失敗，給予安全的基礎替代題防崩潰
                 qArr = generateIndicesQuestions(1, "1");
                 qArr[0].id = idx + 1;
-                qArr[0].topic = fallbackConfigs[t].name + " (替代)";
+                qArr[0].topic = fallbackConfigs[t]?.name + " (替代)" || "替代題目";
+                if (level !== 'mixed') qArr[0].level = `程度 ${level}`;
                 questionBank.push(qArr[0]);
             }
         });
@@ -378,13 +387,13 @@ window.switchInputMode = function(mode) {
     }
 };
 
-// 🌟 跳過本題功能
+// 🌟 跳過本題功能 (0分)
 window.skipQuestion = function() {
     if (confirm("確定要跳過這題嗎？\n(跳過本題將獲得 0 分，並會直接顯示正確解答供您參考)")) {
         let q = questionBank[currentQuestionIndex];
         let correctOpt = q.options.find(o => o.isCorrect);
         
-        attemptsCount = 2; // 強制標記為已失敗兩次，不再給分
+        attemptsCount = 2; // 強制標記為已失敗兩次
         
         showFeedback('incorrect', correctOpt.hint, true); 
         document.getElementById('feedbackMessage').insertAdjacentHTML('afterbegin', `<div class="mb-4 text-orange-600 font-bold text-lg sm:text-xl bg-orange-50 p-3 rounded-lg border border-orange-200 shadow-sm">⏭️ 你已選擇跳過本題 (獲得 0 分)</div>`);
@@ -626,7 +635,7 @@ async function startRecognitionPhase() {
         if (!result.success) throw new Error(result.message);
 
         if (result.latex === undefined) {
-            throw new Error("後台未回傳數式！請確認您的 Google Apps Script 已部署了最新的 V43 代碼，並且部署時有選擇「建立新版本」。");
+            throw new Error("後台未回傳數式！請確認您的 Google Apps Script 已部署了最新代碼，並且部署時有選擇「建立新版本」。");
         }
         
         currentRecognizedLaTeX = result.latex;
@@ -685,8 +694,9 @@ async function startKeyboardRecognitionPhase() {
         
         if (!result.success) throw new Error(result.message);
 
-        if (result.latex === undefined) {
-            throw new Error("後台未回傳數式！請確認您的 Google Apps Script 已部署了包含「鍵盤轉換」的最新 V43 代碼，並且部署時有選擇「建立新版本」。");
+        // 🌟 強化防呆：防範 undefined 字串被當成正常結果
+        if (!result.latex || String(result.latex).trim() === "undefined") {
+            throw new Error("系統無法識別該數式。請確保輸入了正確的數學符號，或檢查 Google Apps Script 後台是否已更新至支援鍵盤轉換的版本。");
         }
         
         currentRecognizedLaTeX = result.latex;
@@ -729,7 +739,6 @@ window.rewriteHandwriting = function() {
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     
-    // 取消跳過功能
     document.getElementById('skip-btn').disabled = true;
     document.getElementById('skip-btn').classList.add('opacity-50', 'cursor-not-allowed');
     
@@ -745,7 +754,7 @@ window.confirmAndGrade = async function() {
         tempDiv.innerHTML = correctOpt.text;
         let standardAns = tempDiv.textContent || tempDiv.innerText;
         
-        const formData = newSearchParams();
+        const formData = new URLSearchParams(); 
         formData.append('action', 'ai_grade');
         formData.append('studentLatex', currentRecognizedLaTeX);
         formData.append('standardAns', standardAns);
@@ -823,7 +832,6 @@ function showEndScreen() {
     document.getElementById('appContainer').classList.add('hidden');
     document.getElementById('endScreen').classList.remove('hidden');
     
-    // 🌟 動態計算滿分並顯示
     let totalPossibleScore = questionBank.reduce((sum, q) => sum + (q.scoreVal || 10), 0);
     
     document.getElementById('finalScore').textContent = score;
@@ -903,7 +911,6 @@ function submitToGoogleSheet() {
     
     let displayLevel = currentLevelPref === 'mixed' ? '綜合挑戰' : currentLevelPref.toString().toUpperCase();
     
-    // 🌟 動態總分計算上傳
     let totalScoreVal = questionBank.reduce((sum, q) => sum + (q.scoreVal || 10), 0);
     let percentageVal = ((score / totalScoreVal) * 100).toFixed(0) + "%";
 
@@ -1005,6 +1012,3 @@ window.onload = () => {
     if(savedClass) document.getElementById('className').value = savedClass; if(savedNum) document.getElementById('classNumber').value = savedNum; if(savedName) document.getElementById('studentName').value = savedName;
     setupCanvasEvents();
 };
-
-
-```
