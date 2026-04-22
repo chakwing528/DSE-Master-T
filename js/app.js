@@ -1,6 +1,6 @@
 // js/app.js
 
-console.log("App.js V57 成功載入！已完美復原所有經典排版，並加裝防彈裝甲！");
+console.log("App.js V58 成功載入！已完美整合無提示跳過功能與精準手寫題數分配！");
 
 // ==========================================
 // 🚨 老師設定區
@@ -113,28 +113,35 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
         }
     });
 
-    // 🌟 首頁：雙欄排版，完全對應截圖
     let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
     globalLeaderboard.slice(0, 20).forEach((student, index) => {
         let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
+        const isHighestMe = (String(student.className).toUpperCase().trim() === currentUserClass && String(student.classNum).trim() === currentUserNum) && (index + 1 === userRank);
+
+        const bgClass = isHighestMe ? 'bg-amber-100 border-amber-300 ring-2 ring-amber-200' : 'bg-white border-slate-100';
+        const textClass = isHighestMe ? 'text-amber-900' : 'text-slate-700';
+        const scoreClass = isHighestMe ? 'text-amber-700' : 'text-indigo-600';
         
-        html += `<div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-3">${rankIcon}<span class="font-bold text-slate-700 text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="text-indigo-600 font-bold text-base">${student.totalScore} 分</div></div>`;
+        html += `<div class="flex justify-between items-center ${bgClass} p-4 rounded-xl border shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-3">${rankIcon}<span class="font-bold ${textClass} text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="${scoreClass} font-bold text-lg">${student.totalScore} 分</div></div>`;
     });
     html += '</div>';
 
     if (homeContainer) homeContainer.innerHTML = html;
     
-    // 🌟 結算畫面：同樣使用雙欄排版 (截圖 3 顯示為左右兩排)
     let endHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
     globalLeaderboard.slice(0, 20).forEach((student, index) => {
         let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
-        
-        endHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-2">${rankIcon}<span class="font-bold text-slate-700 text-sm sm:text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="text-indigo-600 font-bold text-sm sm:text-base">${student.totalScore} 分</div></div>`;
+        const isHighestMe = (String(student.className).toUpperCase().trim() === currentUserClass && String(student.classNum).trim() === currentUserNum) && (index + 1 === userRank);
+
+        const bgClass = isHighestMe ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-300' : 'bg-white border-slate-100';
+        const textClass = isHighestMe ? 'text-amber-800' : 'text-slate-700';
+        const scoreClass = isHighestMe ? 'text-amber-700' : 'text-indigo-600';
+
+        endHtml += `<div class="flex justify-between items-center ${bgClass} p-3 rounded-xl border shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-2">${rankIcon}<span class="font-bold ${textClass} text-sm sm:text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="${scoreClass} font-bold text-sm sm:text-base">${student.totalScore} 分</div></div>`;
     });
     endHtml += '</div>';
     if (endContainer) endContainer.innerHTML = endHtml;
 
-    // 🌟 完全復原截圖的黃色背景排名區塊
     let myRankHtml = '';
     if (currentUserClass && currentUserNum) {
         if (userRank !== -1) {
@@ -175,7 +182,6 @@ function backToLevelSelection() {
     if (currentTopic === 'global_mixed') showTopicScreen(); else selectTopic(currentTopic);
 }
 
-// 🌟 新增重做此難度的函數 (對應截圖底部的藍色按鈕)
 window.restartLevel = function() {
     startGame(currentLevelPref);
 };
@@ -246,10 +252,12 @@ function selectTopic(topic) {
 function assignHandwriting(bank) {
     if (!ENABLE_AI_HANDWRITING || !bank) return; 
     let hwCount = 0;
+    
+    // 🌟 精準分配手寫題數
     if (bank.length === 3) hwCount = 1;
     else if (bank.length === 5) hwCount = 2;
-    else if (bank.length === 10) hwCount = 5;
-    else if (bank.length > 0) hwCount = Math.floor(bank.length / 2);
+    else if (bank.length === 10) hwCount = 3;
+    else if (bank.length > 0) hwCount = Math.floor(bank.length / 3);
 
     let indices = Array.from({length: bank.length}, (_, i) => i);
     indices = shuffleArray(indices).slice(0, hwCount);
@@ -385,37 +393,32 @@ window.switchInputMode = function(mode) {
     }
 };
 
+// 🌟 修正：移除彈窗與解答提示，直接給 0 分並進入下一題狀態
 window.skipQuestion = function() {
-    if (confirm("確定要跳過這題嗎？\n(跳過本題將獲得 0 分，並會直接顯示正確解答供您參考)")) {
-        let q = questionBank[currentQuestionIndex];
-        if(!q) return;
-        let correctOpt = q.options.find(o => o.isCorrect);
-        if(!correctOpt) return;
-        
-        attemptsCount = 2; // 強制標記為已失敗兩次
-        
-        showFeedback('incorrect', correctOpt.hint, true); 
-        const fbMsg = document.getElementById('feedbackMessage');
-        if (fbMsg) {
-            fbMsg.insertAdjacentHTML('afterbegin', `<div class="mb-4 text-orange-600 font-bold text-lg sm:text-xl bg-orange-50 p-3 rounded-lg border border-orange-200 shadow-sm">⏭️ 你已選擇跳過本題 (獲得 0 分)</div>`);
-        }
-        
-        disableAllButtons();
-        
-        const skipBtns = document.querySelectorAll('.skip-action-btn');
-        skipBtns.forEach(btn => {
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-        });
+    let q = questionBank[currentQuestionIndex];
+    if(!q) return;
+    
+    attemptsCount = 2; // 強制標記為已失敗兩次
+    
+    // 🌟 直接顯示跳過訊息，不再顯示解答與解析
+    showFeedback('incorrect', `<div class="mb-4 text-orange-600 font-bold text-lg sm:text-xl bg-orange-50 p-3 rounded-lg border border-orange-200 shadow-sm">⏭️ 你已選擇跳過本題 (獲得 0 分)</div>`, true); 
+    
+    disableAllButtons();
+    
+    // 停用所有跳過按鈕
+    const skipBtns = document.querySelectorAll('.skip-action-btn');
+    skipBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
 
-        if (q.isHandwriting) {
-            ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.disabled = true;
-            });
-            document.getElementById('draw-container')?.classList.add('border-slate-300');
-            document.getElementById('kb-container')?.classList.add('border-slate-300');
-        }
+    if (q.isHandwriting) {
+        ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.disabled = true;
+        });
+        document.getElementById('draw-container')?.classList.add('border-slate-300');
+        document.getElementById('kb-container')?.classList.add('border-slate-300');
     }
 };
 
@@ -437,6 +440,7 @@ function loadQuestion() {
     
     hideFeedback();
     
+    // 🌟 啟用所有的跳過按鈕
     const skipBtns = document.querySelectorAll('.skip-action-btn');
     skipBtns.forEach(btn => {
         btn.disabled = false;
@@ -451,9 +455,12 @@ function loadQuestion() {
 
     const optionsGrid = document.getElementById('optionsGrid');
     const hwArea = document.getElementById('handwritingArea');
+    const skipBtnMC = document.getElementById('skip-btn-mc'); // 🌟 取得選擇題專屬跳過按鈕
     
     if (q.isHandwriting) {
         optionsGrid?.classList.add('hidden');
+        skipBtnMC?.classList.add('hidden'); // 隱藏選擇題跳過按鈕
+        
         if (hwArea) {
             hwArea.classList.remove('hidden');
             
@@ -473,6 +480,8 @@ function loadQuestion() {
         }
     } else {
         optionsGrid?.classList.remove('hidden');
+        skipBtnMC?.classList.remove('hidden'); // 顯示選擇題跳過按鈕
+        
         if (hwArea) hwArea.classList.add('hidden');
         if (optionsGrid) {
             optionsGrid.innerHTML = ''; 
@@ -493,6 +502,7 @@ function loadQuestion() {
 function handleAnswer(selectedOption, buttonElement) {
     attemptsCount++;
     
+    // 🌟 作答後停用所有的跳過按鈕
     const skipBtns = document.querySelectorAll('.skip-action-btn');
     skipBtns.forEach(btn => {
         btn.disabled = true;
@@ -781,6 +791,7 @@ window.rewriteHandwriting = function() {
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui')?.classList.add('hidden');
     
+    // 🌟 確認批改後停用所有的跳過按鈕
     const skipBtns = document.querySelectorAll('.skip-action-btn');
     skipBtns.forEach(btn => {
         btn.disabled = true;
@@ -884,15 +895,6 @@ function showEndScreen() {
     const tQs = document.getElementById('totalQuestions');
     if (tQs) tQs.textContent = totalPossibleScore;
     
-    // 🌟 動態改變副標題
-    const subtitle = document.getElementById('endSubtitle');
-    if (subtitle) {
-        let ratio = score / totalPossibleScore;
-        if (ratio >= 0.8) subtitle.textContent = "AI 分析顯示你對這個單元的概念掌握得非常出色！";
-        else if (ratio >= 0.5) subtitle.textContent = "AI 分析顯示你對這個單元的概念掌握得不錯！";
-        else subtitle.textContent = "AI 分析顯示你還需要多加練習，不要灰心，繼續努力！";
-    }
-    
     let selectedQuote = { text: "今天的累積，是明天的底氣。" };
     let pool = dynamicQuotes.length > 0 ? dynamicQuotes : motivationalQuotes.map(q => ({text: q, weight: 1}));
     
@@ -961,6 +963,7 @@ function submitToGoogleSheet() {
     
     if (!classNameEl || !classNumberEl || !studentNameEl || !statusText || !btn) return;
 
+    // 🌟 班別輸入強制轉大寫
     const className = classNameEl.value.trim().toUpperCase();
     const classNumber = classNumberEl.value.trim();
     const studentName = studentNameEl.value.trim();
@@ -1080,7 +1083,7 @@ function renderMath() {
 window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
 
 document.addEventListener('DOMContentLoaded', () => { 
-    console.log("🚀 App.js V57 初始化執行... DOM 載入完成，已啟動終極防彈裝甲與多重跳過按鈕支援！");
+    console.log("🚀 App.js V58 初始化執行... DOM 載入完成，已啟動終極防彈裝甲與多重跳過按鈕支援！");
     showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
     const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
     const classNameEl = document.getElementById('className'); if (classNameEl && savedClass) classNameEl.value = savedClass; 
