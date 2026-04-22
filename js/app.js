@@ -1,6 +1,6 @@
 // js/app.js
 
-console.log("App.js V54 成功載入！已加裝防彈裝甲，無懼快取與 DOM 遺失問題！");
+console.log("App.js V56 成功載入！已加裝防彈裝甲，並支援多重跳過按鈕！");
 
 // ==========================================
 // 🚨 老師設定區
@@ -334,7 +334,7 @@ function startGlobalMixed(level) {
         assignQuestionScores();
         assignHandwriting(questionBank);
         startQuizSession();
-    } catch (error) { alert(`🚨 系統錯誤！無法讀取跨課題題庫 (V54)。\n原因：${error.message}\n如果右下角沒有顯示 V54，代表你的瀏覽器卡在舊版！`); }
+    } catch (error) { alert(`🚨 系統錯誤！無法讀取跨課題題庫。\n原因：${error.message}`); }
 }
 
 function startGame(levelPref) {
@@ -356,7 +356,7 @@ function startGame(levelPref) {
         assignQuestionScores();
         assignHandwriting(questionBank);
         startQuizSession();
-    } catch (error) { alert(`🚨 系統錯誤！無法讀取題庫 (V54)。\n原因：${error.message}\n如果右下角沒有顯示 V54，代表你的瀏覽器卡在舊版！`); }
+    } catch (error) { alert(`🚨 系統錯誤！無法讀取題庫。\n原因：${error.message}`); }
 }
 
 function startQuizSession() {
@@ -396,6 +396,7 @@ window.switchInputMode = function(mode) {
     }
 };
 
+// 🌟 修改：跳過本題功能 (針對 Class 進行控制)
 window.skipQuestion = function() {
     if (confirm("確定要跳過這題嗎？\n(跳過本題將獲得 0 分，並會直接顯示正確解答供您參考)")) {
         let q = questionBank[currentQuestionIndex];
@@ -403,7 +404,7 @@ window.skipQuestion = function() {
         let correctOpt = q.options.find(o => o.isCorrect);
         if(!correctOpt) return;
         
-        attemptsCount = 2; 
+        attemptsCount = 2; // 強制標記為已失敗兩次
         
         showFeedback('incorrect', correctOpt.hint, true); 
         const fbMsg = document.getElementById('feedbackMessage');
@@ -412,11 +413,13 @@ window.skipQuestion = function() {
         }
         
         disableAllButtons();
-        const skipBtn = document.getElementById('skip-btn');
-        if (skipBtn) {
-            skipBtn.disabled = true;
-            skipBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        }
+        
+        // 🌟 使用 querySelectorAll 停用手寫區及鍵盤區的所有跳過按鈕
+        const skipBtns = document.querySelectorAll('.skip-action-btn');
+        skipBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+        });
 
         if (q.isHandwriting) {
             ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
@@ -447,11 +450,12 @@ function loadQuestion() {
     
     hideFeedback();
     
-    const skipBtn = document.getElementById('skip-btn');
-    if (skipBtn) {
-        skipBtn.disabled = false;
-        skipBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
+    // 🌟 使用 querySelectorAll 啟用所有的跳過按鈕
+    const skipBtns = document.querySelectorAll('.skip-action-btn');
+    skipBtns.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    });
     
     document.getElementById('hw-confirm-ui')?.classList.add('hidden');
     
@@ -502,11 +506,13 @@ function loadQuestion() {
 
 function handleAnswer(selectedOption, buttonElement) {
     attemptsCount++;
-    const skipBtn = document.getElementById('skip-btn');
-    if (skipBtn) {
-        skipBtn.disabled = true;
-        skipBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    }
+    
+    // 🌟 作答後停用所有的跳過按鈕
+    const skipBtns = document.querySelectorAll('.skip-action-btn');
+    skipBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
 
     if (selectedOption.isCorrect) {
         if(buttonElement) {
@@ -790,11 +796,12 @@ window.rewriteHandwriting = function() {
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui')?.classList.add('hidden');
     
-    const skipBtn = document.getElementById('skip-btn');
-    if (skipBtn) {
-        skipBtn.disabled = true;
-        skipBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    }
+    // 🌟 確認批改後停用所有的跳過按鈕
+    const skipBtns = document.querySelectorAll('.skip-action-btn');
+    skipBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
     
     const loadingDiv = document.getElementById('global-loading');
     const loadingText = document.getElementById('global-loading-text');
@@ -963,7 +970,8 @@ function submitToGoogleSheet() {
     
     if (!classNameEl || !classNumberEl || !studentNameEl || !statusText || !btn) return;
 
-    const className = classNameEl.value.trim();
+    // 🌟 獲取班別輸入時強制轉為大寫，確保統一格式
+    const className = classNameEl.value.trim().toUpperCase();
     const classNumber = classNumberEl.value.trim();
     const studentName = studentNameEl.value.trim();
 
@@ -994,7 +1002,7 @@ function submitToGoogleSheet() {
                 let isCrossed = data.crossedThreshold;
                 let officialName = data.officialName || studentName; 
                 
-                let student = globalLeaderboard.find(s => String(s.className).toUpperCase().trim() === className.toUpperCase() && String(s.classNum).trim() === classNumber);
+                let student = globalLeaderboard.find(s => String(s.className).toUpperCase().trim() === className && String(s.classNum).trim() === classNumber);
                 if (student) { student.totalScore = backendNewTotal; } 
                 else { globalLeaderboard.push({className: className, classNum: classNumber, studentName: officialName, totalScore: backendNewTotal}); }
                 renderLeaderboards();
@@ -1082,7 +1090,7 @@ function renderMath() {
 window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
 
 document.addEventListener('DOMContentLoaded', () => { 
-    console.log("🚀 App.js V54 初始化執行... DOM 載入完成，已啟動終極防彈裝甲！");
+    console.log("🚀 App.js V56 初始化執行... DOM 載入完成，已啟動終極防彈裝甲與多重跳過按鈕支援！");
     showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
     const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
     const classNameEl = document.getElementById('className'); if (classNameEl && savedClass) classNameEl.value = savedClass; 
