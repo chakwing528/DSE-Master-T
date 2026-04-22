@@ -1,9 +1,11 @@
 // js/app.js
 
+console.log("App.js V49 成功載入！如果看到這行，代表快取問題已解決。");
+
 // ==========================================
 // 🚨 老師設定區
 // ==========================================
-// 你的 Google Apps Script 網址 (V43/V44 以後版本)
+// 你的 Google Apps Script 網址 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_h7rVev1VtAuPK4BFGR4i3lLMC2dGH_X6lkeB5IHZNHWPSBcQtFGNg0U9ZEteZMs/exec"; 
 
 // 🟢 開啟 AI 手寫與鍵盤雙模輸入功能
@@ -1007,6 +1009,7 @@ function renderMath() {
 window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
 
 window.onload = () => { 
+    console.log("🚀 App.js V49 初始化執行...");
     showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
     const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
     if(savedClass) document.getElementById('className').value = savedClass; if(savedNum) document.getElementById('classNumber').value = savedNum; if(savedName) document.getElementById('studentName').value = savedName;
