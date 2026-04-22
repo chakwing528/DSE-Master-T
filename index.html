@@ -39,15 +39,16 @@
 
     <!-- 🌟 版本檢測雷達 (極重要，用來確認快取是否清除) -->
     <div class="fixed bottom-2 right-2 bg-slate-800 text-white text-xs px-2 py-1 rounded-md opacity-60 z-50 pointer-events-none">
-        V54
+        V56
     </div>
 
-    <main class="max-w-4xl mx-auto p-3 sm:p-5 mt-4" id="main-wrapper">
+    <!-- 🌟 加寬容器適應電腦版 (max-w-5xl) -->
+    <main class="max-w-5xl mx-auto p-4 sm:p-6 mt-6" id="main-wrapper">
         
         <!-- ========================================== -->
         <!-- 畫面 1：選擇課題 (首頁) -->
         <!-- ========================================== -->
-        <div id="topicScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-8 text-center max-w-4xl mx-auto">
+        <div id="topicScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 text-center max-w-5xl mx-auto">
             
             <div class="flex justify-center items-center gap-3 mb-6">
                 <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full">
@@ -69,8 +70,8 @@
                 <button id="btn-num-10" onclick="setQuestionNum(10)" class="num-btn flex-1 py-2 rounded-full font-bold bg-transparent text-slate-600 hover:bg-slate-200 transition-colors text-sm sm:text-base">10 題</button>
             </div>
             
-            <!-- 九宮格課題區塊 -->
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto mb-10">
+            <!-- 九宮格課題區塊 (lg:grid-cols-4) -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 max-w-5xl mx-auto mb-10">
                 <button onclick="selectTopic('indices')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">指數定律</button>
                 <button onclick="selectTopic('factorization')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">因式分解</button>
                 <button onclick="selectTopic('rounding')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">近似值與捨入</button>
@@ -82,7 +83,7 @@
                 <button onclick="selectTopic('triangle_area')" class="py-5 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 shadow-sm text-sm sm:text-base">4B第10章 三角形面積</button>
             </div>
 
-            <!-- 跨課題綜合挑戰四格排版 -->
+            <!-- 跨課題綜合挑戰四格排版 (含動態配分) -->
             <div class="mt-10 border-t border-slate-100 pt-8 max-w-4xl mx-auto">
                 <h3 class="text-xl sm:text-2xl font-bold text-orange-600 mb-2 flex justify-center items-center gap-2">🏆 跨課題綜合挑戰</h3>
                 <p class="text-slate-500 text-sm sm:text-base mb-6">系統將從所有課題中隨機挑選題目，模擬真實考試情況。</p>
@@ -111,7 +112,7 @@
             </div>
 
             <!-- 雙欄位排行榜 -->
-            <div class="mt-14 pt-8 border-t border-slate-100 max-w-4xl mx-auto">
+            <div class="mt-14 pt-8 border-t border-slate-100 max-w-5xl mx-auto">
                 <h3 class="text-2xl font-bold text-orange-600 mb-2 flex justify-center items-center gap-2">
                     🏆 勤學排行榜 (Top 20)
                 </h3>
@@ -192,15 +193,11 @@
                     </div>
                 </div>
 
-                <!-- 頂部列：返回與跳過本題 -->
+                <!-- 🌟 頂部列：返回選單 (跳過按鈕已移至下方) -->
                 <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                     <button onclick="backToLevelSelectionFromQuiz()" class="text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-1 group font-bold px-2 py-1 rounded-lg hover:bg-indigo-50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                         <span class="text-sm sm:text-base">返回選單</span>
-                    </button>
-                    <button id="skip-btn" onclick="skipQuestion()" class="text-slate-500 hover:text-orange-600 transition-colors flex items-center gap-1 group font-bold px-2 py-1 rounded-lg hover:bg-orange-50">
-                        <span class="text-sm sm:text-base">跳過本題 (0分)</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                     </button>
                 </div>
 
@@ -256,6 +253,10 @@
                                         辨識並提交
                                     </button>
                                 </div>
+                                <!-- 🌟 新增跳過本題按鈕 (手寫區) -->
+                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-3 bg-slate-100 text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm flex justify-center items-center gap-2">
+                                    <span>⏭️ 跳過本題 (0分)</span>
+                                </button>
                             </div>
 
                             <!-- ⌨️ 鍵盤區 -->
@@ -271,6 +272,10 @@
                                         轉換並提交
                                     </button>
                                 </div>
+                                <!-- 🌟 新增跳過本題按鈕 (鍵盤區) -->
+                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-3 bg-slate-100 text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm flex justify-center items-center gap-2">
+                                    <span>⏭️ 跳過本題 (0分)</span>
+                                </button>
                             </div>
 
                             <!-- 全局 Loading 遮罩 -->
@@ -337,11 +342,9 @@
 
                 <div class="grid grid-cols-2 gap-3 mb-3">
                     <div class="col-span-1">
+                        <!-- 🌟 班別改為輸入框 -->
                         <label class="block text-sm font-bold text-slate-600 mb-1 pl-1">班別 (Class)</label>
-                        <select id="className" class="w-full p-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white transition-colors">
-                            <option value="">請選擇</option>
-                            <option value="4A">4A</option><option value="4B">4B</option><option value="4C">4C</option><option value="4D">4D</option>
-                        </select>
+                        <input type="text" id="className" placeholder="如: 4A" class="w-full p-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white transition-colors text-center uppercase">
                     </div>
                     <div class="col-span-1">
                         <label class="block text-sm font-bold text-slate-600 mb-1 pl-1">學號 (No.)</label>
@@ -384,19 +387,19 @@
     </main>
 
     <!-- ========================================== -->
-    <!-- 🌟 強制破除快取 (v=54) 加上 defer 確保載入順序 -->
+    <!-- 🌟 強制破除快取 (v=56) 加上 defer 確保載入順序 -->
     <!-- ========================================== -->
-    <script src="js/utils.js?v=54" defer></script>
-    <script src="js/topics/indices.js?v=54" defer></script>
-    <script src="js/topics/factorization.js?v=54" defer></script>
-    <script src="js/topics/rounding.js?v=54" defer></script>
-    <script src="js/topics/identities.js?v=54" defer></script>
-    <script src="js/topics/fractions.js?v=54" defer></script>
-    <script src="js/topics/binary.js?v=54" defer></script>
-    <script src="js/topics/expansion.js?v=54" defer></script>
-    <script src="js/topics/algebraic_fractions_mul_div.js?v=54" defer></script>
-    <script src="js/topics/triangle_area.js?v=54" defer></script>
-    <script src="js/app.js?v=54" defer></script>
+    <script src="js/utils.js?v=56" defer></script>
+    <script src="js/topics/indices.js?v=56" defer></script>
+    <script src="js/topics/factorization.js?v=56" defer></script>
+    <script src="js/topics/rounding.js?v=56" defer></script>
+    <script src="js/topics/identities.js?v=56" defer></script>
+    <script src="js/topics/fractions.js?v=56" defer></script>
+    <script src="js/topics/binary.js?v=56" defer></script>
+    <script src="js/topics/expansion.js?v=56" defer></script>
+    <script src="js/topics/algebraic_fractions_mul_div.js?v=56" defer></script>
+    <script src="js/topics/triangle_area.js?v=56" defer></script>
+    <script src="js/app.js?v=56" defer></script>
 
 </body>
 </html>
