@@ -1,6 +1,6 @@
 // js/app.js
 
-console.log("App.js V49 成功載入！如果看到這行，代表快取問題已解決。");
+console.log("App.js V52 成功載入！如果看到這行，代表快取問題已解決，DOM 穩固！");
 
 // ==========================================
 // 🚨 老師設定區
@@ -741,6 +741,7 @@ window.rewriteHandwriting = function() {
 window.confirmAndGrade = async function() {
     document.getElementById('hw-confirm-ui').classList.add('hidden');
     
+    // 取消跳過功能
     document.getElementById('skip-btn').disabled = true;
     document.getElementById('skip-btn').classList.add('opacity-50', 'cursor-not-allowed');
     
@@ -1008,10 +1009,10 @@ function renderMath() {
 
 window.setQuestionNum = setQuestionNum; window.showTopicScreen = showTopicScreen; window.backToLevelSelection = backToLevelSelection; window.backToLevelSelectionFromQuiz = backToLevelSelectionFromQuiz; window.closeConfirmModal = closeConfirmModal; window.confirmBackToLevelSelection = confirmBackToLevelSelection; window.selectTopic = selectTopic; window.startGame = startGame; window.startGlobalMixed = startGlobalMixed; window.submitToGoogleSheet = submitToGoogleSheet;
 
-window.onload = () => { 
-    console.log("🚀 App.js V49 初始化執行...");
+document.addEventListener('DOMContentLoaded', () => { 
+    console.log("🚀 App.js V52 初始化執行... DOM 載入完成，UI 穩固！");
     showTopicScreen(); fetchConfig(); setInterval(() => fetchConfig(true), 5000); 
     const savedClass = getStoredData('dse_className'); const savedNum = getStoredData('dse_classNumber'); const savedName = getStoredData('dse_studentName');
     if(savedClass) document.getElementById('className').value = savedClass; if(savedNum) document.getElementById('classNumber').value = savedNum; if(savedName) document.getElementById('studentName').value = savedName;
     setupCanvasEvents();
-};
+});
