@@ -274,20 +274,20 @@
                                 <svg class="animate-spin h-10 w-10 text-indigo-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 <p id="global-loading-text" class="text-indigo-700 font-bold text-center px-4 leading-relaxed">載入中...</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                            
+                            <!-- 🌟 終極防呆：確認視窗 (直接寫死在 HTML，確保 100% 存在，不再依賴 JavaScript 動態生成) -->
+                            <div id="hw-confirm-ui" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all rounded-xl border border-slate-200">
+                                <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 步驟一：數式轉換確認</h3>
+                                <div id="hw-confirm-math" class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner whitespace-nowrap"></div>
+                                <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的輸入相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
+                                <div class="flex gap-3 w-full max-w-sm">
+                                    <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新輸入</button>
+                                    <button onclick="confirmAndGrade()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-md text-sm sm:text-base">✅ 確認並批改</button>
+                                </div>
+                            </div>
 
-                <div id="feedbackArea" class="hidden">
-                    <div id="feedbackBox" class="p-4 rounded-xl border w-full overflow-hidden shadow-sm">
-                        <div id="feedbackMessage" class="flex flex-col w-full text-center"></div>
-                    </div>
-                    <button id="nextBtn" class="mt-6 w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all transform hover:scale-[1.02] shadow-md text-lg">
-                        下一題 ➡️
-                    </button>
-                </div>
-            </div>
-        </div>
+                        </div>
+                        <div class="mt-3 text-slate-500 text-sm text-center">💡 提示：你可以自由切換上方標籤，選擇手寫或鍵盤輸入。</div>
 
         <!-- ========================================== -->
         <!-- 畫面 4：結算畫面 (End Screen) -->
@@ -369,17 +369,19 @@
     <!-- ========================================== -->
     <!-- 🌟 強制破除快取 (v=100) 加上 defer 確保載入順序 -->
     <!-- ========================================== -->
-    <script src="js/utils.js?v=100" defer></script>
-    <script src="js/topics/indices.js?v=100" defer></script>
-    <script src="js/topics/factorization.js?v=100" defer></script>
-    <script src="js/topics/rounding.js?v=100" defer></script>
-    <script src="js/topics/identities.js?v=100" defer></script>
-    <script src="js/topics/fractions.js?v=100" defer></script>
-    <script src="js/topics/binary.js?v=100" defer></script>
-    <script src="js/topics/expansion.js?v=100" defer></script>
-    <script src="js/topics/algebraic_fractions_mul_div.js?v=100" defer></script>
-    <script src="js/topics/triangle_area.js?v=100" defer></script>
-    <script src="js/app.js?v=100" defer></script>
+    <!-- 🌟 強制破除快取 (v=101) 加上 defer 確保載入順序 -->
+    <!-- ========================================== -->
+    <script src="js/utils.js?v=101" defer></script>
+    <script src="js/topics/indices.js?v=101" defer></script>
+    <script src="js/topics/factorization.js?v=101" defer></script>
+    <script src="js/topics/rounding.js?v=101" defer></script>
+    <script src="js/topics/identities.js?v=101" defer></script>
+    <script src="js/topics/fractions.js?v=101" defer></script>
+    <script src="js/topics/binary.js?v=101" defer></script>
+    <script src="js/topics/expansion.js?v=101" defer></script>
+    <script src="js/topics/algebraic_fractions_mul_div.js?v=101" defer></script>
+    <script src="js/topics/triangle_area.js?v=101" defer></script>
+    <script src="js/app.js?v=101" defer></script>
 
 </body>
 </html>
