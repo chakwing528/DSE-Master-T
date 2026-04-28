@@ -1,4 +1,3 @@
-
 // js/app.js
 
 console.log("App.js V71 成功載入！已啟動強制登入認證系統、終極安全防護與今日次數顯示！(支援大小寫忽略)");
@@ -95,10 +94,12 @@ window.loginApp = function() {
     const cClass = document.getElementById('loginClass')?.value.toUpperCase().trim();
     const cNum = document.getElementById('loginNum')?.value.trim();
     const cName = document.getElementById('loginName')?.value.trim();
-    const cPwd = document.getElementById('loginPwd')?.value.trim();
+    // 🌟 修正：密碼改為選填，若沒打則預設為空字串
+    const cPwd = document.getElementById('loginPwd')?.value.trim() || "";
 
-    if (!cClass || !cNum || !cName || !cPwd) {
-        alert("請填寫所有登入資料與密碼！");
+    // 🌟 修正：只要填寫班別、學號、姓名即可通過前端登入
+    if (!cClass || !cNum || !cName) {
+        alert("請至少填寫班別、學號與姓名！\n(若老師有派發密碼也請一併填寫)");
         return;
     }
 
@@ -126,13 +127,15 @@ function showTopicScreen() {
     
     const savedClass = getStoredData('dse_className');
     const savedNum = getStoredData('dse_classNumber');
-    const savedPwd = getStoredData('dse_password');
+    const savedName = getStoredData('dse_studentName');
+    const savedPwd = getStoredData('dse_password') || "";
     
     document.getElementById('startScreen')?.classList.add('hidden');
     document.getElementById('appContainer')?.classList.add('hidden');
     document.getElementById('endScreen')?.classList.add('hidden');
     
-    if (!savedClass || !savedNum || !savedPwd) {
+    // 🌟 修正：只要有班別、學號、姓名，就允許進入選單
+    if (!savedClass || !savedNum || !savedName) {
         // 未登入：強制顯示登入畫面，隱藏主畫面
         document.getElementById('loginScreen')?.classList.remove('hidden');
         document.getElementById('topicScreen')?.classList.add('hidden');
@@ -143,7 +146,7 @@ function showTopicScreen() {
         
         // 更新結算畫面顯示身分
         const identityEl = document.getElementById('submitIdentityInfo');
-        if (identityEl) identityEl.textContent = `${savedClass} 班 - ${savedNum} 號 (${getStoredData('dse_studentName')})`;
+        if (identityEl) identityEl.textContent = `${savedClass} 班 - ${savedNum} 號 (${savedName})`;
     }
 }
 
@@ -1277,7 +1280,7 @@ function submitToGoogleSheet() {
     const studentName = getStoredData('dse_studentName');
     const studentPwd = getStoredData('dse_password');
     
-    if (!className || !classNumber || !studentName || !studentPwd || !statusText || !btn) return;
+    if (!className || !classNumber || !studentName || !statusText || !btn) return;
 
     // 🛑 防連點機制：若按鈕已鎖定，直接阻擋
     if (btn.disabled) return;
