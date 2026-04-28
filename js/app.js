@@ -1,6 +1,7 @@
+
 // js/app.js
 
-console.log("App.js V71 成功載入！已啟動登入認證系統、終極安全防護與今日次數顯示！(支援大小寫忽略)");
+console.log("App.js V71 成功載入！已啟動強制登入認證系統、終極安全防護與今日次數顯示！(支援大小寫忽略)");
 
 // ==========================================
 // 🚨 老師設定區
@@ -57,7 +58,39 @@ let currentRecognizedLaTeX = "";
 function getStoredData(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
 function setStoredData(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
 
-// 🌟 新增：登入與認證系統邏輯
+// ==========================================
+// 🌟 核心：動態生成登入介面與強制登入邏輯
+// ==========================================
+function initLoginUI() {
+    if (document.getElementById('loginScreen')) return;
+    const mainWrapper = document.getElementById('main-wrapper') || document.body;
+    const loginDiv = document.createElement('div');
+    loginDiv.innerHTML = `
+    <div id="loginScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 text-center max-w-lg mx-auto mt-8 z-50">
+        <div class="flex justify-center items-center gap-3 mb-6">
+            <div class="bg-indigo-100 text-indigo-500 p-3 rounded-full">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-800">修練所登入</h1>
+        </div>
+        <p class="text-slate-500 mb-8 font-medium">請輸入你的專屬資料與密碼以進行認證</p>
+        <div class="space-y-4 text-left mb-8">
+            <div><label class="block text-sm font-bold text-slate-600 mb-1">班別 (例: 3C)</label><input type="text" id="loginClass" class="w-full p-3 border border-slate-300 rounded-lg uppercase"></div>
+            <div><label class="block text-sm font-bold text-slate-600 mb-1">學號 (例: 15)</label><input type="number" id="loginNum" class="w-full p-3 border border-slate-300 rounded-lg"></div>
+            <div><label class="block text-sm font-bold text-slate-600 mb-1">姓名 (真實姓名)</label><input type="text" id="loginName" class="w-full p-3 border border-slate-300 rounded-lg"></div>
+            <div><label class="block text-sm font-bold text-slate-600 mb-1">認證密碼</label><input type="password" id="loginPwd" placeholder="請輸入老師派發的密碼" class="w-full p-3 border border-slate-300 rounded-lg"></div>
+        </div>
+        <button onclick="loginApp()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">進入修練所 ➡️</button>
+    </div>`;
+    mainWrapper.prepend(loginDiv.firstElementChild);
+
+    const topicScreen = document.getElementById('topicScreen');
+    if (topicScreen && !document.getElementById('logoutBtn')) {
+        const logoutHTML = `<div class="flex justify-end mb-2"><button id="logoutBtn" onclick="logoutApp()" class="text-sm text-slate-400 hover:text-red-500 font-bold underline transition-colors">登出更換帳號</button></div>`;
+        topicScreen.insertAdjacentHTML('afterbegin', logoutHTML);
+    }
+}
+
 window.loginApp = function() {
     const cClass = document.getElementById('loginClass')?.value.toUpperCase().trim();
     const cNum = document.getElementById('loginNum')?.value.trim();
@@ -74,12 +107,7 @@ window.loginApp = function() {
     setStoredData('dse_studentName', cName);
     setStoredData('dse_password', cPwd);
 
-    // 更新結算畫面顯示身分
-    const identityEl = document.getElementById('submitIdentityInfo');
-    if (identityEl) identityEl.textContent = `${cClass} 班 - ${cNum} 號 (${cName})`;
-
-    document.getElementById('loginScreen')?.classList.add('hidden');
-    document.getElementById('topicScreen')?.classList.remove('hidden');
+    showTopicScreen(); // 重新驗證並進入主畫面
     renderLeaderboards();
 };
 
@@ -92,6 +120,32 @@ window.logoutApp = function() {
         location.reload();
     }
 };
+
+function showTopicScreen() {
+    initLoginUI(); // 確保登入介面已生成
+    
+    const savedClass = getStoredData('dse_className');
+    const savedNum = getStoredData('dse_classNumber');
+    const savedPwd = getStoredData('dse_password');
+    
+    document.getElementById('startScreen')?.classList.add('hidden');
+    document.getElementById('appContainer')?.classList.add('hidden');
+    document.getElementById('endScreen')?.classList.add('hidden');
+    
+    if (!savedClass || !savedNum || !savedPwd) {
+        // 未登入：強制顯示登入畫面，隱藏主畫面
+        document.getElementById('loginScreen')?.classList.remove('hidden');
+        document.getElementById('topicScreen')?.classList.add('hidden');
+    } else {
+        // 已登入：隱藏登入畫面，顯示主畫面
+        document.getElementById('loginScreen')?.classList.add('hidden');
+        document.getElementById('topicScreen')?.classList.remove('hidden');
+        
+        // 更新結算畫面顯示身分
+        const identityEl = document.getElementById('submitIdentityInfo');
+        if (identityEl) identityEl.textContent = `${savedClass} 班 - ${savedNum} 號 (${getStoredData('dse_studentName')})`;
+    }
+}
 
 async function fetchConfig(isSilent = false) {
     if (isFetchingLock) return; 
@@ -159,7 +213,6 @@ function renderHomeworkButtons() {
     }
     
     if (!dynamicHomeworkConfig || dynamicHomeworkConfig.length === 0) {
-        if (!isSilentFetch) console.log("📭 功課清單為空，保留功課區塊但顯示無功課提示。");
         if (hwGrid) {
             hwGrid.innerHTML = `<div class="col-span-full text-center py-6 text-amber-700 font-bold bg-amber-100/50 rounded-xl border border-amber-200 border-dashed">🎉 今天暫無功課，好好休息或進行下方自主練習吧！</div>`;
         }
@@ -183,9 +236,6 @@ function renderHomeworkButtons() {
     }
 }
 
-// 用於靜默讀取的全域變數，避免 console log 雜訊
-let isSilentFetch = false;
-
 function renderLeaderboards(overrideClass = null, overrideNum = null) {
     const homeContainer = document.getElementById('leaderboard-home-container');
     const endContainer = document.getElementById('leaderboard-end-container');
@@ -205,7 +255,6 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
     
     const currentUserClass = String(overrideClass || getStoredData('dse_className')).toUpperCase().trim();
     const currentUserNum = String(overrideNum || getStoredData('dse_classNumber')).trim();
-    const currentUserName = String(getStoredData('dse_studentName')).trim();
 
     let userRank = -1;
     let userScore = 0;
@@ -218,7 +267,7 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
         
         let isMatch = (sClass === currentUserClass && sNum === currentUserNum);
         
-        // 🌟 核心防呆修正：後端傳來的空值若對應到學號 0，直接比對班別與學號即可，不依賴姓名 (徹底解決 Nickname 衝突導致未上榜)
+        // 🌟 核心防呆修正：後端傳來的空值若對應到學號 0，直接比對班別與學號即可
         if (!isMatch && sClass === currentUserClass && sNum === "" && currentUserNum === "0") {
             isMatch = true;
         }
@@ -283,13 +332,6 @@ function setQuestionNum(num) {
         activeBtn.classList.remove('bg-transparent', 'text-slate-600'); 
         activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md'); 
     }
-}
-
-function showTopicScreen() {
-    document.getElementById('topicScreen')?.classList.remove('hidden');
-    document.getElementById('startScreen')?.classList.add('hidden');
-    document.getElementById('appContainer')?.classList.add('hidden');
-    document.getElementById('endScreen')?.classList.add('hidden');
 }
 
 function backToLevelSelection() {
@@ -1425,8 +1467,11 @@ window.restartLevel = restartLevel;
 window.loginApp = loginApp;
 window.logoutApp = logoutApp;
 
+// ==========================================
+// 🌟 初始化邏輯，一啟動就檢查登入狀態
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => { 
-    console.log("🚀 App.js V71 初始化執行... 登入認證系統與終極防護就緒！");
+    console.log("🚀 App.js V71 初始化執行... 強制登入鎖定系統啟動！");
     
     const globalBtns = document.querySelectorAll("button[onclick*='startGlobalMixed']");
     globalBtns.forEach(btn => {
@@ -1446,47 +1491,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 🌟 一載入立刻觸發登入驗證，未登入者會被攔截並動態生成登入畫面
+    showTopicScreen(); 
     fetchConfig(); 
     setInterval(() => fetchConfig(true), 5000); 
     
-    // 🌟 核心：載入暫存資料，判定是否顯示登入畫面
-    const savedClass = getStoredData('dse_className'); 
-    const savedNum = getStoredData('dse_classNumber'); 
-    const savedName = getStoredData('dse_studentName');
-    const savedPwd = getStoredData('dse_password');
-    
-    const loginClassEl = document.getElementById('loginClass'); if (loginClassEl && savedClass) loginClassEl.value = savedClass; 
-    const loginNumEl = document.getElementById('loginNum'); if (loginNumEl && savedNum) loginNumEl.value = savedNum; 
-    const loginNameEl = document.getElementById('loginName'); if (loginNameEl && savedName) loginNameEl.value = savedName;
-    const loginPwdEl = document.getElementById('loginPwd'); if (loginPwdEl && savedPwd) loginPwdEl.value = savedPwd;
-    
-    const identityEl = document.getElementById('submitIdentityInfo');
-    if (identityEl && savedClass && savedNum) {
-        identityEl.textContent = `${savedClass} 班 - ${savedNum} 號 (${savedName})`;
-    }
+    // 將 localStorage 暫存資料填入動態生成的登入框
+    setTimeout(() => {
+        const savedClass = getStoredData('dse_className'); 
+        const savedNum = getStoredData('dse_classNumber'); 
+        const savedName = getStoredData('dse_studentName');
+        const savedPwd = getStoredData('dse_password');
+        
+        const loginClassEl = document.getElementById('loginClass'); if (loginClassEl && savedClass) loginClassEl.value = savedClass; 
+        const loginNumEl = document.getElementById('loginNum'); if (loginNumEl && savedNum) loginNumEl.value = savedNum; 
+        const loginNameEl = document.getElementById('loginName'); if (loginNameEl && savedName) loginNameEl.value = savedName;
+        const loginPwdEl = document.getElementById('loginPwd'); if (loginPwdEl && savedPwd) loginPwdEl.value = savedPwd;
 
-    // 若已登入過且有密碼，直接顯示主選單；否則顯示登入畫面
-    if (savedClass && savedNum && savedPwd) {
-        document.getElementById('loginScreen')?.classList.add('hidden');
-        document.getElementById('topicScreen')?.classList.remove('hidden');
-        renderLeaderboards();
-    } else {
-        document.getElementById('loginScreen')?.classList.remove('hidden');
-        document.getElementById('topicScreen')?.classList.add('hidden');
-    }
+        const updateLoginStorage = () => {
+            if (loginClassEl) setStoredData('dse_className', loginClassEl.value.toUpperCase().trim());
+            if (loginNumEl) setStoredData('dse_classNumber', loginNumEl.value.trim());
+            if (loginNameEl) setStoredData('dse_studentName', loginNameEl.value.trim());
+            if (loginPwdEl) setStoredData('dse_password', loginPwdEl.value.trim());
+        };
 
-    // 🌟 若是在登入畫面修改輸入，自動更新緩存 (預防意外跳出)
-    const updateLoginStorage = () => {
-        if (loginClassEl) setStoredData('dse_className', loginClassEl.value.toUpperCase().trim());
-        if (loginNumEl) setStoredData('dse_classNumber', loginNumEl.value.trim());
-        if (loginNameEl) setStoredData('dse_studentName', loginNameEl.value.trim());
-        if (loginPwdEl) setStoredData('dse_password', loginPwdEl.value.trim());
-    };
-
-    loginClassEl?.addEventListener('input', updateLoginStorage);
-    loginNumEl?.addEventListener('input', updateLoginStorage);
-    loginNameEl?.addEventListener('input', updateLoginStorage);
-    loginPwdEl?.addEventListener('input', updateLoginStorage);
+        loginClassEl?.addEventListener('input', updateLoginStorage);
+        loginNumEl?.addEventListener('input', updateLoginStorage);
+        loginNameEl?.addEventListener('input', updateLoginStorage);
+        loginPwdEl?.addEventListener('input', updateLoginStorage);
+    }, 100);
 
     setupCanvasEvents();
 });
