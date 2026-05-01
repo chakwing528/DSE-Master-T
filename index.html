@@ -101,7 +101,7 @@
                 </div>
             </div>
             
-            <button onclick="if(typeof loginApp !== 'undefined') loginApp(); else alert('系統載入中，請稍候...');" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
+            <button id="loginSubmitBtn" onclick="if(typeof loginApp !== 'undefined') loginApp(); else alert('系統載入中，請稍候...');" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
                 進入修練所 ➡️
             </button>
         </div>
@@ -339,9 +339,10 @@
                                 <div id="draw-container" class="w-full border-4 border-slate-300 rounded-xl overflow-hidden shadow-inner relative h-64 sm:h-72 touch-none bg-white transition-colors">
                                     <canvas id="draw-canvas" class="absolute inset-0 w-full h-full cursor-crosshair touch-none"></canvas>
                                 </div>
-                                <div class="flex gap-4 mt-4 w-full">
-                                    <button id="clear-btn" class="flex-1 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">清除重畫</button>
-                                    <button id="recognize-btn" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md flex justify-center items-center gap-2">
+                                <div class="flex gap-2 mt-4 w-full">
+                                    <button id="undo-btn" class="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition-colors shadow-sm border border-slate-200 opacity-40 cursor-not-allowed" disabled>↩️ 上一步</button>
+                                    <button id="clear-btn" class="flex-1 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">🗑️ 清除</button>
+                                    <button id="recognize-btn" class="flex-[2] py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md flex justify-center items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                                         辨識並提交
                                     </button>
@@ -470,19 +471,19 @@
     </main>
 
     <!-- ========================================== -->
-    <!-- 🌟 強制破除快取 (v=64) 加上 defer 確保載入順序 -->
+    <!-- 🌟 強制破除快取 (v=71) 加上 defer 確保載入順序 -->
     <!-- ========================================== -->
-    <script src="js/utils.js?v=64" defer></script>
-    <script src="js/topics/indices.js?v=64" defer></script>
-    <script src="js/topics/factorization.js?v=64" defer></script>
-    <script src="js/topics/rounding.js?v=64" defer></script>
-    <script src="js/topics/identities.js?v=64" defer></script>
-    <script src="js/topics/fractions.js?v=64" defer></script>
-    <script src="js/topics/binary.js?v=64" defer></script>
-    <script src="js/topics/expansion.js?v=64" defer></script>
-    <script src="js/topics/algebraic_fractions_mul_div.js?v=64" defer></script>
-    <script src="js/topics/triangle_area.js?v=64" defer></script>
-    <script src="js/app.js?v=64" defer></script>
+    <script src="js/utils.js?v=71" defer></script>
+    <script src="js/topics/indices.js?v=71" defer></script>
+    <script src="js/topics/factorization.js?v=71" defer></script>
+    <script src="js/topics/rounding.js?v=71" defer></script>
+    <script src="js/topics/identities.js?v=71" defer></script>
+    <script src="js/topics/fractions.js?v=71" defer></script>
+    <script src="js/topics/binary.js?v=71" defer></script>
+    <script src="js/topics/expansion.js?v=71" defer></script>
+    <script src="js/topics/algebraic_fractions_mul_div.js?v=71" defer></script>
+    <script src="js/topics/triangle_area.js?v=71" defer></script>
+    <script src="js/app.js?v=71" defer></script>
 
 </body>
 </html>
