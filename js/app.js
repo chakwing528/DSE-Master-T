@@ -51,6 +51,7 @@ let topicScores = {}; // 追蹤各課題的分數明細
 let quizStartTime = 0;
 let quizTimeTaken = 0;
 let sessionNonce = "";
+let quizIntegrity = { seed: "", chain: "", events: [] };
 
 let currentRecognizedLaTeX = "";
 
@@ -666,6 +667,7 @@ window.skipQuestion = function() {
     if(!q) return;
     
     attemptsCount = 2; 
+    addIntegrityEvent('skip', q, false); 
     
     showFeedback('incorrect', `<div class="mb-4 text-orange-600 font-bold text-lg sm:text-xl bg-orange-50 p-3 rounded-lg border border-orange-200 shadow-sm">⏭️ 你已選擇跳過本題 (獲得 0 分)</div>`, true); 
     
@@ -774,6 +776,7 @@ function handleAnswer(selectedOption, buttonElement) {
     let q = questionBank[currentQuestionIndex];
 
     if (selectedOption.isCorrect) {
+        addIntegrityEvent('mcq', q, true);
         const skipBtns = document.querySelectorAll('.skip-action-btn');
         skipBtns.forEach(btn => {
             btn.disabled = true;
@@ -800,6 +803,7 @@ function handleAnswer(selectedOption, buttonElement) {
         showFeedback('correct', selectedOption.hint, true);
         disableAllButtons();
     } else {
+        addIntegrityEvent('mcq', q, false);
         const skipBtns = document.querySelectorAll('.skip-action-btn');
         skipBtns.forEach(btn => {
             btn.disabled = false;
@@ -1196,6 +1200,7 @@ window.confirmAndGrade = async function() {
         let finalHint = feedbackHtml + correctOpt.hint;
 
         if (result.isCorrect) {
+            addIntegrityEvent('hw', q, true);
             if (attemptsCount === 1) { 
                 score += (q.scoreVal || 10); 
                 if (topicScores[q.topic]) {
@@ -1207,6 +1212,7 @@ window.confirmAndGrade = async function() {
             document.getElementById('draw-container')?.classList.add('border-green-500');
             document.getElementById('kb-container')?.classList.add('border-green-500');
         } else {
+            addIntegrityEvent('hw', q, false);
             skipBtns.forEach(btn => {
                 btn.disabled = false;
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -1375,6 +1381,30 @@ function updateScoreDisplay() {
     if (sd) sd.textContent = score; 
 }
 
+function resetIntegrityState() {
+    quizIntegrity.seed = (typeof crypto !== 'undefined' && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now().toString(36);
+    quizIntegrity.chain = quizIntegrity.seed;
+    quizIntegrity.events = [];
+}
+
+function addIntegrityEvent(eventType, q, isCorrect = false) {
+    const payload = {
+        t: Date.now(), e: eventType, i: currentQuestionIndex,
+        topic: q?.topic || "", level: q?.level || "",
+        sv: q?.scoreVal || 0, c: !!isCorrect
+    };
+    quizIntegrity.events.push(payload);
+    const raw = `${quizIntegrity.chain}|${JSON.stringify(payload)}`;
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash = hash & hash;
+    }
+    quizIntegrity.chain = (hash >>> 0).toString(16);
+}
+
 function submitToGoogleSheet() {
     const btn = document.getElementById('submitRecordBtn');
     const statusText = document.getElementById('submitStatus');
@@ -1408,7 +1438,10 @@ function submitToGoogleSheet() {
     // 🌟 準備終極防護參數
     const timestampStr = Date.now().toString();
     const timeTakenStr = quizTimeTaken.toString();
-
+    const integritySeed = quizIntegrity.seed;
+    const integrityChain = quizIntegrity.chain;
+    const integrityPayload = JSON.stringify(quizIntegrity.events);
+    
     // ====================================================================
     // 🔐 終極加密防禦：加入 UUID、時間戳、作答時間 與 密碼 進行混合加密
     // ====================================================================
@@ -1443,7 +1476,10 @@ function submitToGoogleSheet() {
     formData.append('timestamp', timestampStr);
     formData.append('timeTaken', timeTakenStr);
     formData.append('password', studentPwd); // 加入密碼
-
+    formData.append('integritySeed', integritySeed);
+    formData.append('integrityChain', integrityChain);
+    formData.append('integrityPayload', integrityPayload);
+    
     fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData })
         .then(response => response.json())
         .then(data => {
@@ -1735,7 +1771,6 @@ window.confirmBackToLevelSelection = confirmBackToLevelSelection;
 window.selectTopic = selectTopic; 
 window.startGame = startGame; 
 window.startGlobalMixed = startGlobalMixed; 
-window.submitToGoogleSheet = submitToGoogleSheet;
 window.startHomework = startHomework;
 window.restartLevel = restartLevel;
 window.loginApp = loginApp;
