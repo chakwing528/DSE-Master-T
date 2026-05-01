@@ -90,26 +90,46 @@ function initLoginUI() {
     }
 }
 
-window.loginApp = function() {
+window.loginApp = async function() {
     const cClass = document.getElementById('loginClass')?.value.toUpperCase().trim();
     const cNum = document.getElementById('loginNum')?.value.trim();
     const cName = document.getElementById('loginName')?.value.trim();
-    // 🌟 修正：密碼改為選填，若沒打則預設為空字串
     const cPwd = document.getElementById('loginPwd')?.value.trim() || "";
 
-    // 🌟 修正：只要填寫班別、學號、姓名即可通過前端登入
     if (!cClass || !cNum || !cName) {
-        alert("請至少填寫班別、學號與姓名！\n(若老師有派發密碼也請一併填寫)");
+        alert("請填寫班別、學號與姓名！");
         return;
     }
 
-    setStoredData('dse_className', cClass);
-    setStoredData('dse_classNumber', cNum);
-    setStoredData('dse_studentName', cName);
-    setStoredData('dse_password', cPwd);
+    const btn = document.getElementById('loginSubmitBtn');
+    if (btn) { btn.disabled = true; btn.textContent = "驗證中..."; }
 
-    showTopicScreen(); // 重新驗證並進入主畫面
-    renderLeaderboards();
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'verify_login');
+        formData.append('className', cClass);
+        formData.append('classNumber', cNum);
+        formData.append('password', cPwd);
+
+        const result = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData }).then(r => r.json());
+
+        if (!result.success) {
+            alert(result.message || "登入失敗，請再試。");
+            if (btn) { btn.disabled = false; btn.textContent = "進入修練所 ➡️"; }
+            return;
+        }
+
+        setStoredData('dse_className', cClass);
+        setStoredData('dse_classNumber', cNum);
+        setStoredData('dse_studentName', cName);
+        setStoredData('dse_password', cPwd);
+
+        showTopicScreen();
+        renderLeaderboards();
+    } catch (err) {
+        alert("網路連線失敗，請檢查網路後再試。");
+        if (btn) { btn.disabled = false; btn.textContent = "進入修練所 ➡️"; }
+    }
 };
 
 window.logoutApp = function() {
@@ -659,7 +679,7 @@ window.skipQuestion = function() {
     });
 
     if (q.isHandwriting) {
-        ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+        ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.disabled = true;
         });
@@ -717,7 +737,7 @@ function loadQuestion() {
             document.getElementById('draw-container')?.classList.remove('border-green-500', 'border-red-400');
             document.getElementById('kb-container')?.classList.remove('border-green-500', 'border-red-400');
             
-            ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+            ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.disabled = false;
             });
@@ -725,7 +745,7 @@ function loadQuestion() {
             const kbInput = document.getElementById('keyboard-math-input');
             if (kbInput) kbInput.value = ""; 
 
-            switchInputMode('draw');
+            switchInputMode('keyboard');
             setTimeout(() => { resizeCanvas(); initCanvas(); }, 50);
         }
     } else {
@@ -823,6 +843,8 @@ function goToNext() { currentQuestionIndex++; if (currentQuestionIndex < questio
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
+let strokeHistory = [];   // 🌟 儲存所有筆劃，用於「上一步」
+let currentStroke = [];   // 🌟 當前正在繪製的筆劃
 
 function initCanvas() {
     const canvas = document.getElementById('draw-canvas');
@@ -834,6 +856,49 @@ function initCanvas() {
     ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+    strokeHistory = [];
+    currentStroke = [];
+    updateUndoBtn();
+}
+
+function updateUndoBtn() {
+    const btn = document.getElementById('undo-btn');
+    if (!btn) return;
+    if (strokeHistory.length === 0) {
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'cursor-not-allowed');
+    } else {
+        btn.disabled = false;
+        btn.classList.remove('opacity-40', 'cursor-not-allowed');
+    }
+}
+
+function undoStroke() {
+    if (strokeHistory.length === 0) return;
+    strokeHistory.pop();
+    redrawCanvasFromHistory();
+    updateUndoBtn();
+}
+
+function redrawCanvasFromHistory() {
+    const canvas = document.getElementById('draw-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    strokeHistory.forEach(stroke => {
+        if (stroke.length < 2) return;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for (let i = 1; i < stroke.length; i++) {
+            ctx.lineTo(stroke[i].x, stroke[i].y);
+        }
+        ctx.stroke();
+    });
 }
 
 function resizeCanvas() {
@@ -861,9 +926,35 @@ function getPos(e) {
     return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
 }
 
-function startDrawing(e) { e.preventDefault(); isDrawing = true; const pos = getPos(e); lastX = pos.x; lastY = pos.y; }
-function draw(e) { if (!isDrawing) return; e.preventDefault(); const pos = getPos(e); const ctx = document.getElementById('draw-canvas').getContext('2d'); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(pos.x, pos.y); ctx.stroke(); lastX = pos.x; lastY = pos.y; }
-function stopDrawing() { isDrawing = false; }
+function startDrawing(e) {
+    e.preventDefault();
+    isDrawing = true;
+    const pos = getPos(e);
+    lastX = pos.x;
+    lastY = pos.y;
+    currentStroke = [{ x: pos.x, y: pos.y }];
+}
+function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    const ctx = document.getElementById('draw-canvas').getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    lastX = pos.x;
+    lastY = pos.y;
+    currentStroke.push({ x: pos.x, y: pos.y });
+}
+function stopDrawing() {
+    if (isDrawing && currentStroke.length > 1) {
+        strokeHistory.push(currentStroke);
+        updateUndoBtn();
+    }
+    currentStroke = [];
+    isDrawing = false;
+}
 
 function setupCanvasEvents() {
     const canvas = document.getElementById('draw-canvas');
@@ -871,8 +962,12 @@ function setupCanvasEvents() {
     canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDrawing); canvas.addEventListener('mouseout', stopDrawing);
     canvas.addEventListener('touchstart', startDrawing, { passive: false }); canvas.addEventListener('touchmove', draw, { passive: false }); canvas.addEventListener('touchend', stopDrawing); canvas.addEventListener('touchcancel', stopDrawing);
     
-    document.getElementById('clear-btn')?.addEventListener('click', () => { 
-        initCanvas(); 
+    document.getElementById('clear-btn')?.addEventListener('click', () => {
+        initCanvas();
+        document.getElementById('draw-container')?.classList.remove('border-green-500', 'border-red-400');
+    });
+    document.getElementById('undo-btn')?.addEventListener('click', () => {
+        undoStroke();
         document.getElementById('draw-container')?.classList.remove('border-green-500', 'border-red-400');
     });
     document.getElementById('recognize-btn')?.addEventListener('click', startRecognitionPhase);
@@ -934,6 +1029,8 @@ async function startRecognitionPhase() {
     if (recBtn) recBtn.disabled = true;
     const clrBtn = document.getElementById('clear-btn');
     if (clrBtn) clrBtn.disabled = true;
+    const undoBtn = document.getElementById('undo-btn');
+    if (undoBtn) undoBtn.disabled = true;
     document.getElementById('draw-container')?.classList.remove('border-green-500', 'border-red-400');
     
     try {
@@ -1040,7 +1137,7 @@ async function startKeyboardRecognitionPhase() {
 window.rewriteHandwriting = function() {
     document.getElementById('hw-confirm-ui')?.classList.add('hidden');
     initCanvas(); 
-    const btns = ['recognize-btn', 'clear-btn', 'kb-recognize-btn', 'kb-clear-btn'];
+    const btns = ['recognize-btn', 'clear-btn', 'undo-btn', 'kb-recognize-btn', 'kb-clear-btn'];
     btns.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = false;
@@ -1120,7 +1217,7 @@ window.confirmAndGrade = async function() {
             document.getElementById('draw-container')?.classList.add('border-red-400');
             document.getElementById('kb-container')?.classList.add('border-red-400');
             
-            ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+            ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.disabled = false;
             });
@@ -1145,7 +1242,7 @@ window.giveUpHandwriting = function() {
     let correctOpt = q.options.find(o => o.isCorrect);
     showFeedback('incorrect', correctOpt.hint, true); 
     
-    ['clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+    ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = true;
     });
@@ -1263,9 +1360,18 @@ function showEndScreen() {
             </div>
         `;
     }
+
+    // 🌟 自動傳送成績 (無需手動按鈕)
+    setTimeout(() => {
+        const submitBtn = document.getElementById('submitRecordBtn');
+        if (submitBtn && !submitBtn.disabled) {
+            submitBtn.textContent = "正在自動傳送...";
+            submitToGoogleSheet();
+        }
+    }, 800);
 }
 
-function updateScoreDisplay() { 
+function updateScoreDisplay() {
     const sd = document.getElementById('scoreDisplay');
     if (sd) sd.textContent = score; 
 }
@@ -1433,19 +1539,185 @@ function submitToGoogleSheet() {
 function renderScratchCard() {
     const canvas = document.getElementById('scratchCanvas');
     if (!canvas) return;
+
+    // 重置可見性
+    canvas.style.opacity = '1';
+    canvas.style.display = 'block';
+    canvas.style.transition = '';
+
     const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-    ctx.fillStyle = '#cbd5e1'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 16px sans-serif'; ctx.fillStyle = '#64748b'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('✨ 刮開看獎勵 ✨', canvas.width / 2, canvas.height / 2);
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = 25; ctx.globalCompositeOperation = 'destination-out';
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    // 🌟 漸變金箔覆蓋層
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#fde68a');
+    gradient.addColorStop(0.35, '#f59e0b');
+    gradient.addColorStop(0.7, '#d97706');
+    gradient.addColorStop(1, '#92400e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 金箔光澤紋理
+    for (let i = 0; i < 45; i++) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.18})`;
+        ctx.beginPath();
+        ctx.arc(
+            Math.random() * canvas.width,
+            Math.random() * canvas.height,
+            Math.random() * 6 + 1,
+            0, Math.PI * 2
+        );
+        ctx.fill();
+    }
+
+    // 中央提示文字
+    ctx.font = 'bold 17px sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(120, 53, 15, 0.6)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1;
+    ctx.fillText('✨ 用手指刮開驚喜 ✨', canvas.width / 2, canvas.height / 2);
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    // 設置刮除模式
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 38;
+    ctx.globalCompositeOperation = 'destination-out';
+
     let isDrawing = false;
-    function getPos(e) { const rect = canvas.getBoundingClientRect(); const evt = e.touches ? e.touches[0] : e; return { x: evt.clientX - rect.left, y: evt.clientY - rect.top }; }
-    canvas.onmousedown = (e) => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-    canvas.onmousemove = (e) => { if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
-    window.onmouseup = () => isDrawing = false;
-    canvas.ontouchstart = (e) => { e.preventDefault(); isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-    canvas.ontouchmove = (e) => { e.preventDefault(); if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); };
-    canvas.ontouchend = () => isDrawing = false;
+    let revealed = false;
+    let strokeCount = 0;
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const evt = e.touches ? e.touches[0] : e;
+        return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+    }
+
+    function checkReveal() {
+        if (revealed) return;
+        strokeCount++;
+        if (strokeCount % 4 !== 0) return;
+        try {
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let transparent = 0, total = 0;
+            for (let i = 3; i < imgData.data.length; i += 40) {
+                total++;
+                if (imgData.data[i] < 128) transparent++;
+            }
+            if (total > 0 && (transparent / total) > 0.4) {
+                revealed = true;
+                triggerReveal();
+            }
+        } catch (err) {}
+    }
+
+    function triggerReveal() {
+        if (navigator.vibrate) {
+            try { navigator.vibrate([80, 40, 80, 40, 200]); } catch (e) {}
+        }
+        canvas.style.transition = 'opacity 0.7s ease-out';
+        canvas.style.opacity = '0';
+        spawnConfetti();
+        const rewardZone = document.getElementById('rewardZone');
+        if (rewardZone) {
+            rewardZone.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            rewardZone.style.transform = 'scale(1.04)';
+            setTimeout(() => { rewardZone.style.transform = 'scale(1)'; }, 450);
+        }
+        setTimeout(() => { canvas.style.display = 'none'; }, 800);
+    }
+
+    canvas.onmousedown = (e) => {
+        isDrawing = true;
+        const p = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+    };
+    canvas.onmousemove = (e) => {
+        if (!isDrawing) return;
+        const p = getPos(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        checkReveal();
+    };
+    window.addEventListener('mouseup', () => {
+        if (isDrawing) { isDrawing = false; checkReveal(); }
+    });
+    canvas.ontouchstart = (e) => {
+        e.preventDefault();
+        isDrawing = true;
+        const p = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+    };
+    canvas.ontouchmove = (e) => {
+        e.preventDefault();
+        if (!isDrawing) return;
+        const p = getPos(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        checkReveal();
+    };
+    canvas.ontouchend = () => {
+        if (isDrawing) { isDrawing = false; checkReveal(); }
+    };
+}
+
+// 🎉 刮刮卡完全揭開時的彩屑爆發效果
+function spawnConfetti() {
+    const container = document.getElementById('rewardZone');
+    if (!container) return;
+    const colors = ['#fbbf24', '#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#a855f7', '#ec4899', '#facc15'];
+    const scratchUI = document.getElementById('scratchUI');
+    const containerRect = container.getBoundingClientRect();
+    let originX = container.offsetWidth / 2;
+    let originY = container.offsetHeight / 2;
+    if (scratchUI) {
+        const sRect = scratchUI.getBoundingClientRect();
+        originX = sRect.left - containerRect.left + sRect.width / 2;
+        originY = sRect.top - containerRect.top + sRect.height / 2;
+    }
+    for (let i = 0; i < 45; i++) {
+        const piece = document.createElement('div');
+        const w = 6 + Math.random() * 6;
+        piece.style.cssText = `
+            position: absolute;
+            width: ${w}px;
+            height: ${w * 0.4}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            top: ${originY}px;
+            left: ${originX}px;
+            border-radius: 1px;
+            pointer-events: none;
+            z-index: 50;
+            transform: translate(-50%, -50%);
+        `;
+        container.appendChild(piece);
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 70 + Math.random() * 200;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance + 60;
+        const rotation = (Math.random() - 0.5) * 1080;
+        piece.animate([
+            { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rotation}deg)`, opacity: 0 }
+        ], {
+            duration: 1400 + Math.random() * 700,
+            easing: 'cubic-bezier(0.15, 0.55, 0.35, 1)',
+            fill: 'forwards'
+        });
+        setTimeout(() => piece.remove(), 2300);
+    }
 }
 
 function renderMath() {
@@ -1497,7 +1769,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🌟 一載入立刻觸發登入驗證，未登入者會被攔截並動態生成登入畫面
     showTopicScreen(); 
     fetchConfig(); 
-    setInterval(() => fetchConfig(true), 5000); 
+    setInterval(() => fetchConfig(true), 30000);
     
     // 將 localStorage 暫存資料填入動態生成的登入框
     setTimeout(() => {
