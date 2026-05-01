@@ -77,7 +77,7 @@ function initLoginUI() {
         <div class="space-y-4 text-left mb-8">
             <div><label class="block text-sm font-bold text-slate-600 mb-1">班別</label><input type="text" id="loginClass" class="w-full p-3 border border-slate-300 rounded-lg uppercase"></div>
             <div><label class="block text-sm font-bold text-slate-600 mb-1">學號</label><input type="number" id="loginNum" class="w-full p-3 border border-slate-300 rounded-lg"></div>
-            <div><label class="block text-sm font-bold text-slate-600 mb-1">密碼</label><input type="password" id="loginPwd" placeholder="老師派發的密碼，沒有則留空" class="w-full p-3 border border-slate-300 rounded-lg"></div>
+            <div><label class="block text-sm font-bold text-slate-600 mb-1">密碼</label><input type="password" id="loginPwd" class="w-full p-3 border border-slate-300 rounded-lg"></div>
         </div>
         <button id="loginSubmitBtn" onclick="loginApp()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">進入修練所 ➡️</button>
     </div>`;
