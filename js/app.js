@@ -72,14 +72,13 @@ function initLoginUI() {
             </div>
             <h1 class="text-3xl font-bold text-slate-800">修練所登入</h1>
         </div>
-        <p class="text-slate-500 mb-8 font-medium">請輸入你的專屬資料與密碼以進行認證</p>
+        <p class="text-slate-500 mb-8 font-medium">請輸入班別、學號與密碼以進行認證</p>
         <div class="space-y-4 text-left mb-8">
             <div><label class="block text-sm font-bold text-slate-600 mb-1">班別 (例: 3C)</label><input type="text" id="loginClass" class="w-full p-3 border border-slate-300 rounded-lg uppercase"></div>
             <div><label class="block text-sm font-bold text-slate-600 mb-1">學號 (例: 15)</label><input type="number" id="loginNum" class="w-full p-3 border border-slate-300 rounded-lg"></div>
-            <div><label class="block text-sm font-bold text-slate-600 mb-1">姓名 (真實姓名)</label><input type="text" id="loginName" class="w-full p-3 border border-slate-300 rounded-lg"></div>
-            <div><label class="block text-sm font-bold text-slate-600 mb-1">認證密碼</label><input type="password" id="loginPwd" placeholder="請輸入老師派發的密碼" class="w-full p-3 border border-slate-300 rounded-lg"></div>
+            <div><label class="block text-sm font-bold text-slate-600 mb-1">認證密碼 (老師沒派發可留空)</label><input type="password" id="loginPwd" placeholder="老師派發的密碼，沒有則留空" class="w-full p-3 border border-slate-300 rounded-lg"></div>
         </div>
-        <button onclick="loginApp()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">進入修練所 ➡️</button>
+        <button id="loginSubmitBtn" onclick="loginApp()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">進入修練所 ➡️</button>
     </div>`;
     mainWrapper.prepend(loginDiv.firstElementChild);
 
@@ -93,11 +92,10 @@ function initLoginUI() {
 window.loginApp = async function() {
     const cClass = document.getElementById('loginClass')?.value.toUpperCase().trim();
     const cNum = document.getElementById('loginNum')?.value.trim();
-    const cName = document.getElementById('loginName')?.value.trim();
     const cPwd = document.getElementById('loginPwd')?.value.trim() || "";
 
-    if (!cClass || !cNum || !cName) {
-        alert("請填寫班別、學號與姓名！");
+    if (!cClass || !cNum) {
+        alert("請填寫班別與學號！");
         return;
     }
 
@@ -119,9 +117,10 @@ window.loginApp = async function() {
             return;
         }
 
+        // 🌟 姓名直接從後端 Google Sheet 取得，不再需要學生輸入
         setStoredData('dse_className', cClass);
         setStoredData('dse_classNumber', cNum);
-        setStoredData('dse_studentName', cName);
+        setStoredData('dse_studentName', result.studentName || "");
         setStoredData('dse_password', cPwd);
 
         showTopicScreen();
@@ -154,8 +153,8 @@ function showTopicScreen() {
     document.getElementById('appContainer')?.classList.add('hidden');
     document.getElementById('endScreen')?.classList.add('hidden');
     
-    // 🌟 修正：只要有班別、學號、姓名，就允許進入選單
-    if (!savedClass || !savedNum || !savedName) {
+    // 🌟 只要有班別與學號，就允許進入選單 (姓名由後端帶回)
+    if (!savedClass || !savedNum) {
         // 未登入：強制顯示登入畫面，隱藏主畫面
         document.getElementById('loginScreen')?.classList.remove('hidden');
         document.getElementById('topicScreen')?.classList.add('hidden');
@@ -1771,29 +1770,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchConfig(); 
     setInterval(() => fetchConfig(true), 30000);
     
-    // 將 localStorage 暫存資料填入動態生成的登入框
+    // 將 localStorage 暫存資料預填到登入框 (僅班別與學號，密碼為求安全不預填)
     setTimeout(() => {
-        const savedClass = getStoredData('dse_className'); 
-        const savedNum = getStoredData('dse_classNumber'); 
-        const savedName = getStoredData('dse_studentName');
-        const savedPwd = getStoredData('dse_password');
-        
-        const loginClassEl = document.getElementById('loginClass'); if (loginClassEl && savedClass) loginClassEl.value = savedClass; 
-        const loginNumEl = document.getElementById('loginNum'); if (loginNumEl && savedNum) loginNumEl.value = savedNum; 
-        const loginNameEl = document.getElementById('loginName'); if (loginNameEl && savedName) loginNameEl.value = savedName;
-        const loginPwdEl = document.getElementById('loginPwd'); if (loginPwdEl && savedPwd) loginPwdEl.value = savedPwd;
+        const savedClass = getStoredData('dse_className');
+        const savedNum = getStoredData('dse_classNumber');
 
-        const updateLoginStorage = () => {
-            if (loginClassEl) setStoredData('dse_className', loginClassEl.value.toUpperCase().trim());
-            if (loginNumEl) setStoredData('dse_classNumber', loginNumEl.value.trim());
-            if (loginNameEl) setStoredData('dse_studentName', loginNameEl.value.trim());
-            if (loginPwdEl) setStoredData('dse_password', loginPwdEl.value.trim());
-        };
-
-        loginClassEl?.addEventListener('input', updateLoginStorage);
-        loginNumEl?.addEventListener('input', updateLoginStorage);
-        loginNameEl?.addEventListener('input', updateLoginStorage);
-        loginPwdEl?.addEventListener('input', updateLoginStorage);
+        const loginClassEl = document.getElementById('loginClass'); if (loginClassEl && savedClass) loginClassEl.value = savedClass;
+        const loginNumEl = document.getElementById('loginNum'); if (loginNumEl && savedNum) loginNumEl.value = savedNum;
     }, 100);
 
     setupCanvasEvents();
