@@ -148,21 +148,37 @@ function showTopicScreen() {
     const savedClass = getStoredData('dse_className');
     const savedNum = getStoredData('dse_classNumber');
     const savedName = getStoredData('dse_studentName');
-    const savedPwd = getStoredData('dse_password') || "";
     
     document.getElementById('startScreen')?.classList.add('hidden');
     document.getElementById('appContainer')?.classList.add('hidden');
     document.getElementById('endScreen')?.classList.add('hidden');
     
-    // 🌟 只要有班別與學號，就允許進入選單 (姓名由後端帶回)
+    const topicScreen = document.getElementById('topicScreen');
+    
+    // 🌟 只要有班別與學號，就允許進入選單
     if (!savedClass || !savedNum) {
         // 未登入：強制顯示登入畫面，隱藏主畫面
         document.getElementById('loginScreen')?.classList.remove('hidden');
-        document.getElementById('topicScreen')?.classList.add('hidden');
+        topicScreen?.classList.add('hidden');
     } else {
         // 已登入：隱藏登入畫面，顯示主畫面
         document.getElementById('loginScreen')?.classList.add('hidden');
-        document.getElementById('topicScreen')?.classList.remove('hidden');
+        topicScreen?.classList.remove('hidden');
+        
+        // 🌟 新增：在主選單左上角動態加入學生資訊 Badge
+        if (topicScreen) {
+            topicScreen.classList.add('relative'); // 確保可以絕對定位
+            let infoBadge = document.getElementById('student-info-badge');
+            if (!infoBadge) {
+                infoBadge = document.createElement('div');
+                infoBadge.id = 'student-info-badge';
+                // 使用 Tailwind CSS 設定左上角絕對定位與樣式
+                infoBadge.className = 'absolute top-4 left-4 sm:top-6 sm:left-6 bg-indigo-50 border border-indigo-200 text-indigo-800 px-3 py-1.5 rounded-lg text-sm sm:text-base font-bold shadow-sm flex items-center gap-2 z-10';
+                topicScreen.appendChild(infoBadge);
+            }
+            // 寫入學生資料
+            infoBadge.innerHTML = `<span>🎓 ${savedClass} 班 - ${savedNum} 號 (${savedName})</span>`;
+        }
         
         // 更新結算畫面顯示身分
         const identityEl = document.getElementById('submitIdentityInfo');
