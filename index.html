@@ -19,6 +19,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <!-- 🎨 Refined Modern: Google Fonts (Inter + Noto Sans HK) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+HK:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- ✂️ Cropper.js（拍照後剪裁） -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
     
     <!-- 🚨 系統診斷工具與防護腳本 -->
     <script>
@@ -54,13 +63,262 @@
     </script>
 
     <style>
+        /* ===========================================
+           🎨 Design Tokens — Refined Modern Education
+           =========================================== */
+        :root {
+            /* 語意色彩系統 */
+            --c-primary-50:  #eef2ff;
+            --c-primary-100: #e0e7ff;
+            --c-primary-500: #6366f1;
+            --c-primary-600: #4f46e5;
+            --c-primary-700: #4338ca;
+
+            --c-success-50:  #ecfdf5;
+            --c-success-500: #10b981;
+            --c-success-600: #059669;
+
+            --c-energy-50:   #fff1f2;
+            --c-energy-500:  #f43f5e;
+            --c-energy-600:  #e11d48;
+
+            --c-amber-50:    #fffbeb;
+            --c-amber-200:   #fde68a;
+            --c-amber-400:   #fbbf24;
+            --c-amber-500:   #f59e0b;
+            --c-amber-600:   #d97706;
+            --c-amber-700:   #b45309;
+            --c-amber-800:   #92400e;
+
+            --c-sky-50:      #f0f9ff;
+            --c-sky-500:     #0ea5e9;
+            --c-sky-600:     #0284c7;
+
+            --c-ink-900: #0f172a;
+            --c-ink-700: #334155;
+            --c-ink-500: #64748b;
+            --c-ink-300: #cbd5e1;
+            --c-ink-100: #f1f5f9;
+            --c-ink-50:  #f8fafc;
+
+            /* 陰影層次 */
+            --shadow-subtle:  0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-card:    0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+            --shadow-elevated:0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 10px -4px rgba(15, 23, 42, 0.04);
+            --shadow-glow:    0 20px 50px -12px rgba(99, 102, 241, 0.25);
+            --shadow-gold:    0 12px 32px -8px rgba(245, 158, 11, 0.45), 0 4px 10px -4px rgba(245, 158, 11, 0.25);
+
+            /* 圓角 */
+            --r-sm: 8px;
+            --r-md: 12px;
+            --r-lg: 16px;
+            --r-xl: 20px;
+            --r-2xl: 28px;
+        }
+
+        /* 全局字體 */
+        body {
+            font-family: 'Inter', 'Noto Sans HK', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-feature-settings: 'cv11', 'ss01';
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: -0.01em;
+        }
+
+        /* 中文字符使用 Noto Sans HK 提升可讀性 */
+        :lang(zh-HK), :lang(zh) {
+            font-family: 'Noto Sans HK', 'Inter', sans-serif;
+        }
+
+        /* 數字使用 Inter tabular numbers 對齊 */
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+
+        /* ===========================================
+           ➗ 數式字體還原（KaTeX 強制使用經典課本字體）
+           =========================================== */
+        .katex,
+        .katex .mathnormal,
+        .katex .mathit,
+        .katex .mathrm,
+        .katex .mord,
+        .katex .mop,
+        .katex .mbin,
+        .katex .mrel {
+            font-family: 'Times New Roman', 'Cambria Math', 'STIX Two Math', Times, serif !important;
+        }
+        .katex .mathnormal,
+        .katex .mathit { font-style: italic; }
+        .katex .mathrm { font-style: normal; }
+
+        /* ===========================================
+           🌊 通用工具類
+           =========================================== */
+
+        /* 漸變背景 */
+        .grad-primary    { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+        .grad-success    { background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); }
+        .grad-energy     { background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%); }
+        .grad-warm       { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%); }
+        .grad-cool       { background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); }
+        .grad-soft-bg    { background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); }
+
+        /* 文字漸變（金色） */
+        .text-grad-gold {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #92400e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        /* 自訂滾動條 */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
         .math-scroll { overflow-x: auto; overflow-y: hidden; }
         .math-scroll::-webkit-scrollbar { height: 6px; }
         .math-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
         #draw-canvas { touch-action: none; }
+
+        /* ===========================================
+           ✨ 動畫關鍵幀
+           =========================================== */
+
+        /* 金箔閃光（用於刮刮卡前情緒鋪陳） */
+        @keyframes shimmer-sweep {
+            0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+            30%  { opacity: 0.7; }
+            100% { transform: translateX(220%) skewX(-20deg); opacity: 0; }
+        }
+        .shimmer-sweep::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%);
+            animation: shimmer-sweep 2.4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* 光暈脈衝 */
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55), var(--shadow-gold); }
+            50%      { box-shadow: 0 0 0 18px rgba(245, 158, 11, 0), var(--shadow-gold); }
+        }
+        .glow-pulse { animation: glow-pulse 1.8s ease-in-out infinite; }
+
+        /* 獎勵文字浮現彈跳 */
+        @keyframes reveal-bounce {
+            0%   { transform: scale(0.4) translateY(20px); opacity: 0; filter: blur(8px); }
+            50%  { transform: scale(1.18) translateY(-4px); opacity: 1; filter: blur(0); }
+            75%  { transform: scale(0.96) translateY(2px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+        }
+        .reveal-bounce { animation: reveal-bounce 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+        /* 背景光環擴散 */
+        @keyframes ring-burst {
+            0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0.85; }
+            100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+        }
+        .ring-burst {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 80%;
+            aspect-ratio: 1 / 1;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0) 70%);
+            pointer-events: none;
+            animation: ring-burst 1s ease-out forwards;
+        }
+
+        /* 柔和浮動 */
+        @keyframes float-soft {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-4px); }
+        }
+        .float-soft { animation: float-soft 3.2s ease-in-out infinite; }
+
+        /* 文字閃爍（用於提示「即將解鎖」） */
+        @keyframes text-glow {
+            0%, 100% { text-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+            50%      { text-shadow: 0 0 18px rgba(245, 158, 11, 0.95), 0 0 30px rgba(245, 158, 11, 0.5); }
+        }
+        .text-glow { animation: text-glow 1.6s ease-in-out infinite; }
+
+        /* 鑽石紋理（用於刮刮卡背景補位） */
+        .diamond-pattern {
+            background-image:
+                radial-gradient(circle at 20% 25%, rgba(255,255,255,0.45) 0%, transparent 8%),
+                radial-gradient(circle at 70% 60%, rgba(255,255,255,0.35) 0%, transparent 6%),
+                radial-gradient(circle at 50% 85%, rgba(255,255,255,0.4) 0%, transparent 7%);
+        }
+
+        /* ===========================================
+           🎬 畫面過場動畫
+           =========================================== */
+        @keyframes screen-enter {
+            0%   { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .screen-enter { animation: screen-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+        /* ===========================================
+           💀 骨架載入（Skeleton）
+           =========================================== */
+        @keyframes skeleton-shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg,
+                rgba(203, 213, 225, 0.25) 0%,
+                rgba(203, 213, 225, 0.55) 50%,
+                rgba(203, 213, 225, 0.25) 100%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.4s ease-in-out infinite;
+            border-radius: 12px;
+        }
+        .skeleton-amber {
+            background: linear-gradient(90deg,
+                rgba(252, 211, 77, 0.20) 0%,
+                rgba(252, 211, 77, 0.50) 50%,
+                rgba(252, 211, 77, 0.20) 100%);
+            background-size: 200% 100%;
+            animation: skeleton-shimmer 1.4s ease-in-out infinite;
+            border-radius: 12px;
+        }
+
+        /* ===========================================
+           🎯 微互動 Polish
+           =========================================== */
+        @keyframes coin-drop {
+            0%   { transform: translateY(-12px) rotate(0deg); opacity: 0; }
+            40%  { opacity: 1; }
+            100% { transform: translateY(0) rotate(360deg); opacity: 1; }
+        }
+        .coin-drop { display: inline-block; animation: coin-drop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+        @keyframes ping-soft {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55); }
+            50%      { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+        }
+        .ping-soft { animation: ping-soft 1.6s ease-in-out infinite; }
+
+        /* 全局按鈕觸感反饋（覆蓋舊樣式按鈕） */
+        button { transition: transform 0.12s ease-out, box-shadow 0.18s ease, background-color 0.2s ease, border-color 0.2s ease; }
+        button:not(:disabled):active { transform: scale(0.97); }
+
+        /* 焦點環優化（無障礙） */
+        button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-800 relative pb-10">
+<body class="grad-soft-bg min-h-screen font-sans text-slate-800 relative pb-10">
 
     <!-- 🌟 版本檢測雷達 -->
     <div class="fixed bottom-2 right-2 bg-slate-800 text-white text-xs px-2 py-1 rounded-md opacity-60 z-50 pointer-events-none">
@@ -73,31 +331,37 @@
         <!-- ========================================== -->
         <!-- 🌟 新增：登入畫面 (Login Screen) -->
         <!-- ========================================== -->
-        <div id="loginScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 text-center max-w-lg mx-auto mt-8">
-            <div class="flex justify-center items-center gap-3 mb-6">
-                <div class="bg-indigo-100 text-indigo-500 p-3 rounded-full">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        <div id="loginScreen" class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white p-7 sm:p-12 text-center max-w-lg mx-auto mt-12" style="box-shadow: var(--shadow-elevated);">
+            <div class="flex flex-col items-center mb-8">
+                <div class="grad-primary text-white p-4 rounded-2xl mb-4 float-soft" style="box-shadow: var(--shadow-glow);">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
-                <h1 class="text-3xl font-bold text-slate-800">修練所登入</h1>
+                <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">DSE 修練所</h1>
+                <p class="text-slate-500 mt-2 font-medium text-sm sm:text-base">請輸入班別、學號與密碼以進行認證</p>
             </div>
-            <p class="text-slate-500 mb-8 font-medium">請輸入班別、學號與密碼以進行認證</p>
 
             <div class="space-y-4 text-left mb-8">
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">班別 (例: 3A)</label>
-                    <input type="text" id="loginClass" placeholder="如: 4A" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 uppercase">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5 tracking-wider uppercase">班別</label>
+                    <input type="text" id="loginClass" placeholder="如: 4A" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none uppercase font-bold transition-all">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">學號 (例: 15)</label>
-                    <input type="number" id="loginNum" min="0" max="40" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5 tracking-wider uppercase">學號</label>
+                    <input type="number" id="loginNum" placeholder="如: 1" min="0" max="40" class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none font-bold transition-all tabular-nums">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">認證密碼 (老師沒派發可留空)</label>
-                    <input type="password" id="loginPwd" placeholder="老師派發的密碼，沒有則留空" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5 tracking-wider uppercase">密碼</label>
+                    <div class="relative">
+                        <input type="password" id="loginPwd" placeholder="註冊編號" class="w-full px-4 py-3.5 pr-12 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none font-bold transition-all">
+                        <button type="button" id="loginPwdToggleBtn" onclick="togglePasswordVisibility()" aria-label="顯示/隱藏密碼" class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                            <!-- 預設：閉眼（密碼隱藏中） -->
+                            <svg id="loginPwdEyeIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-            <button id="loginSubmitBtn" onclick="if(typeof loginApp !== 'undefined') loginApp(); else alert('系統載入中，請稍候...');" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
+
+            <button id="loginSubmitBtn" onclick="if(typeof loginApp !== 'undefined') loginApp(); else alert('系統載入中，請稍候...');" class="w-full py-4 grad-primary text-white font-bold rounded-2xl hover:opacity-95 active:scale-[0.98] transition-all text-lg" style="box-shadow: var(--shadow-glow);">
                 進入修練所 ➡️
             </button>
         </div>
@@ -105,106 +369,146 @@
         <!-- ========================================== -->
         <!-- 畫面 1：選擇課題 (首頁) -->
         <!-- ========================================== -->
-        <div id="topicScreen" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 text-center max-w-3xl mx-auto">
-            
-            <!-- 🌟 新增：登出按鈕 -->
-            <div class="flex justify-end mb-2">
-                <button onclick="logoutApp()" class="text-sm text-slate-400 hover:text-red-500 font-bold underline transition-colors">登出更換帳號</button>
+        <div id="topicScreen" class="hidden bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 text-center max-w-3xl mx-auto" style="box-shadow: var(--shadow-elevated);">
+
+            <!-- 🌟 右上角：修改密碼 + 登出 -->
+            <div class="flex justify-end items-center gap-2 mb-2">
+                <button onclick="openChangePwdModal()" class="text-xs sm:text-sm text-slate-400 hover:text-indigo-600 font-bold transition-colors flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-indigo-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    修改密碼
+                </button>
+                <button onclick="logoutApp()" class="text-xs sm:text-sm text-slate-400 hover:text-rose-500 font-bold transition-colors flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-rose-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    登出
+                </button>
             </div>
-            
+
             <!-- 頂部 Logo 與標題 -->
-            <div class="flex justify-center items-center gap-3 mb-6 mt-2">
-                <div class="bg-indigo-100 text-indigo-500 p-3 rounded-full">
+            <div class="flex flex-col items-center mb-8 mt-1">
+                <div class="grad-primary text-white p-3.5 rounded-2xl mb-3" style="box-shadow: var(--shadow-glow);">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                 </div>
-                <h1 class="text-3xl font-bold text-slate-800">DSE無限修練所</h1>
+                <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">DSE 無限修練所</h1>
+                <p class="text-slate-500 text-sm mt-1.5 font-medium">每日刷題，累積分數，解鎖驚喜獎勵</p>
             </div>
 
-            <!-- 黃色獎勵橫幅 -->
-            <div class="bg-[#FFF9E6] border border-[#FDE68A] text-slate-700 p-5 rounded-xl mb-10 text-sm sm:text-base leading-relaxed text-center shadow-sm mx-auto max-w-2xl">
-                每天刷題 <span class="font-bold text-red-600">無次數限制</span>！只要不斷挑戰累積積分，<span class="font-bold text-red-600">每累積滿 100 分</span> 即可解鎖一張專屬刮刮卡，隨機抽取 <span class="font-bold text-red-600">印賞卡、Mcdonald、零食、飲品、文具！</span> 快來挑戰吧！
-            </div>
-
-            <!-- ========================================== -->
-            <!-- 🌟 修改：班級專屬功課區塊 (常駐不隱藏，排版更新為3欄) -->
-            <!-- ========================================== -->
-            <div id="homeworkSection" class="mb-12 border-2 border-amber-200 bg-amber-50 rounded-2xl p-6 shadow-sm">
-                <h3 class="text-xl sm:text-2xl font-bold text-amber-700 mb-2 flex items-center justify-center gap-2">📝 班級專屬功課</h3>
-                <p class="text-amber-600 text-sm sm:text-base mb-6 font-medium text-center">
-                    老師已派發專屬功課！完成將會記錄明細成績（每份功課限交 2 次）<br>
-                    <span id="hw-date-display" class="inline-block mt-3 font-bold text-amber-800 bg-amber-200 px-4 py-1.5 rounded-full shadow-sm">📅 今日日期：載入中...</span>
-                </p>
-                <!-- 修改 grid 樣式，使其與下方自主練習排版一致 -->
-                <div id="homeworkGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div class="col-span-full text-center py-6 text-amber-600 font-bold bg-amber-100/50 rounded-xl border border-amber-200 border-dashed">
-                        連線中，請稍候...
+            <!-- 🎁 獎勵橫幅（升級為金色漸變 + 圖示） -->
+            <div class="relative overflow-hidden rounded-2xl mb-10 mx-auto max-w-2xl border border-amber-200" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); box-shadow: var(--shadow-card);">
+                <div class="absolute -top-8 -right-8 w-32 h-32 rounded-full opacity-20" style="background: radial-gradient(circle, #fbbf24 0%, transparent 70%);"></div>
+                <div class="relative p-5 sm:p-6 flex items-start gap-4 text-left">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); box-shadow: 0 6px 16px -4px rgba(245,158,11,0.4);">🎁</div>
+                    <div class="flex-1 text-sm sm:text-base text-amber-900 leading-relaxed font-medium">
+                        每天刷題<span class="font-bold text-rose-600">無次數限制</span>！每累積滿
+                        <span class="font-black text-rose-600 tabular-nums">100 分</span>
+                        即可解鎖<span class="font-bold text-amber-700">專屬刮刮卡</span>，隨機抽取印賞卡、麥當勞、零食、飲品、文具！
                     </div>
                 </div>
             </div>
 
-            <div class="mb-8 border-t border-slate-200 pt-8"></div>
-
-            <!-- 原有：日常練習區塊 -->
-            <div class="text-center mb-6">
-                <h2 class="text-xl font-bold text-slate-700">🌱 自主日常練習</h2>
-                <p class="text-sm text-slate-500 mt-1">無限次數，累積積分抽刮刮卡</p>
+            <!-- 📝 班級專屬功課區塊 -->
+            <div id="homeworkSection" class="mb-12 rounded-2xl p-6 sm:p-7 text-left" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid var(--c-amber-200); box-shadow: var(--shadow-card);">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                    <h3 class="text-xl sm:text-2xl font-black text-amber-800 flex items-center gap-2">
+                        <span class="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-500 text-white shadow-md">📝</span>
+                        班級專屬功課
+                    </h3>
+                    <span id="hw-date-display" class="text-xs sm:text-sm font-bold text-amber-800 bg-white/70 border border-amber-300 px-3 py-1.5 rounded-full">📅 載入中...</span>
+                </div>
+                <p class="text-amber-700 text-xs sm:text-sm mb-5 font-medium">老師已派發專屬功課！完成將會記錄明細成績（每份功課限交 2 次）</p>
+                <div id="homeworkGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div class="skeleton-amber h-[88px]"></div>
+                    <div class="skeleton-amber h-[88px]"></div>
+                    <div class="skeleton-amber h-[88px]"></div>
+                </div>
             </div>
-            
+
+            <!-- 🌱 日常練習區塊標題 -->
+            <div class="text-center mb-5">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-wider uppercase mb-3">
+                    Daily Practice
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900">🌱 自主日常練習</h2>
+                <p class="text-sm text-slate-500 mt-1.5 font-medium">無限次數，累積積分抽刮刮卡</p>
+            </div>
+
             <!-- 題數設定膠囊 -->
-            <div class="mb-10 flex justify-center items-center bg-slate-50 border border-slate-200 rounded-xl p-2 mx-auto w-fit shadow-sm">
-                <span class="text-slate-700 font-bold text-sm sm:text-base mx-3">每回合題數：</span>
-                <button id="btn-num-3" onclick="setQuestionNum(3)" class="num-btn px-6 py-2 rounded-lg font-bold bg-indigo-600 text-white shadow-sm transition-colors text-sm sm:text-base">3 題</button>
-                <button id="btn-num-5" onclick="setQuestionNum(5)" class="num-btn px-6 py-2 rounded-lg font-bold bg-transparent text-slate-600 hover:bg-slate-200 transition-colors text-sm sm:text-base">5 題</button>
-                <button id="btn-num-10" onclick="setQuestionNum(10)" class="num-btn px-6 py-2 rounded-lg font-bold bg-transparent text-slate-600 hover:bg-slate-200 transition-colors text-sm sm:text-base">10 題</button>
-            </div>
-            
-            <!-- 九宮格課題區塊 -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('indices'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">指數定律</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('factorization'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">因式分解</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('rounding'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">近似值與捨入</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('identities'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">恆等式</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('fractions'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">通分母</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('binary'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">二進制</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('expansion'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">恆等式的展開</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('alg_frac_mul_div'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">代數分式乘除法</button>
-                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('triangle_area'); else checkEnvironment();" class="py-4 px-2 border border-slate-200 rounded-xl hover:border-indigo-400 hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-slate-700 bg-white shadow-sm text-sm sm:text-base">4B第10章 三角形面積</button>
+            <div class="mb-8 flex justify-center items-center bg-slate-100 rounded-2xl p-1.5 mx-auto w-fit">
+                <span class="text-slate-600 font-bold text-xs sm:text-sm mx-3">每回合題數</span>
+                <button id="btn-num-3" onclick="setQuestionNum(3)" class="num-btn px-5 py-2 rounded-xl font-bold bg-indigo-600 text-white shadow-md transition-all text-sm tabular-nums">3 題</button>
+                <button id="btn-num-5" onclick="setQuestionNum(5)" class="num-btn px-5 py-2 rounded-xl font-bold bg-transparent text-slate-600 hover:bg-white transition-all text-sm tabular-nums">5 題</button>
+                <button id="btn-num-10" onclick="setQuestionNum(10)" class="num-btn px-5 py-2 rounded-xl font-bold bg-transparent text-slate-600 hover:bg-white transition-all text-sm tabular-nums">10 題</button>
             </div>
 
-            <!-- 跨課題綜合挑戰四格排版 -->
-            <div class="mt-8 border-t border-slate-100 pt-8 text-center">
-                <h3 class="text-xl font-bold text-slate-700 mb-2 flex justify-center items-center gap-2">🏆 跨課題綜合挑戰</h3>
-                <p class="text-slate-500 text-sm mb-6">包含所有課題，全面測試你的實力</p>
+            <!-- 九宮格課題區塊（簡約：只顯示課題名） -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-12">
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('indices'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">指數定律</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('factorization'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-emerald-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">因式分解</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('rounding'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">近似值與捨入</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('identities'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-rose-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">恆等式</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('fractions'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">通分母</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('binary'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-violet-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">二進制</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('expansion'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-teal-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">恆等式展開</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('alg_frac_mul_div'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-fuchsia-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">代數分式乘除</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('triangle_area'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-cyan-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">三角形面積</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('change_of_subject'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-pink-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">主項轉換</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('pricing'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-lime-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">成本售價標價</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('linear_equations'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-purple-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">直線方程</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('quadratic_equations'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-emerald-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">二次方程</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('simultaneous_equations'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">聯立方程</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('vertex'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-violet-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">頂點圖像</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('functions_remainder'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">函數與餘式</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('simple_inequalities'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-rose-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">簡單不等式</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('compound_inequalities'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-red-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">複合不等式</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('hcf_lcm'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-green-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">H.C.F./L.C.M.</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('percentage_change'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-yellow-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">百分變化</button>
+                <button onclick="if(typeof selectTopic !== 'undefined') selectTopic('compound_interest'); else checkEnvironment();" class="topic-card group px-4 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-orange-400 hover:-translate-y-0.5 active:translate-y-0 transition-all text-center font-bold text-slate-800 text-sm sm:text-base" style="box-shadow: var(--shadow-subtle);">複利息</button>
+            </div>
+
+            <!-- 🏆 跨課題綜合挑戰 -->
+            <div class="mt-10 pt-8 text-center border-t border-slate-100">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold tracking-wider uppercase mb-3">Ultimate Challenge</div>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-1.5 flex justify-center items-center gap-2">🏆 跨課題綜合挑戰</h3>
+                <p class="text-slate-500 text-sm mb-6 font-medium">包含所有課題，全面測試你的實力</p>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(1); else checkEnvironment();" class="py-4 px-2 border border-green-200 bg-[#F0FDF4] rounded-xl hover:shadow-md transition-all flex flex-col items-center justify-center">
-                        <span class="text-green-500 font-bold text-lg mb-1">⭐</span>
-                        <span class="text-green-700 font-bold">程度 1</span>
+                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(1); else checkEnvironment();" class="group p-4 rounded-2xl border border-emerald-200 hover:border-emerald-400 hover:-translate-y-1 active:translate-y-0 transition-all text-center" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); box-shadow: var(--shadow-subtle);">
+                        <div class="text-emerald-500 font-bold text-base mb-1.5">⭐</div>
+                        <div class="text-emerald-700 font-black text-base">程度 1</div>
+                        <div class="text-[10px] text-emerald-600 font-bold mt-1 tracking-wider uppercase">輕鬆熱身</div>
                     </button>
-                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(2); else checkEnvironment();" class="py-4 px-2 border border-blue-200 bg-[#EFF6FF] rounded-xl hover:shadow-md transition-all flex flex-col items-center justify-center">
-                        <span class="text-blue-500 font-bold text-lg mb-1">⭐⭐</span>
-                        <span class="text-blue-700 font-bold">程度 2</span>
+                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(2); else checkEnvironment();" class="group p-4 rounded-2xl border border-sky-200 hover:border-sky-400 hover:-translate-y-1 active:translate-y-0 transition-all text-center" style="background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%); box-shadow: var(--shadow-subtle);">
+                        <div class="text-sky-500 font-bold text-base mb-1.5">⭐⭐</div>
+                        <div class="text-sky-700 font-black text-base">程度 2</div>
+                        <div class="text-[10px] text-sky-600 font-bold mt-1 tracking-wider uppercase">穩紮穩打</div>
                     </button>
-                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(3); else checkEnvironment();" class="py-4 px-2 border border-purple-200 bg-[#FAF5FF] rounded-xl hover:shadow-md transition-all flex flex-col items-center justify-center">
-                        <span class="text-purple-500 font-bold text-lg mb-1">⭐⭐⭐</span>
-                        <span class="text-purple-700 font-bold">程度 3</span>
+                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(3); else checkEnvironment();" class="group p-4 rounded-2xl border border-violet-200 hover:border-violet-400 hover:-translate-y-1 active:translate-y-0 transition-all text-center" style="background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%); box-shadow: var(--shadow-subtle);">
+                        <div class="text-violet-500 font-bold text-base mb-1.5">⭐⭐⭐</div>
+                        <div class="text-violet-700 font-black text-base">程度 3</div>
+                        <div class="text-[10px] text-violet-600 font-bold mt-1 tracking-wider uppercase">挑戰自我</div>
                     </button>
-                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(4); else checkEnvironment();" class="py-4 px-2 border border-orange-200 bg-[#FFFBEB] rounded-xl hover:shadow-md transition-all flex flex-col items-center justify-center">
-                        <span class="text-orange-500 font-bold text-lg mb-1">⭐⭐⭐⭐</span>
-                        <span class="text-orange-700 font-bold">程度 4</span>
+                    <button onclick="if(typeof startGlobalMixed !== 'undefined') startGlobalMixed(4); else checkEnvironment();" class="group p-4 rounded-2xl border border-amber-200 hover:border-amber-400 hover:-translate-y-1 active:translate-y-0 transition-all text-center" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); box-shadow: var(--shadow-subtle);">
+                        <div class="text-amber-500 font-bold text-base mb-1.5">⭐⭐⭐⭐</div>
+                        <div class="text-amber-700 font-black text-base">程度 4</div>
+                        <div class="text-[10px] text-amber-600 font-bold mt-1 tracking-wider uppercase">無懼極限</div>
                     </button>
                 </div>
             </div>
 
-            <!-- 排行榜區塊 -->
+            <!-- 🏅 排行榜區塊 -->
             <div class="mt-12 pt-8 border-t border-slate-100 text-center">
-                <h3 class="text-xl font-bold text-indigo-700 mb-2 flex justify-center items-center gap-2">
-                    🏅 日常勤學排行榜 (Top 20)
-                </h3>
-                <p class="text-slate-500 text-sm mb-6">全校最強刷題王者，累積最高分的勤學生都在這裡！</p>
-                
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold tracking-wider uppercase mb-3">Leaderboard</div>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-1.5 flex justify-center items-center gap-2">🏅 日常勤學排行榜</h3>
+                <p class="text-slate-500 text-sm mb-6 font-medium">全校最強刷題王者 Top 20，累積最高分的勤學生都在這裡！</p>
+
                 <div id="my-rank-home" class="mb-4"></div>
                 <div id="leaderboard-home-container" class="max-h-[500px] overflow-y-auto custom-scrollbar px-1 text-left">
-                    <div class="text-center py-4 text-slate-500">連線中，請稍候...</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div class="skeleton h-16"></div>
+                        <div class="skeleton h-16"></div>
+                        <div class="skeleton h-16"></div>
+                        <div class="skeleton h-16"></div>
+                        <div class="skeleton h-16"></div>
+                        <div class="skeleton h-16"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -212,49 +516,56 @@
         <!-- ========================================== -->
         <!-- 畫面 2：選擇難度 (Start Screen) -->
         <!-- ========================================== -->
-        <div id="startScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 text-center hidden relative max-w-2xl mx-auto">
-            <button onclick="showTopicScreen()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 transition-colors p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
+        <div id="startScreen" class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 text-center hidden relative max-w-2xl mx-auto" style="box-shadow: var(--shadow-elevated);">
+            <button onclick="showTopicScreen()" class="absolute top-5 left-5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all p-2 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             </button>
-            <h2 id="levelTitle" class="text-2xl font-bold text-slate-800 mb-8 mt-2">請選擇難度</h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto mb-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold tracking-wider uppercase mb-3 mt-2">Select Difficulty</div>
+            <h2 id="levelTitle" class="text-2xl sm:text-3xl font-black text-slate-900 mb-8">請選擇難度</h2>
+
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-3 max-w-lg mx-auto mb-4">
                 <!-- 一般難度 -->
-                <button id="btnL1" onclick="startGame(1)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐ 程度 1</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL1" onclick="startGame(1)" class="level-card p-3 sm:p-3.5 border-2 border-emerald-100 rounded-xl hover:border-emerald-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);">
+                    <div class="text-emerald-500 text-xs mb-1">⭐</div>
+                    <div class="text-base font-black text-emerald-800 leading-tight">程度 1</div>
+                    <div class="text-[10px] text-emerald-600 mt-1 font-bold"></div>
                 </button>
-                <button id="btnL2" onclick="startGame(2)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐ 程度 2</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL2" onclick="startGame(2)" class="level-card p-3 sm:p-3.5 border-2 border-sky-100 rounded-xl hover:border-sky-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);">
+                    <div class="text-sky-500 text-xs mb-1">⭐⭐</div>
+                    <div class="text-base font-black text-sky-800 leading-tight">程度 2</div>
+                    <div class="text-[10px] text-sky-600 mt-1 font-bold"></div>
                 </button>
-                <button id="btnL3" onclick="startGame(3)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐ 程度 3</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL3" onclick="startGame(3)" class="level-card p-3 sm:p-3.5 border-2 border-violet-100 rounded-xl hover:border-violet-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);">
+                    <div class="text-violet-500 text-xs mb-1">⭐⭐⭐</div>
+                    <div class="text-base font-black text-violet-800 leading-tight">程度 3</div>
+                    <div class="text-[10px] text-violet-600 mt-1 font-bold"></div>
                 </button>
-                <button id="btnL4" onclick="startGame(4)" class="p-4 border-2 border-slate-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐⭐ 程度 4</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL4" onclick="startGame(4)" class="level-card p-3 sm:p-3.5 border-2 border-amber-100 rounded-xl hover:border-amber-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                    <div class="text-amber-500 text-xs mb-1">⭐⭐⭐⭐</div>
+                    <div class="text-base font-black text-amber-800 leading-tight">程度 4</div>
+                    <div class="text-[10px] text-amber-600 mt-1 font-bold"></div>
                 </button>
 
-                <!-- 細分難度 (用於因式分解) -->
-                <button id="btnL2A" onclick="startGame('2a')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐ 程度 2A</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <!-- 細分難度 -->
+                <button id="btnL2A" onclick="startGame('2a')" class="level-card p-3 sm:p-3.5 border-2 border-sky-100 rounded-xl hover:border-sky-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);">
+                    <div class="text-sky-500 text-xs mb-1">⭐⭐</div>
+                    <div class="text-base font-black text-sky-800 leading-tight">程度 2A</div>
+                    <div class="text-[10px] text-sky-600 mt-1 font-bold"></div>
                 </button>
-                <button id="btnL2B" onclick="startGame('2b')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐ 程度 2B</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL2B" onclick="startGame('2b')" class="level-card p-3 sm:p-3.5 border-2 border-sky-100 rounded-xl hover:border-sky-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);">
+                    <div class="text-sky-500 text-xs mb-1">⭐⭐</div>
+                    <div class="text-base font-black text-sky-800 leading-tight">程度 2B</div>
+                    <div class="text-[10px] text-sky-600 mt-1 font-bold"></div>
                 </button>
-                <button id="btnL3A" onclick="startGame('3a')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐ 程度 3A</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL3A" onclick="startGame('3a')" class="level-card p-3 sm:p-3.5 border-2 border-violet-100 rounded-xl hover:border-violet-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);">
+                    <div class="text-violet-500 text-xs mb-1">⭐⭐⭐</div>
+                    <div class="text-base font-black text-violet-800 leading-tight">程度 3A</div>
+                    <div class="text-[10px] text-violet-600 mt-1 font-bold"></div>
                 </button>
-                <button id="btnL3B" onclick="startGame('3b')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-colors hidden flex flex-col items-center">
-                    <div class="text-lg font-bold text-slate-700">⭐⭐⭐ 程度 3B</div>
-                    <div class="text-sm text-slate-500 mt-1"></div>
+                <button id="btnL3B" onclick="startGame('3b')" class="level-card p-3 sm:p-3.5 border-2 border-violet-100 rounded-xl hover:border-violet-400 hover:-translate-y-0.5 active:translate-y-0 transition-all hidden flex flex-col items-center text-center" style="background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);">
+                    <div class="text-violet-500 text-xs mb-1">⭐⭐⭐</div>
+                    <div class="text-base font-black text-violet-800 leading-tight">程度 3B</div>
+                    <div class="text-[10px] text-violet-600 mt-1 font-bold"></div>
                 </button>
             </div>
         </div>
@@ -263,46 +574,60 @@
         <!-- 畫面 3：答題區 (App Container) -->
         <!-- ========================================== -->
         <div id="appContainer" class="hidden max-w-3xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8">
-                
+            <div class="bg-white rounded-3xl border border-slate-100 p-5 sm:p-8" style="box-shadow: var(--shadow-elevated);">
+
                 <!-- 確認返回彈窗 -->
-                <div id="confirmModal" class="hidden absolute inset-0 bg-slate-900/50 z-50 flex items-center justify-center rounded-2xl">
-                    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full mx-4 border border-slate-100">
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">確定要離開嗎？</h3>
-                        <p class="text-slate-600 mb-6">目前的作答進度將不會被保留，成績也不會上傳。</p>
-                        <div class="flex gap-3 justify-end">
-                            <button onclick="closeConfirmModal()" class="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors">取消</button>
-                            <button onclick="confirmBackToLevelSelection()" class="px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors shadow-sm">確定離開</button>
+                <div id="confirmModal" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center rounded-3xl">
+                    <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4 border border-slate-100">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-2xl">⚠️</div>
+                        <h3 class="text-xl font-black text-slate-900 mb-2 text-center">確定要離開嗎？</h3>
+                        <p class="text-slate-500 mb-6 text-center text-sm">目前的作答進度將不會被保留，成績也不會上傳。</p>
+                        <div class="flex gap-3">
+                            <button onclick="closeConfirmModal()" class="flex-1 px-4 py-3 text-slate-700 bg-slate-100 font-bold hover:bg-slate-200 rounded-xl transition-colors">取消</button>
+                            <button onclick="confirmBackToLevelSelection()" class="flex-1 px-4 py-3 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition-colors">確定離開</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- 頂部列：返回選單 -->
-                <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-                    <button onclick="backToLevelSelectionFromQuiz()" class="text-slate-500 hover:text-indigo-600 transition-colors flex items-center gap-1 group font-bold px-2 py-1 rounded-lg hover:bg-indigo-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                        <span class="text-sm sm:text-base">返回選單</span>
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="backToLevelSelectionFromQuiz()" class="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all flex items-center gap-1 group font-bold px-3 py-1.5 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                        <span class="text-sm">返回選單</span>
                     </button>
                 </div>
 
                 <!-- 答題 Header -->
-                <div class="flex justify-between items-start mb-6 pb-2">
-                    <div class="flex flex-col gap-2">
-                        <span id="topicBadge" class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold w-max">
+                <div class="flex justify-between items-center mb-4 gap-3">
+                    <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                        <span id="topicBadge" class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-xs sm:text-sm font-bold w-max max-w-full truncate">
                             課題載入中...
                         </span>
-                        <span id="levelBadge" class="text-slate-500 font-medium text-sm ml-1">
+                        <span id="levelBadge" class="text-slate-500 font-bold text-xs ml-1 truncate">
                             難度: 載入中...
                         </span>
                     </div>
-                    
-                    <div class="text-right">
-                        <div id="progressText" class="text-slate-500 font-bold text-base mb-1">
-                            完成 0/3
+
+                    <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                        <!-- 獎勵題（左側、放大 2 倍） -->
+                        <div id="dailyBonusIndicator" class="text-sm sm:text-base font-black text-amber-700 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200 hidden tabular-nums"></div>
+                        <!-- 分數（右側） -->
+                        <div class="text-indigo-700 font-black text-lg sm:text-xl px-3 py-1.5 rounded-xl inline-block tabular-nums" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border: 1px solid #c7d2fe;">
+                            <span class="text-[10px] tracking-widest font-bold opacity-60 uppercase block leading-none mb-0.5">Score</span>
+                            <span id="scoreDisplay">0</span>
+                            <span class="text-xs font-bold opacity-70">分</span>
                         </div>
-                        <div class="text-indigo-600 font-bold text-lg bg-indigo-50 px-3 py-1 rounded-lg inline-block shadow-sm border border-indigo-100">
-                            分數: <span id="scoreDisplay">0</span>
-                        </div>
+                    </div>
+                </div>
+
+                <!-- 進度條視覺化 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-500 tracking-widest uppercase">Progress</span>
+                        <span id="progressText" class="text-base sm:text-lg font-black text-slate-700 tabular-nums">0 / 3</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="quizProgressBar" class="h-2 rounded-full grad-primary transition-all duration-500 ease-out" style="width: 0%"></div>
                     </div>
                 </div>
 
@@ -314,7 +639,7 @@
                     <div id="optionsGrid" class="grid grid-cols-1 gap-3 sm:gap-4 mt-6"></div>
 
                     <!-- 選擇題專用跳過按鈕 -->
-                    <button id="skip-btn-mc" onclick="skipQuestion()" class="skip-action-btn hidden w-full mt-4 py-3 bg-slate-100 text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm flex justify-center items-center gap-2">
+                    <button id="skip-btn-mc" onclick="skipQuestion()" class="skip-action-btn hidden w-full mt-4 py-2.5 bg-transparent text-slate-400 hover:text-orange-500 hover:bg-orange-50 font-bold rounded-xl border border-slate-200 hover:border-orange-200 transition-all text-xs flex justify-center items-center gap-1.5">
                         <span>⏭️ 跳過本題 (0分)</span>
                     </button>
 
@@ -325,6 +650,7 @@
                         <div class="flex w-full max-w-[500px] mb-3 bg-slate-200 p-1 rounded-lg">
                             <button id="tab-draw" onclick="switchInputMode('draw')" class="flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all">✍️ 手寫輸入</button>
                             <button id="tab-keyboard" onclick="switchInputMode('keyboard')" class="flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all">⌨️ 鍵盤輸入</button>
+                            <button id="tab-camera" onclick="switchInputMode('camera')" class="flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all">📷 拍照</button>
                         </div>
 
                         <!-- 容器區塊 -->
@@ -344,7 +670,7 @@
                                     </button>
                                 </div>
                                 <!-- 跳過本題按鈕 (手寫區) -->
-                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-3 bg-slate-100 text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm flex justify-center items-center gap-2">
+                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-2.5 bg-transparent text-slate-400 hover:text-orange-500 hover:bg-orange-50 font-bold rounded-xl border border-slate-200 hover:border-orange-200 transition-all text-xs flex justify-center items-center gap-1.5">
                                     <span>⏭️ 跳過本題 (0分)</span>
                                 </button>
                             </div>
@@ -363,21 +689,63 @@
                                     </button>
                                 </div>
                                 <!-- 跳過本題按鈕 (鍵盤區) -->
-                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-3 bg-slate-100 text-orange-600 font-bold rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors shadow-sm flex justify-center items-center gap-2">
+                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-2.5 bg-transparent text-slate-400 hover:text-orange-500 hover:bg-orange-50 font-bold rounded-xl border border-slate-200 hover:border-orange-200 transition-all text-xs flex justify-center items-center gap-1.5">
+                                    <span>⏭️ 跳過本題 (0分)</span>
+                                </button>
+                            </div>
+
+                            <!-- 📷 拍照區 -->
+                            <div id="camera-input-zone" class="w-full flex flex-col items-center hidden">
+                                <input type="file" id="camera-file-input" accept="image/*" capture="environment" class="hidden">
+                                <div id="camera-container" class="w-full border-4 border-slate-300 rounded-xl overflow-hidden shadow-inner relative h-64 sm:h-72 bg-slate-50 flex flex-col items-center justify-center transition-colors">
+                                    <div id="camera-placeholder" class="flex flex-col items-center gap-3 text-slate-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                        <p class="text-sm font-bold">點擊下方按鈕開啟鏡頭或選擇相片</p>
+                                        <p class="text-xs text-slate-400 px-6 text-center">💡 建議光線充足，紙張放平，確保字跡清晰</p>
+                                    </div>
+                                    <!-- Cropper 會綁定到此 img；初始隱藏 -->
+                                    <img id="camera-preview" class="hidden max-w-full max-h-full" alt="相片預覽" style="display:block;">
+                                </div>
+                                <div class="flex gap-2 mt-4 w-full">
+                                    <button id="camera-open-btn" onclick="document.getElementById('camera-file-input').click()" class="flex-1 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition-colors shadow-sm">📷 開啟鏡頭</button>
+                                    <button id="camera-retake-btn" onclick="retakeCameraPhoto()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-lg hover:bg-slate-200 transition-colors shadow-sm hidden">🔄 重新拍攝</button>
+                                    <button id="camera-recognize-btn" class="flex-[2] py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md flex justify-center items-center gap-2 hidden">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                        ✂️ 確認剪裁並辨識
+                                    </button>
+                                </div>
+                                <button onclick="skipQuestion()" class="skip-action-btn w-full mt-3 py-2.5 bg-transparent text-slate-400 hover:text-orange-500 hover:bg-orange-50 font-bold rounded-xl border border-slate-200 hover:border-orange-200 transition-all text-xs flex justify-center items-center gap-1.5">
                                     <span>⏭️ 跳過本題 (0分)</span>
                                 </button>
                             </div>
 
                             <!-- 全局 Loading 遮罩 -->
-                            <div id="global-loading" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm z-30 flex flex-col items-center justify-center rounded-xl border border-slate-200 shadow-sm">
-                                <svg class="animate-spin h-10 w-10 text-indigo-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <p id="global-loading-text" class="text-indigo-700 font-bold text-center px-4 leading-relaxed">載入中...</p>
+                            <div id="global-loading" class="hidden absolute inset-0 bg-white/95 backdrop-blur-md z-30 flex flex-col items-center justify-center rounded-2xl border border-slate-100">
+                                <div class="relative w-14 h-14 mb-4">
+                                    <div class="absolute inset-0 rounded-full grad-primary opacity-20 animate-ping"></div>
+                                    <div class="absolute inset-0 rounded-full grad-primary flex items-center justify-center">
+                                        <svg class="w-7 h-7 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    </div>
+                                </div>
+                                <p id="global-loading-text" class="text-indigo-700 font-bold text-center px-4 leading-relaxed text-sm">載入中...</p>
                             </div>
                             
                             <!-- 終極防呆：確認視窗 -->
-                            <div id="hw-confirm-ui" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all rounded-xl border border-slate-200">
+                            <div id="hw-confirm-ui" class="hidden absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-all rounded-xl border border-slate-200 overflow-y-auto">
                                 <h3 class="text-lg sm:text-xl font-bold text-indigo-700 mb-2">🤖 步驟一：數式轉換確認</h3>
-                                <div id="hw-confirm-math" class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-4 min-h-[80px] flex items-center justify-center shadow-inner whitespace-nowrap"></div>
+                                <div id="hw-confirm-math" class="text-xl sm:text-2xl font-bold text-indigo-700 overflow-x-auto math-scroll py-4 px-2 w-full bg-white rounded-lg border-2 border-indigo-200 mb-3 min-h-[80px] flex items-center justify-center shadow-inner whitespace-nowrap"></div>
+
+                                <!-- 可編輯 LaTeX 原始碼（讓使用者修正辨識誤差） -->
+                                <div class="w-full mb-3">
+                                    <label class="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold text-slate-500 mb-1 tracking-wider uppercase">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        可編輯 LaTeX（如辨識有誤可手動修正）
+                                    </label>
+                                    <input type="text" id="hw-latex-edit" spellcheck="false" autocomplete="off" autocapitalize="off"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none text-sm font-mono transition-all"
+                                        placeholder="LaTeX 原始碼...">
+                                </div>
+
                                 <p class="text-sm sm:text-base text-slate-600 font-bold mb-4 text-center">請確認以上數式是否與你的輸入相符？<br><span class="text-xs text-slate-500 font-normal">確認無誤後，才會交由 AI 老師進行邏輯批改。</span></p>
                                 <div class="flex gap-3 w-full max-w-sm">
                                     <button onclick="rewriteHandwriting()" class="flex-1 py-3 bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base">❌ 重新輸入</button>
@@ -386,16 +754,20 @@
                             </div>
 
                         </div>
-                        <div class="mt-3 text-slate-500 text-sm text-center">💡 提示：你可以自由切換上方標籤，選擇手寫或鍵盤輸入。</div>
+                        <div class="mt-4 text-slate-400 text-xs text-center font-medium flex items-center justify-center gap-1.5">
+                            <span>💡</span>
+                            <span>切換上方標籤，可選擇手寫、鍵盤或拍照輸入</span>
+                        </div>
                     </div>
                 </div>
 
                 <div id="feedbackArea" class="hidden">
-                    <div id="feedbackBox" class="p-4 rounded-xl border w-full overflow-hidden shadow-sm">
+                    <div id="feedbackBox" class="p-4 sm:p-5 rounded-2xl border w-full overflow-hidden">
                         <div id="feedbackMessage" class="flex flex-col w-full text-center"></div>
                     </div>
-                    <button id="nextBtn" class="mt-6 w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all transform hover:scale-[1.02] shadow-md text-lg">
-                        下一題 ➡️
+                    <button id="nextBtn" class="mt-5 w-full py-4 grad-primary text-white font-black rounded-2xl hover:opacity-95 active:scale-[0.98] transition-all text-lg flex items-center justify-center gap-2" style="box-shadow: var(--shadow-glow);">
+                        下一題
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
             </div>
@@ -404,43 +776,65 @@
         <!-- ========================================== -->
         <!-- 畫面 4：結算畫面 (End Screen) -->
         <!-- ========================================== -->
-        <div id="endScreen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 text-center max-w-3xl mx-auto hidden">
-            <h2 class="text-3xl font-bold text-slate-800 mb-2 mt-4">練習完成！</h2>
-            <p id="endSubtitle" class="text-slate-500 mb-6 font-medium">AI 分析顯示你對這個單元的概念掌握得不錯！</p>
-            
-            <div class="mb-8 text-2xl font-bold text-slate-800">
-                總得分：<span id="finalScore" class="text-indigo-600 text-4xl mx-1 font-black">30</span> / <span id="totalQuestions" class="text-slate-700 text-2xl">30</span>
-            </div>
+        <div id="endScreen" class="bg-white rounded-3xl border border-slate-100 p-6 sm:p-10 text-center max-w-3xl mx-auto hidden" style="box-shadow: var(--shadow-elevated);">
 
-            <!-- ========================================== -->
-            <!-- 🌟 新增：各課題得分明細追蹤器 -->
-            <!-- ========================================== -->
-            <div id="topicDetailsTracker" class="mb-8 p-5 bg-slate-50 border border-slate-200 rounded-xl text-left shadow-sm hidden">
-                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">📈 各課題表現明細</h3>
-                <div id="topicDetailsList" class="space-y-4">
-                    <!-- 系統將自動產生得分條 -->
-                </div>
-            </div>
+            <!-- 標題 -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-xs font-bold tracking-wider uppercase mb-3 mt-2">Practice Complete</div>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mb-6">練習完成！🎉</h2>
 
-            <!-- 名言區塊 (淺紫色) -->
-            <div class="mb-8 p-5 bg-indigo-50 border border-indigo-100 rounded-xl text-left shadow-sm flex items-start gap-3">
-                <div class="text-indigo-400 font-serif text-3xl leading-none mt-1">"</div>
-                <div id="motivationalQuote" class="text-lg font-bold text-indigo-900">想得再多，不如踏實去做。</div>
-            </div>
-
-            <!-- 遞交成績區塊 -->
-            <div class="border border-slate-200 rounded-xl p-5 sm:p-6 mb-6 text-left shadow-sm bg-white">
-                <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">📝 遞交成績給老師</h3>
-                
-                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-lg mb-4 flex justify-between items-center">
-                    <div>
-                        <div class="text-xs text-indigo-400 font-bold mb-1">目前登入身分</div>
-                        <div id="submitIdentityInfo" class="text-indigo-800 font-bold text-lg">讀取中...</div>
+            <!-- 🎯 Hero Card：圓環（左）+ 個人資訊（右）水平合併 -->
+            <div class="mb-6 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center sm:items-stretch gap-4 sm:gap-6 text-left" style="background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%); border: 1px solid #e0e7ff;">
+                <!-- 左：圓環分數 -->
+                <div class="relative w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="44" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                        <circle id="scoreRingFill" cx="50" cy="50" r="44" fill="none" stroke="url(#ringGradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="276.46" style="transition: stroke-dashoffset 1.4s cubic-bezier(0.22, 1, 0.36, 1);"/>
+                        <defs>
+                            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#6366f1"/>
+                                <stop offset="100%" stop-color="#8b5cf6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-widest uppercase">Score</div>
+                        <span id="finalScore" class="text-3xl sm:text-4xl font-black text-grad-gold tabular-nums leading-none">0</span>
+                        <div class="text-[10px] sm:text-xs font-bold text-slate-500 mt-0.5">/ <span id="totalQuestions" class="tabular-nums">0</span> 分</div>
                     </div>
                 </div>
-                
-                <button id="submitRecordBtn" onclick="submitToGoogleSheet()" class="w-full py-3 bg-[#44994d] text-white font-bold rounded-lg hover:bg-green-700 transition-all shadow-sm">
-                    傳送成績
+                <!-- 右：身分（放大）+ 評級 + 心靈雞湯 -->
+                <div class="flex-1 flex flex-col justify-center text-center sm:text-left min-w-0">
+                    <div id="endRatingBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-sm font-black bg-indigo-50 text-indigo-700 border border-indigo-100 self-center sm:self-start mb-3">
+                        讀取中...
+                    </div>
+                    <div class="flex items-center gap-3 mb-3 justify-center sm:justify-start">
+                        <span class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white flex items-center justify-center text-3xl sm:text-4xl border border-indigo-100 flex-shrink-0">👤</span>
+                        <div class="min-w-0">
+                            <div class="text-xs sm:text-sm text-indigo-500 font-bold tracking-widest uppercase">Student</div>
+                            <div id="submitIdentityInfo" class="text-indigo-900 font-black text-lg sm:text-2xl truncate">讀取中...</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-2 mt-1">
+                        <span class="text-indigo-400 text-2xl leading-none font-serif flex-shrink-0">"</span>
+                        <p id="endSubtitle" class="text-indigo-900 font-bold text-sm sm:text-base leading-relaxed">想得再多，不如踏實去做。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 各課題表現明細 -->
+            <div id="topicDetailsTracker" class="mb-6 p-5 sm:p-6 rounded-2xl text-left hidden" style="background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%); border: 1px solid #e0e7ff;">
+                <h3 class="text-base sm:text-lg font-black text-slate-800 mb-4 flex items-center gap-2"><span class="text-xl">📈</span>各課題表現明細</h3>
+                <div id="topicDetailsList" class="space-y-4"></div>
+            </div>
+
+            <!-- 心靈雞湯已搬上 Hero Card，此處保留隱藏節點維持兼容 -->
+            <div id="motivationalQuote" class="hidden">想得再多，不如踏實去做。</div>
+
+            <!-- 遞交成績區塊（精簡版：身分已在 Hero Card） -->
+            <div class="rounded-2xl p-4 sm:p-5 mb-6 text-left bg-white border border-slate-200" style="box-shadow: var(--shadow-card);">
+                <button id="submitRecordBtn" onclick="submitToGoogleSheet()" class="w-full py-3.5 grad-success text-white font-black rounded-xl hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-2" style="box-shadow: 0 8px 20px -6px rgba(16,185,129,0.4);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    傳送成績給老師
                 </button>
                 <div id="submitStatus" class="mt-3 text-center text-sm font-bold hidden"></div>
             </div>
@@ -448,22 +842,82 @@
             <!-- 動態獎勵與解鎖進度區塊 -->
             <div id="rewardContainer" class="hidden mb-8"></div>
 
-            <!-- 結算畫面的雙欄排行榜 -->
-            <div id="endLeaderboardContainer" class="mb-8 bg-[#FFF9E6] border border-[#FDE68A] rounded-xl p-5 text-left shadow-sm">
-                 <h3 class="text-lg font-bold text-amber-800 mb-4 flex items-center justify-center gap-2">🏆 勤學排行榜 (Top 20)</h3>
-                 <div id="my-rank-end"></div>
-                 <div id="leaderboard-end-container" class="max-h-64 overflow-y-auto custom-scrollbar px-1">
-                    <!-- 動態插入 -->
-                 </div>
+            <!-- 結算畫面排行榜 -->
+            <div id="endLeaderboardContainer" class="mb-8 rounded-2xl p-5 sm:p-6 text-left" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid var(--c-amber-200);">
+                <h3 class="text-base sm:text-lg font-black text-amber-800 mb-4 flex items-center justify-center gap-2"><span class="text-xl">🏆</span>勤學排行榜 Top 20</h3>
+                <div id="my-rank-end"></div>
+                <div id="leaderboard-end-container" class="max-h-64 overflow-y-auto custom-scrollbar px-1"></div>
             </div>
 
-            <!-- 底部按鈕區塊 -->
+            <!-- 底部按鈕 -->
             <div class="flex flex-col sm:flex-row gap-3">
-                <button onclick="if(typeof restartLevel !== 'undefined') restartLevel(); else checkEnvironment();" class="flex-1 py-3 bg-[#5B50D6] text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition-colors">重做此練習</button>
-                <button onclick="if(typeof backToLevelSelection !== 'undefined') backToLevelSelection(); else checkEnvironment();" class="flex-1 py-3 bg-[#EEF2FF] text-indigo-700 font-bold rounded-xl shadow-sm hover:bg-indigo-100 transition-colors border border-indigo-100">選擇其他練習</button>
-                <button onclick="if(typeof showTopicScreen !== 'undefined') showTopicScreen(); else checkEnvironment();" class="flex-1 py-3 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-colors">返回主選單</button>
+                <button onclick="if(typeof restartLevel !== 'undefined') restartLevel(); else checkEnvironment();" class="flex-1 py-3.5 grad-primary text-white font-black rounded-2xl hover:opacity-95 active:scale-[0.98] transition-all" style="box-shadow: var(--shadow-glow);">🔄 重做此練習</button>
+                <button onclick="if(typeof backToLevelSelection !== 'undefined') backToLevelSelection(); else checkEnvironment();" class="flex-1 py-3.5 bg-indigo-50 text-indigo-700 font-black rounded-2xl hover:bg-indigo-100 active:scale-[0.98] transition-all border border-indigo-100">📚 選擇其他練習</button>
+                <button onclick="if(typeof showTopicScreen !== 'undefined') showTopicScreen(); else checkEnvironment();" class="flex-1 py-3.5 bg-white border border-slate-200 text-slate-700 font-black rounded-2xl hover:bg-slate-50 active:scale-[0.98] transition-all">🏠 返回主選單</button>
             </div>
         </div>
+
+        <!-- 📊 校內成績 Modal -->
+        <div id="schoolGradesModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-7 border border-slate-100 max-h-[85vh] flex flex-col" style="box-shadow: var(--shadow-elevated);">
+                <div class="flex flex-col items-center mb-5 flex-shrink-0">
+                    <div class="grad-primary text-white p-3 rounded-2xl mb-3" style="box-shadow: var(--shadow-glow);">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-900">📊 我的校內成績</h3>
+                    <p id="schoolGradesIdentity" class="text-slate-500 text-xs sm:text-sm mt-1 font-medium">讀取中...</p>
+                </div>
+
+                <!-- 成績列表容器 -->
+                <div id="schoolGradesContent" class="overflow-y-auto custom-scrollbar flex-1 mb-4 -mx-1 px-1">
+                    <!-- 預設：載入骨架 -->
+                    <div class="space-y-2">
+                        <div class="skeleton h-14"></div>
+                        <div class="skeleton h-14"></div>
+                        <div class="skeleton h-14"></div>
+                        <div class="skeleton h-14"></div>
+                    </div>
+                </div>
+
+                <button onclick="closeGradesModal()" class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all flex-shrink-0">關閉</button>
+            </div>
+        </div>
+
+        <!-- 🔐 修改密碼 Modal -->
+        <div id="changePasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-7 border border-slate-100" style="box-shadow: var(--shadow-elevated);">
+                <div class="flex flex-col items-center mb-5">
+                    <div class="grad-primary text-white p-3 rounded-2xl mb-3" style="box-shadow: var(--shadow-glow);">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-black text-slate-900">修改密碼</h3>
+                    <p class="text-slate-500 text-xs sm:text-sm mt-1 font-medium">設定一個只有你知道的密碼，避免他人使用</p>
+                </div>
+
+                <div class="space-y-3 mb-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5 tracking-wider uppercase">舊密碼<span class="text-slate-400 normal-case ml-1">(若無請留空)</span></label>
+                        <input type="password" id="oldPwdInput" placeholder="輸入舊密碼" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none font-bold transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5 tracking-wider uppercase">新密碼<span class="text-slate-400 normal-case ml-1">(至少 4 個字元)</span></label>
+                        <input type="password" id="newPwdInput" placeholder="輸入新密碼" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none font-bold transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1.5 tracking-wider uppercase">確認新密碼</label>
+                        <input type="password" id="newPwdConfirmInput" placeholder="再次輸入新密碼" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 focus:outline-none font-bold transition-all">
+                    </div>
+                </div>
+
+                <div id="changePwdStatus" class="hidden mb-3 px-3 py-2 rounded-lg text-sm font-bold text-center"></div>
+
+                <div class="flex gap-3">
+                    <button onclick="closeChangePwdModal()" class="flex-1 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 active:scale-[0.98] transition-all">取消</button>
+                    <button id="changePwdSubmitBtn" onclick="submitChangePassword()" class="flex-1 py-3 grad-primary text-white font-black rounded-xl hover:opacity-95 active:scale-[0.98] transition-all" style="box-shadow: var(--shadow-glow);">確認修改</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- ========================================== -->
@@ -479,7 +933,19 @@
     <script src="js/topics/expansion.js?v=71" defer></script>
     <script src="js/topics/algebraic_fractions_mul_div.js?v=71" defer></script>
     <script src="js/topics/triangle_area.js?v=71" defer></script>
-    <script src="js/app.js?v=71" defer></script>
+    <script src="js/topics/change_of_subject.js?v=72" defer></script>
+    <script src="js/topics/pricing.js?v=72" defer></script>
+    <script src="js/topics/compound_inequalities.js?v=72" defer></script>
+    <script src="js/topics/compound_interest.js?v=72" defer></script>
+    <script src="js/topics/functions_remainder.js?v=72" defer></script>
+    <script src="js/topics/hcf_lcm.js?v=72" defer></script>
+    <script src="js/topics/linear_equations.js?v=72" defer></script>
+    <script src="js/topics/percentage_change.js?v=72" defer></script>
+    <script src="js/topics/quadratic_equations.js?v=72" defer></script>
+    <script src="js/topics/simple_inequalities.js?v=72" defer></script>
+    <script src="js/topics/simultaneous_equations.js?v=72" defer></script>
+    <script src="js/topics/vertex.js?v=72" defer></script>
+    <script src="js/app.js?v=72" defer></script>
 
 </body>
 </html>
