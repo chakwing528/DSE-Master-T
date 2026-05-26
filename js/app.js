@@ -24,7 +24,19 @@ const fallbackConfigs = {
     'binary': { name: '二進制', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '二進制轉十進制<br>只有加法。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '十進制轉二進制<br>只有加法。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '綜合轉換<br>包含加法與減法。' } ] },
     'expansion': { name: '恆等式的展開', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '展開 (x+a)² 或 (x+a)(x-a)<br>基礎展開。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '展開 (bx+a)² 或 (bx+a)(bx-a)<br>b 為正整數。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '展開 (bx+a)² 或 (bx+a)(bx-a)<br>a 與 b 皆可為負數。' } ] },
     'alg_frac_mul_div': { name: '代數分式的乘除法', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2', desc: '單項式乘除法<br>指數定律約簡' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2', desc: '二項式乘除法<br>提公因式與變號' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '進階因式分解<br>平方差與完全平方' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '進階因式分解<br>十字相乘法' } ] },
-    'triangle_area': { name: '三角形面積', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '包含 1/2absinC 及 希羅公式<br>考驗公式判別與計算。' } ] }
+    'triangle_area': { name: '三角形面積', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '包含 1/2absinC 及 希羅公式<br>考驗公式判別與計算。' } ] },
+    'change_of_subject': { name: '主項轉換', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '基礎主項轉換<br>一步變項移項。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '進階主項轉換<br>含括號與多步移項。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '挑戰級主項轉換<br>分式與多項合併。' } ] },
+    'pricing': { name: '成本 / 售價 / 標價', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '基礎折扣與利潤計算<br>百分比應用。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '標價與售價綜合<br>多步驟百分比運算。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '成本利潤反推<br>進階比例與百分比分析。' } ] },
+    'linear_equations': { name: '直線方程', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '基礎截距與幾何判讀<br>補底基本功。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '單一圖像之係數正負號判別<br>穩固中游。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '雙線圖像與係數比較<br>拉分進階。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '高階代數不等式與交叉相乘<br>拔尖挑戰。' } ] },
+    'quadratic_equations': { name: '二次方程', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '基礎二次方程求解<br>防漏根陷阱。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '根的性質與判別式 Δ<br>核心概念。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '兩根之和與兩根之積<br>韋達定理。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '高階代數變形與隱藏二次方程<br>拔尖。' } ] },
+    'simultaneous_equations': { name: '聯立方程', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '標準常規方程與直接代入<br>補底穩分。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2、DSE', desc: '連等式變換 A=B=C<br>核心基本題。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '真實生活情境與應用題<br>卷一常客。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '代數變換與跨課題綜合<br>拔尖神題。' } ] },
+    'vertex': { name: '頂點與二次圖像', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S4、DSE', desc: '基礎圖像特徵判讀<br>補底基本功。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S4、DSE', desc: '頂點式參數符號判讀<br>建基。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S4、DSE', desc: '對稱軸與交點<br>進階。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S4、DSE', desc: '綜合高階推論與代數幾何轉換<br>拔尖。' } ] },
+    'functions_remainder': { name: '函數與餘式定理', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S4、DSE', desc: '基礎餘式定理與函數值<br>直接代入。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S4、DSE', desc: '基礎因式定理<br>求未知常數與餘數。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S4、DSE', desc: '函數代入與多項式恆等特性<br>進階。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S4、DSE', desc: '進階定理綜合<br>兩步與聯立方程拔尖。' } ] },
+    'simple_inequalities': { name: '簡單不等式', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '基礎一元一次不等式<br>單邊移項與變號。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S2、DSE', desc: '雙邊變數與括號展開<br>常見題型。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S2、DSE', desc: '不等式性質推導與判斷<br>進階。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '求極端整數解與三個分式不等式<br>拔尖。' } ] },
+    'compound_inequalities': { name: '複合不等式', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '基礎一元一次不等式與性質判斷<br>建基補底。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '複合不等式與數軸交疊處理<br>常考核心。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '含分數與複雜代數變形<br>補強拔尖。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '進階推論、整數解計數與二次不等式<br>拔尖挑戰。' } ] },
+    'hcf_lcm': { name: 'H.C.F. / L.C.M.', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S1、DSE', desc: '基礎 H.C.F.<br>補底。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S1、DSE', desc: '基礎 L.C.M.<br>建基。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S2、DSE', desc: '逆向推導<br>單純變數。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '逆向推導綜合<br>拔尖。' } ] },
+    'percentage_change': { name: '百分變化', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S2、DSE', desc: '基礎百分變化與數量計算<br>補底基本。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '連鎖複合關係與幾何公式變化<br>中游核心。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '加權百分數與二維交叉分類問題<br>進階。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '高階代數聯立與未知數推導<br>拔尖。' } ] },
+    'compound_interest': { name: '複利息', levels: [ { id: 'L1', title: '⭐ 程度 1', badge: 'S3、DSE', desc: '基礎本利和計算 (Amount)<br>補底。' }, { id: 'L2', title: '⭐⭐ 程度 2', badge: 'S3、DSE', desc: '複利息計算 (Interest)<br>核心。' }, { id: 'L3', title: '⭐⭐⭐ 程度 3', badge: 'S3、DSE', desc: '逆向求本金<br>進階。' }, { id: 'L4', title: '⭐⭐⭐⭐ 程度 4', badge: 'S3、DSE', desc: '等比年金逆向推導<br>拔尖。' } ] }
 };
 
 let questionBank = [];
@@ -47,6 +59,27 @@ let currentHomeworkName = "";
 let dynamicHomeworkConfig = [];
 let topicScores = {}; // 追蹤各課題的分數明細
 
+// 🎁 每日首10題獎勵系統
+let dailyCorrectCount = 0;
+
+function _dailyBonusKey() {
+    const cls = getStoredData('dse_className').toUpperCase().trim();
+    const num = getStoredData('dse_classNumber').trim();
+    const d = new Date();
+    const dateStr = d.getFullYear().toString() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0');
+    return `dse_dailyQ_${cls}_${num}_${dateStr}`;
+}
+
+function getDailyCorrectCount() {
+    return parseInt(getStoredData(_dailyBonusKey())) || 0;
+}
+
+function saveDailyCorrectCount(count) {
+    setStoredData(_dailyBonusKey(), String(count));
+}
+
 // 🛡️ 終極防護系統變數
 let quizStartTime = 0;
 let quizTimeTaken = 0;
@@ -55,8 +88,61 @@ let quizIntegrity = { seed: "", chain: "", events: [] };
 
 let currentRecognizedLaTeX = "";
 
-function getStoredData(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
-function setStoredData(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+// 🌟 改用 sessionStorage：學校公用電腦關 Tab 自動登出；iPhone PWA 背景仍保留
+function getStoredData(key) { try { return sessionStorage.getItem(key) || ''; } catch (e) { return ''; } }
+function setStoredData(key, value) { try { sessionStorage.setItem(key, value); } catch (e) {} }
+
+// ✏️ 開啟手寫確認視窗（同時將 LaTeX 填入可編輯框）
+function showHwConfirmUI() {
+    const confirmUI = document.getElementById('hw-confirm-ui');
+    const mathDiv = document.getElementById('hw-confirm-math');
+    const editInput = document.getElementById('hw-latex-edit');
+    if (mathDiv) mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
+    if (editInput) editInput.value = currentRecognizedLaTeX;
+    if (confirmUI) confirmUI.classList.remove('hidden');
+    if (typeof renderMath === 'function') renderMath();
+
+    // 一次性綁定即時更新監聽
+    if (editInput && !editInput.dataset.boundLive) {
+        editInput.addEventListener('input', function() {
+            currentRecognizedLaTeX = this.value;
+            const md = document.getElementById('hw-confirm-math');
+            if (md) md.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
+            if (typeof renderMath === 'function') renderMath();
+        });
+        editInput.dataset.boundLive = '1';
+    }
+}
+
+// 👁️ 密碼顯示 / 隱藏切換
+window.togglePasswordVisibility = function() {
+    const inp = document.getElementById('loginPwd');
+    const icon = document.getElementById('loginPwdEyeIcon');
+    if (!inp || !icon) return;
+    const showing = inp.type === 'text';
+    inp.type = showing ? 'password' : 'text';
+    if (showing) {
+        // 切回隱藏：顯示「閉眼」icon
+        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`;
+    } else {
+        // 顯示中：改為「開眼」icon
+        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+    }
+};
+
+// 🎬 畫面切換時播放 fade+slide enter 動畫
+function showScreen(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.classList.remove('screen-enter');
+    void el.offsetWidth; // 強制重排以重啟動畫
+    el.classList.add('screen-enter');
+}
+// 觸覺反饋（行動裝置振動）
+function haptic(pattern) {
+    if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} }
+}
 
 // ==========================================
 // 🌟 核心：動態生成登入介面與強制登入邏輯
@@ -123,6 +209,7 @@ window.loginApp = async function() {
         setStoredData('dse_classNumber', cNum);
         setStoredData('dse_studentName', result.studentName || "");
         setStoredData('dse_password', cPwd);
+        setStoredData('dse_sessionToken', result.sessionToken || ""); // 🔐 V2 安全 Token
 
         showTopicScreen();
         renderLeaderboards();
@@ -138,9 +225,269 @@ window.logoutApp = function() {
         setStoredData('dse_classNumber', '');
         setStoredData('dse_studentName', '');
         setStoredData('dse_password', '');
+        setStoredData('dse_sessionToken', ''); // 🔐 清除 V2 Token
         location.reload();
     }
 };
+
+// ==========================================
+// 🔐 修改密碼功能
+// ==========================================
+window.openChangePwdModal = function() {
+    const modal = document.getElementById('changePasswordModal');
+    if (!modal) return;
+    // 檢查 sessionToken 是否存在
+    if (!getStoredData('dse_sessionToken')) {
+        alert("⚠️ 認證已逾期，請先登出後重新登入再修改密碼。");
+        return;
+    }
+    // 重置欄位
+    ['oldPwdInput', 'newPwdInput', 'newPwdConfirmInput'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const statusBox = document.getElementById('changePwdStatus');
+    if (statusBox) statusBox.classList.add('hidden');
+    modal.classList.remove('hidden');
+};
+
+window.closeChangePwdModal = function() {
+    const modal = document.getElementById('changePasswordModal');
+    if (modal) modal.classList.add('hidden');
+};
+
+function showChangePwdStatus(msg, isError) {
+    const box = document.getElementById('changePwdStatus');
+    if (!box) return;
+    box.textContent = msg;
+    box.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-700', 'bg-rose-50', 'text-rose-700');
+    if (isError) {
+        box.classList.add('bg-rose-50', 'text-rose-700');
+    } else {
+        box.classList.add('bg-emerald-50', 'text-emerald-700');
+    }
+}
+
+window.submitChangePassword = async function() {
+    const oldPwd = document.getElementById('oldPwdInput')?.value || "";
+    const newPwd = document.getElementById('newPwdInput')?.value || "";
+    const newPwd2 = document.getElementById('newPwdConfirmInput')?.value || "";
+    const btn = document.getElementById('changePwdSubmitBtn');
+
+    // 前端驗證
+    if (newPwd.length < 4) { showChangePwdStatus("❌ 新密碼至少 4 個字元", true); return; }
+    if (newPwd.length > 30) { showChangePwdStatus("❌ 新密碼不可超過 30 個字元", true); return; }
+    if (newPwd !== newPwd2) { showChangePwdStatus("❌ 兩次輸入的新密碼不一致", true); return; }
+
+    const sessionToken = getStoredData('dse_sessionToken');
+    if (!sessionToken) {
+        showChangePwdStatus("⚠️ 認證已逾期，請重新登入", true);
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = "處理中..."; }
+
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'change_password');
+        formData.append('sessionToken', sessionToken);
+        formData.append('oldPassword', oldPwd);
+        formData.append('newPassword', newPwd);
+
+        const result = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData }).then(r => r.json());
+
+        if (result.success) {
+            // 更新 localStorage
+            setStoredData('dse_password', newPwd);
+            showChangePwdStatus(result.message || "✅ 密碼修改成功！", false);
+            if (typeof haptic === 'function') haptic([40, 30, 60]);
+            setTimeout(() => {
+                closeChangePwdModal();
+                alert(result.message || "✅ 密碼修改成功！");
+            }, 800);
+        } else {
+            showChangePwdStatus(result.message || "❌ 修改失敗", true);
+        }
+    } catch (err) {
+        showChangePwdStatus("⚠️ 網路連線失敗，請稍後再試", true);
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "確認修改"; }
+    }
+};
+
+// ==========================================
+// 📊 查看校內成績功能
+// ==========================================
+window.openGradesModal = function() {
+    const modal = document.getElementById('schoolGradesModal');
+    if (!modal) return;
+    if (!getStoredData('dse_sessionToken')) {
+        alert("⚠️ 認證已逾期，請先登出後重新登入再查看成績。");
+        return;
+    }
+
+    // 顯示身分（從 localStorage 取，僅用於 UI 顯示）
+    const idEl = document.getElementById('schoolGradesIdentity');
+    if (idEl) {
+        const cls = getStoredData('dse_className');
+        const num = getStoredData('dse_classNumber');
+        const nm  = getStoredData('dse_studentName');
+        idEl.textContent = `${cls} 班 - ${num} 號 (${nm})`;
+    }
+
+    // 重置內容為骨架載入
+    const content = document.getElementById('schoolGradesContent');
+    if (content) {
+        content.innerHTML = `
+            <div class="space-y-2">
+                <div class="skeleton h-14"></div>
+                <div class="skeleton h-14"></div>
+                <div class="skeleton h-14"></div>
+                <div class="skeleton h-14"></div>
+            </div>`;
+    }
+
+    modal.classList.remove('hidden');
+    fetchSchoolGrades();
+};
+
+window.closeGradesModal = function() {
+    const modal = document.getElementById('schoolGradesModal');
+    if (modal) modal.classList.add('hidden');
+};
+
+async function fetchSchoolGrades() {
+    const content = document.getElementById('schoolGradesContent');
+    if (!content) return;
+
+    const sessionToken = getStoredData('dse_sessionToken');
+    if (!sessionToken) {
+        content.innerHTML = `<div class="text-center py-8 text-rose-600 font-bold">⚠️ 認證已逾期，請重新登入</div>`;
+        return;
+    }
+
+    try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'fetch_school_grades');
+        formData.append('sessionToken', sessionToken);
+
+        const result = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData }).then(r => r.json());
+
+        if (!result.success) {
+            content.innerHTML = `<div class="text-center py-8 text-rose-600 font-bold">${result.message || '❌ 讀取失敗'}</div>`;
+            return;
+        }
+
+        const grades = Array.isArray(result.grades) ? result.grades : [];
+        if (grades.length === 0) {
+            content.innerHTML = `
+                <div class="text-center py-10 px-6 rounded-2xl" style="background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%); border: 1px dashed #c7d2fe;">
+                    <div class="text-5xl mb-3 opacity-50">📭</div>
+                    <div class="text-slate-600 font-bold text-base">目前尚無你的成績紀錄</div>
+                    <div class="text-slate-400 text-xs mt-1.5 font-medium">老師可能未公布成績，或你該次缺考</div>
+                </div>`;
+            return;
+        }
+
+        // 動態渲染成績卡片（3 級配色：及格綠 / 不及格紅 / ABS 灰）
+        let html = '<div class="space-y-3">';
+        grades.forEach((g, idx) => {
+            const examName = g.examName || `項目 ${idx + 1}`;
+            const score = g.score;
+            const fullMark = g.fullMark;
+            const pct = (typeof g.percentage === 'number') ? g.percentage : null;
+            const rank = g.rank;
+            const classSize = g.classSize;
+            const stats = g.stats || {};
+            const isAbsent = (score === "ABS");
+
+            // 🎨 3 級配色
+            //   ABS（缺考） → 灰
+            //   ≥ 50%       → 綠（emerald）
+            //   < 50%       → 紅（rose）
+            let palette;
+            if (isAbsent) {
+                palette = { headBg: '#f1f5f9', border: '#cbd5e1', text: '#475569', accent: '#94a3b8', accentBg: '#e2e8f0' };
+            } else if (pct !== null && pct >= 50) {
+                palette = { headBg: '#ecfdf5', border: '#a7f3d0', text: '#065f46', accent: '#10b981', accentBg: '#d1fae5' };
+            } else {
+                palette = { headBg: '#fff1f2', border: '#fecdd3', text: '#9f1239', accent: '#f43f5e', accentBg: '#ffe4e6' };
+            }
+
+            // 排名徽章（ABS 不顯示排名）
+            let rankBadgeHtml = '';
+            if (!isAbsent && typeof rank === 'number') {
+                let rankPalette;
+                if (rank === 1)      rankPalette = { bg: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)', text: '#ffffff', icon: '🥇' };
+                else if (rank === 2) rankPalette = { bg: 'linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%)', text: '#ffffff', icon: '🥈' };
+                else if (rank === 3) rankPalette = { bg: 'linear-gradient(135deg, #fca5a5 0%, #b45309 100%)', text: '#ffffff', icon: '🥉' };
+                else                 rankPalette = { bg: palette.accent, text: '#ffffff', icon: '🎯' };
+                rankBadgeHtml = `
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm flex-shrink-0" style="background: ${rankPalette.bg}; color: ${rankPalette.text}; box-shadow: 0 4px 10px -3px rgba(0,0,0,0.15);">
+                        <span>${rankPalette.icon}</span>
+                        <span>班排名</span>
+                        <span class="tabular-nums">${rank}<span class="opacity-70 mx-0.5">/</span>${classSize}</span>
+                    </div>`;
+            } else if (isAbsent) {
+                rankBadgeHtml = `
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm flex-shrink-0" style="background: #94a3b8; color: #ffffff;">
+                        <span>📭</span><span>缺考紀錄</span>
+                    </div>`;
+            }
+
+            // 個人表現主體（ABS 顯示 "ABS" 字樣，無百分比 Badge）
+            const scoreSection = isAbsent
+                ? `<div class="flex items-baseline gap-2 min-w-0">
+                       <span class="font-black text-2xl sm:text-3xl tabular-nums leading-none" style="color: ${palette.text};">ABS</span>
+                       <span class="text-sm sm:text-base font-bold text-slate-400 tabular-nums">/ ${fullMark}</span>
+                   </div>`
+                : `<div class="flex items-baseline gap-2 min-w-0">
+                       <span class="font-black text-3xl sm:text-4xl tabular-nums leading-none" style="color: ${palette.text};">${score}</span>
+                       <span class="text-sm sm:text-base font-bold text-slate-400 tabular-nums">/ ${fullMark}</span>
+                       ${pct !== null ? `<span class="ml-1 px-2 py-0.5 rounded-md text-xs font-black tabular-nums" style="background: ${palette.accentBg}; color: ${palette.text};">${pct}%</span>` : ''}
+                   </div>`;
+
+            html += `
+                <div class="rounded-2xl overflow-hidden" style="background: white; border: 1px solid ${palette.border}; box-shadow: var(--shadow-card);">
+                    <!-- 卡片頂部：測驗名稱 -->
+                    <div class="px-4 py-2.5 flex items-center gap-2" style="background: ${palette.headBg}; border-bottom: 1px solid ${palette.border};">
+                        <span class="w-1.5 h-5 rounded-full" style="background: ${palette.accent};"></span>
+                        <h4 class="font-black text-sm sm:text-base" style="color: ${palette.text};">${examName}</h4>
+                    </div>
+
+                    <!-- 卡片中段：個人表現 -->
+                    <div class="px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                        ${scoreSection}
+                        ${rankBadgeHtml}
+                    </div>
+
+                    <!-- 卡片底部：全班統計 4 格 -->
+                    <div class="mx-3 mb-3 rounded-lg p-3 grid grid-cols-4 gap-2" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <div class="text-center min-w-0">
+                            <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase">平均</div>
+                            <div class="font-black text-sm sm:text-base text-slate-700 tabular-nums truncate">${stats.avg}</div>
+                        </div>
+                        <div class="text-center min-w-0">
+                            <div class="text-[9px] sm:text-[10px] font-bold text-emerald-500 tracking-wider uppercase">最高</div>
+                            <div class="font-black text-sm sm:text-base text-emerald-700 tabular-nums truncate">${stats.max}</div>
+                        </div>
+                        <div class="text-center min-w-0">
+                            <div class="text-[9px] sm:text-[10px] font-bold text-indigo-500 tracking-wider uppercase">中位</div>
+                            <div class="font-black text-sm sm:text-base text-indigo-700 tabular-nums truncate">${stats.median}</div>
+                        </div>
+                        <div class="text-center min-w-0">
+                            <div class="text-[9px] sm:text-[10px] font-bold text-rose-500 tracking-wider uppercase">最低</div>
+                            <div class="font-black text-sm sm:text-base text-rose-700 tabular-nums truncate">${stats.min}</div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        html += '</div>';
+        content.innerHTML = html;
+    } catch (err) {
+        content.innerHTML = `<div class="text-center py-8 text-rose-600 font-bold">⚠️ 網路連線失敗，請稍後再試</div>`;
+    }
+}
 
 function showTopicScreen() {
     initLoginUI(); // 確保登入介面已生成
@@ -158,26 +505,32 @@ function showTopicScreen() {
     // 🌟 只要有班別與學號，就允許進入選單
     if (!savedClass || !savedNum) {
         // 未登入：強制顯示登入畫面，隱藏主畫面
-        document.getElementById('loginScreen')?.classList.remove('hidden');
+        showScreen('loginScreen');
         topicScreen?.classList.add('hidden');
     } else {
         // 已登入：隱藏登入畫面，顯示主畫面
         document.getElementById('loginScreen')?.classList.add('hidden');
-        topicScreen?.classList.remove('hidden');
+        showScreen('topicScreen');
         
-        // 🌟 新增：在主選單左上角動態加入學生資訊 Badge
+        // 🌟 在主選單左上角動態加入學生資訊 Badge + 查看成績按鈕
         if (topicScreen) {
             topicScreen.classList.add('relative'); // 確保可以絕對定位
             let infoBadge = document.getElementById('student-info-badge');
             if (!infoBadge) {
                 infoBadge = document.createElement('div');
                 infoBadge.id = 'student-info-badge';
-                // 使用 Tailwind CSS 設定左上角絕對定位與樣式
-                infoBadge.className = 'absolute top-4 left-4 sm:top-6 sm:left-6 bg-indigo-50 border border-indigo-200 text-indigo-800 px-3 py-1.5 rounded-lg text-sm sm:text-base font-bold shadow-sm flex items-center gap-2 z-10';
                 topicScreen.appendChild(infoBadge);
             }
-            // 寫入學生資料
-            infoBadge.innerHTML = `<span>🎓 ${savedClass} 班 - ${savedNum} 號 (${savedName})</span>`;
+            // ⚠️ 每次都重新套用 className（避免舊樣式殘留）
+            infoBadge.className = 'absolute top-4 left-4 sm:top-6 sm:left-6 flex flex-col items-start gap-2 z-20';
+            infoBadge.innerHTML = `
+                <div class="bg-indigo-50 border border-indigo-200 text-indigo-800 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold shadow-sm">
+                    🎓 ${savedClass} 班 - ${savedNum} 號 (${savedName})
+                </div>
+                <button onclick="openGradesModal()" class="font-black text-sm sm:text-base px-4 py-2 rounded-xl flex items-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #ffffff; border: 1.5px solid #d97706; box-shadow: 0 8px 18px -6px rgba(245, 158, 11, 0.55);">
+                    📊 查看校內成績
+                </button>
+            `;
         }
         
         // 更新結算畫面顯示身分
@@ -264,11 +617,15 @@ function renderHomeworkButtons() {
         hwGrid.innerHTML = '';
         uniqueHwNames.forEach(hwName => {
             let totalQs = dynamicHomeworkConfig.filter(c => c.hwName === hwName).reduce((sum, c) => sum + (c.qCount || 1), 0);
-            
+
             hwGrid.innerHTML += `
-            <button onclick="startHomework('${hwName}')" class="py-4 px-2 border border-amber-300 rounded-xl hover:border-amber-400 hover:shadow-md hover:bg-amber-100 transition-all bg-white shadow-sm flex flex-col items-center justify-center group">
-                <span class="text-amber-800 font-bold text-sm sm:text-base">${hwName}</span>
-                <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md mt-1 border border-amber-100">共 ${totalQs} 題 (每題 10 分)</span>
+            <button onclick="startHomework('${hwName}')" class="group relative overflow-hidden p-4 rounded-2xl bg-white border border-amber-200 hover:border-amber-400 hover:-translate-y-1 active:translate-y-0 transition-all flex flex-col items-start text-left" style="box-shadow: var(--shadow-subtle);">
+                <div class="flex items-center justify-between w-full mb-2">
+                    <span class="text-2xl">📋</span>
+                    <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100 tabular-nums">${totalQs} 題</span>
+                </div>
+                <span class="text-amber-900 font-black text-sm sm:text-base leading-tight">${hwName}</span>
+                <span class="text-[10px] text-amber-600 font-bold mt-1.5 uppercase tracking-wider">每題 10 分</span>
             </button>
             `;
         });
@@ -319,37 +676,74 @@ function renderLeaderboards(overrideClass = null, overrideNum = null) {
         }
     });
 
-    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
-    globalLeaderboard.slice(0, 20).forEach((student, index) => {
-        let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
-        
-        html += `<div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-3">${rankIcon}<span class="font-bold text-slate-700 text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="text-right flex flex-col justify-center"><span class="text-indigo-600 font-bold text-base">${student.totalScore} 分</span><span class="text-slate-400 font-bold text-[11px] mt-0.5">今日: ${student.playCountToday || 0} 次</span></div></div>`;
-    });
-    html += '</div>';
+    function renderLbCard(student, index, compact) {
+        const padding = compact ? 'p-3' : 'p-3.5';
+        const nameSize = compact ? 'text-sm sm:text-base' : 'text-sm sm:text-base';
+        const scoreSize = compact ? 'text-base' : 'text-lg';
+        // 前 3 名特殊樣式
+        let bgStyle = '', borderStyle = 'border-slate-100', rankBadge = '', scoreColor = 'text-indigo-600';
+        if (index === 0) {
+            bgStyle = 'background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);';
+            borderStyle = 'border-amber-300';
+            scoreColor = 'text-amber-700';
+            rankBadge = `<span class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-lg" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); box-shadow: 0 4px 10px -2px rgba(245,158,11,0.5);">🥇</span>`;
+        } else if (index === 1) {
+            bgStyle = 'background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);';
+            borderStyle = 'border-slate-300';
+            scoreColor = 'text-slate-700';
+            rankBadge = `<span class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-lg" style="background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%); box-shadow: 0 4px 10px -2px rgba(148,163,184,0.5);">🥈</span>`;
+        } else if (index === 2) {
+            bgStyle = 'background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);';
+            borderStyle = 'border-rose-200';
+            scoreColor = 'text-rose-700';
+            rankBadge = `<span class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-lg" style="background: linear-gradient(135deg, #fca5a5 0%, #b45309 100%); box-shadow: 0 4px 10px -2px rgba(180,83,9,0.4);">🥉</span>`;
+        } else {
+            bgStyle = 'background: white;';
+            rankBadge = `<span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 text-slate-500 font-black text-sm tabular-nums">${index + 1}</span>`;
+        }
+        return `<div class="flex justify-between items-center ${padding} rounded-xl border ${borderStyle} transition-all hover:-translate-y-0.5" style="${bgStyle} box-shadow: var(--shadow-subtle);">
+            <div class="flex items-center gap-3 min-w-0">
+                ${rankBadge}
+                <span class="font-bold text-slate-800 ${nameSize} truncate">${student.className} <span class="text-slate-400 font-medium tabular-nums">(${student.classNum})</span> ${student.studentName}</span>
+            </div>
+            <div class="text-right flex flex-col justify-center flex-shrink-0 ml-2">
+                <span class="${scoreColor} font-black ${scoreSize} tabular-nums">${student.totalScore}<span class="text-xs font-bold ml-0.5">分</span></span>
+                <span class="text-slate-400 font-bold text-[10px] mt-0.5 tabular-nums">今日 ${student.playCountToday || 0} 次</span>
+            </div>
+        </div>`;
+    }
 
+    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pb-2">';
+    globalLeaderboard.slice(0, 20).forEach((student, index) => { html += renderLbCard(student, index, false); });
+    html += '</div>';
     if (homeContainer) homeContainer.innerHTML = html;
-    
-    let endHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">';
-    globalLeaderboard.slice(0, 20).forEach((student, index) => {
-        let rankIcon = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : `<span class="inline-block w-6 text-center text-slate-400 font-bold text-sm">${index + 1}.</span>`));
-        
-        endHtml += `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm transition-all hover:shadow-md"><div class="flex items-center gap-2">${rankIcon}<span class="font-bold text-slate-700 text-sm sm:text-base">${student.className} (${student.classNum}) ${student.studentName}</span></div><div class="text-right flex flex-col justify-center"><span class="text-indigo-600 font-bold text-sm sm:text-base">${student.totalScore} 分</span><span class="text-slate-400 font-bold text-[10px] mt-0.5">今日: ${student.playCountToday || 0} 次</span></div></div>`;
-    });
+
+    let endHtml = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pb-2">';
+    globalLeaderboard.slice(0, 20).forEach((student, index) => { endHtml += renderLbCard(student, index, true); });
     endHtml += '</div>';
     if (endContainer) endContainer.innerHTML = endHtml;
 
     let myRankHtml = '';
     if (currentUserClass && currentUserNum) {
         if (userRank !== -1) {
-            myRankHtml = `<div class="bg-[#FFF3C4] border border-[#FDE68A] p-4 rounded-xl flex justify-between items-center shadow-sm mb-6">
-                <span class="font-bold text-amber-800 text-base flex items-center gap-2"><span class="text-xl">👉</span> 你的目前排名：第 ${userRank} 名</span>
-                <div class="text-right flex flex-col justify-center">
-                    <span class="text-amber-800 font-bold text-lg">${userScore} 分</span>
-                    <span class="text-amber-600 font-bold text-xs mt-0.5">今日已交: ${userPlayCount} 次</span>
+            myRankHtml = `<div class="rounded-2xl p-4 sm:p-5 mb-6 flex justify-between items-center" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid var(--c-amber-200); box-shadow: var(--shadow-card);">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl sm:text-3xl">🎯</span>
+                    <div class="text-left">
+                        <div class="text-[10px] sm:text-xs font-bold text-amber-600 tracking-widest uppercase">Your Rank</div>
+                        <div class="font-black text-amber-800 text-base sm:text-lg">第 <span class="text-2xl tabular-nums">${userRank}</span> 名</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-amber-800 font-black text-2xl sm:text-3xl tabular-nums">${userScore}<span class="text-sm font-bold ml-1">分</span></div>
+                    <div class="text-amber-600 font-bold text-[10px] sm:text-xs mt-0.5 tabular-nums">今日已交 ${userPlayCount} 次</div>
                 </div>
             </div>`;
         } else {
-            myRankHtml = `<div class="bg-slate-100 border border-slate-300 p-3 rounded-lg flex justify-between items-center shadow-sm mb-6"><span class="font-bold text-slate-600">👉 你的目前排名：未上榜</span><span class="text-slate-500 font-bold text-sm">繼續刷題累積積分吧！</span></div>`;
+            myRankHtml = `<div class="rounded-2xl p-4 mb-6 flex justify-between items-center bg-slate-50 border border-slate-200">
+                <span class="font-bold text-slate-600 flex items-center gap-2"><span class="text-xl">📊</span>未上榜</span>
+                <span class="text-slate-500 font-bold text-xs sm:text-sm">繼續刷題累積積分吧！</span>
+            </div>`;
         }
     }
     if (myRankHome) myRankHome.innerHTML = myRankHtml;
@@ -406,8 +800,8 @@ function assignQuestionScores() {
 function selectTopic(topic) {
     currentTopic = topic;
     document.getElementById('topicScreen')?.classList.add('hidden');
-    document.getElementById('startScreen')?.classList.remove('hidden');
-    
+    showScreen('startScreen');
+
     ['btnL1', 'btnL2', 'btnL3', 'btnL4', 'btnL2A', 'btnL2B', 'btnL3A', 'btnL3B'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
@@ -439,12 +833,22 @@ function selectTopic(topic) {
         const btn = document.getElementById('btn' + lvl.id.toUpperCase());
         if (btn) {
             btn.classList.remove('hidden');
-            let colorClass = lvl.id.includes('1') ? 'bg-green-100 text-green-700' : (lvl.id.includes('2') ? 'bg-blue-100 text-blue-700' : (lvl.id.includes('3') ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'));
-            
-            let btnFont = btn.querySelector('.font-bold');
-            if(btnFont) btnFont.innerHTML = title + `<div class="mt-1"><span class="inline-block px-2 py-0.5 ${colorClass} text-xs rounded-md font-bold">${badge}</span></div>`;
-            
-            if(btn.lastElementChild) btn.lastElementChild.innerHTML = desc + `<div class="mt-3 text-indigo-600 font-bold text-sm bg-indigo-50 inline-block px-3 py-1 rounded-full shadow-sm border border-indigo-100">🎯 答對得 ${scoreVal} 分</div>`;
+            // 顏色語意：1=emerald, 2=sky, 3=violet, 4=amber
+            const palette = lvl.id.includes('1') ? { bg: '#ecfdf5', text: '#065f46', border: '#a7f3d0' }
+                          : lvl.id.includes('4') ? { bg: '#fffbeb', text: '#92400e', border: '#fcd34d' }
+                          : lvl.id.includes('3') ? { bg: '#faf5ff', text: '#5b21b6', border: '#ddd6fe' }
+                          : { bg: '#f0f9ff', text: '#075985', border: '#bae6fd' };
+
+            const children = btn.children;
+            // children[1] = 標題（程度 X）
+            if (children[1]) children[1].innerHTML = title.replace(/⭐+\s*/g, '');
+            // children[2] = 資訊槽：放大年級標示 + 得分膠囊
+            if (children[2]) {
+                children[2].innerHTML = `
+                    <div class="font-black text-base sm:text-lg mt-2 px-3 py-1 rounded-lg inline-block" style="background: ${palette.bg}; color: ${palette.text}; border: 1.5px solid ${palette.border};">${badge}</div>
+                    <div class="mt-2 text-indigo-700 font-black text-xs bg-indigo-50 inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-indigo-100">🎯 <span class="tabular-nums">${scoreVal}</span> 分</div>
+                `;
+            }
         }
     });
 }
@@ -491,6 +895,18 @@ window.startHomework = function(hwName) {
                 else if (cfg.topic === 'expansion') qArr = generateExpansionQuestions(cfg.qCount, String(cfg.levelId));
                 else if (cfg.topic === 'alg_frac_mul_div') qArr = generateAlgFracMulDivQuestions(cfg.qCount, String(cfg.levelId));
                 else if (cfg.topic === 'triangle_area') qArr = generateTriangleAreaQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'change_of_subject') qArr = generateSubjectQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'pricing') qArr = generatePricingQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'linear_equations') qArr = generateLinearQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'quadratic_equations') qArr = generateQuadraticQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'simultaneous_equations') qArr = generateSimultaneousQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'vertex') qArr = generateVertexQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'functions_remainder') qArr = generateFunctionsRemainderQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'simple_inequalities') qArr = generateSimpleInequalitiesQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'compound_inequalities') qArr = generateInequalitiesQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'hcf_lcm') qArr = generateHcfLcmQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'percentage_change') qArr = generatePercentageQuestions(cfg.qCount, String(cfg.levelId));
+                else if (cfg.topic === 'compound_interest') qArr = generateCompoundInterestQuestions(cfg.qCount, String(cfg.levelId));
             } catch(e) {
                 console.error(`Error generating ${cfg.topic}:`, e);
             }
@@ -533,7 +949,7 @@ function startGlobalMixed(level) {
         currentTopicName = '跨課題綜合挑戰';
         currentLevelPref = level;
 
-        let topicsList = ['indices', 'factorization', 'rounding', 'identities', 'fractions', 'binary', 'expansion', 'alg_frac_mul_div', 'triangle_area'];
+        let topicsList = ['indices', 'factorization', 'rounding', 'identities', 'fractions', 'binary', 'expansion', 'alg_frac_mul_div', 'triangle_area', 'change_of_subject', 'pricing', 'linear_equations', 'quadratic_equations', 'simultaneous_equations', 'vertex', 'functions_remainder', 'simple_inequalities', 'compound_inequalities', 'hcf_lcm', 'percentage_change', 'compound_interest'];
         
         let numQ = typeof window !== 'undefined' && window.totalQuestionsConfig ? window.totalQuestionsConfig : totalQuestionsConfig;
         let selectedTopics = [];
@@ -569,6 +985,18 @@ function startGlobalMixed(level) {
                 else if (t === 'expansion') qArr = generateExpansionQuestions(1, lvl);
                 else if (t === 'alg_frac_mul_div') qArr = generateAlgFracMulDivQuestions(1, lvl);
                 else if (t === 'triangle_area') qArr = generateTriangleAreaQuestions(1, lvl);
+                else if (t === 'change_of_subject') qArr = generateSubjectQuestions(1, lvl);
+                else if (t === 'pricing') qArr = generatePricingQuestions(1, lvl);
+                else if (t === 'linear_equations') qArr = generateLinearQuestions(1, lvl);
+                else if (t === 'quadratic_equations') qArr = generateQuadraticQuestions(1, lvl);
+                else if (t === 'simultaneous_equations') qArr = generateSimultaneousQuestions(1, lvl);
+                else if (t === 'vertex') qArr = generateVertexQuestions(1, lvl);
+                else if (t === 'functions_remainder') qArr = generateFunctionsRemainderQuestions(1, lvl);
+                else if (t === 'simple_inequalities') qArr = generateSimpleInequalitiesQuestions(1, lvl);
+                else if (t === 'compound_inequalities') qArr = generateInequalitiesQuestions(1, lvl);
+                else if (t === 'hcf_lcm') qArr = generateHcfLcmQuestions(1, lvl);
+                else if (t === 'percentage_change') qArr = generatePercentageQuestions(1, lvl);
+                else if (t === 'compound_interest') qArr = generateCompoundInterestQuestions(1, lvl);
             } catch(e) {
                 console.error(`Error generating ${t}:`, e);
             }
@@ -621,7 +1049,19 @@ function startGame(levelPref) {
         else if (currentTopic === 'expansion') questionBank = generateExpansionQuestions(numQ, currentLevelPref);
         else if (currentTopic === 'alg_frac_mul_div') questionBank = generateAlgFracMulDivQuestions(numQ, currentLevelPref);
         else if (currentTopic === 'triangle_area') questionBank = generateTriangleAreaQuestions(numQ, currentLevelPref);
-        
+        else if (currentTopic === 'change_of_subject') questionBank = generateSubjectQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'pricing') questionBank = generatePricingQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'linear_equations') questionBank = generateLinearQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'quadratic_equations') questionBank = generateQuadraticQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'simultaneous_equations') questionBank = generateSimultaneousQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'vertex') questionBank = generateVertexQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'functions_remainder') questionBank = generateFunctionsRemainderQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'simple_inequalities') questionBank = generateSimpleInequalitiesQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'compound_inequalities') questionBank = generateInequalitiesQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'hcf_lcm') questionBank = generateHcfLcmQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'percentage_change') questionBank = generatePercentageQuestions(numQ, currentLevelPref);
+        else if (currentTopic === 'compound_interest') questionBank = generateCompoundInterestQuestions(numQ, currentLevelPref);
+
         assignQuestionScores();
         assignHandwriting(questionBank);
 
@@ -637,7 +1077,7 @@ function startGame(levelPref) {
 }
 
 function startQuizSession() {
-    currentQuestionIndex = 0; score = 0; updateScoreDisplay();
+    currentQuestionIndex = 0; score = 0; dailyCorrectCount = getDailyCorrectCount(); updateScoreDisplay();
     
     // 🌟 啟動防護紀錄：記錄開始時間與產生一次性隨機碼 (UUID)
     quizStartTime = Date.now();
@@ -645,8 +1085,8 @@ function startQuizSession() {
 
     document.getElementById('topicScreen')?.classList.add('hidden');
     document.getElementById('startScreen')?.classList.add('hidden');
-    document.getElementById('endScreen')?.classList.add('hidden'); 
-    document.getElementById('appContainer')?.classList.remove('hidden');
+    document.getElementById('endScreen')?.classList.add('hidden');
+    showScreen('appContainer');
     
     const btn = document.getElementById('submitRecordBtn');
     if (btn) {
@@ -661,20 +1101,30 @@ function startQuizSession() {
 window.switchInputMode = function(mode) {
     const drawZone = document.getElementById('draw-input-zone');
     const kbZone = document.getElementById('keyboard-input-zone');
+    const camZone = document.getElementById('camera-input-zone');
     const tabDraw = document.getElementById('tab-draw');
     const tabKb = document.getElementById('tab-keyboard');
-    
+    const tabCam = document.getElementById('tab-camera');
+    const activeClass = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
+    const inactiveClass = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
+
+    drawZone?.classList.add('hidden');
+    kbZone?.classList.add('hidden');
+    camZone?.classList.add('hidden');
+    if (tabDraw) tabDraw.className = inactiveClass;
+    if (tabKb) tabKb.className = inactiveClass;
+    if (tabCam) tabCam.className = inactiveClass;
+
     if (mode === 'draw') {
         drawZone?.classList.remove('hidden');
-        kbZone?.classList.add('hidden');
-        if (tabDraw) tabDraw.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
-        if (tabKb) tabKb.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
-        setTimeout(() => { resizeCanvas(); }, 50); 
-    } else {
-        drawZone?.classList.add('hidden');
+        if (tabDraw) tabDraw.className = activeClass;
+        setTimeout(() => { resizeCanvas(); }, 50);
+    } else if (mode === 'keyboard') {
         kbZone?.classList.remove('hidden');
-        if (tabKb) tabKb.className = "flex-1 py-2 text-sm font-bold rounded-md bg-white text-indigo-600 shadow-sm transition-all";
-        if (tabDraw) tabDraw.className = "flex-1 py-2 text-sm font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
+        if (tabKb) tabKb.className = activeClass;
+    } else if (mode === 'camera') {
+        camZone?.classList.remove('hidden');
+        if (tabCam) tabCam.className = activeClass;
     }
 };
 
@@ -685,7 +1135,7 @@ window.skipQuestion = function() {
     attemptsCount = 2; 
     addIntegrityEvent('skip', q, false); 
     
-    showFeedback('incorrect', `<div class="mb-4 text-orange-600 font-bold text-lg sm:text-xl bg-orange-50 p-3 rounded-lg border border-orange-200 shadow-sm">⏭️ 你已選擇跳過本題 (獲得 0 分)</div>`, true); 
+    showFeedback('incorrect', `<div class="mb-4 text-orange-700 font-black text-base sm:text-lg bg-white/60 p-3 rounded-xl border border-orange-200">⏭️ 暫時跳過本題，下次再戰！</div>`, true);
     
     disableAllButtons();
     
@@ -696,19 +1146,23 @@ window.skipQuestion = function() {
     });
 
     if (q.isHandwriting) {
-        ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+        ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn', 'camera-open-btn', 'camera-recognize-btn'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.disabled = true;
         });
         document.getElementById('draw-container')?.classList.add('border-slate-300');
         document.getElementById('kb-container')?.classList.add('border-slate-300');
+        document.getElementById('camera-container')?.classList.add('border-slate-300');
     }
 };
 
 function loadQuestion() {
-    attemptsCount = 0; 
-    currentRecognizedLaTeX = ""; 
-    
+    attemptsCount = 0;
+    currentRecognizedLaTeX = "";
+    // 清空可編輯 LaTeX 輸入框
+    const _latexEdit = document.getElementById('hw-latex-edit');
+    if (_latexEdit) _latexEdit.value = '';
+
     const q = questionBank[currentQuestionIndex];
     if(!q) return;
     
@@ -724,7 +1178,9 @@ function loadQuestion() {
     }
     
     const pText = document.getElementById('progressText');
-    if (pText) pText.textContent = `完成 ${currentQuestionIndex}/${questionBank.length}`;
+    if (pText) pText.textContent = `${currentQuestionIndex} / ${questionBank.length}`;
+    const pBar = document.getElementById('quizProgressBar');
+    if (pBar) pBar.style.width = (questionBank.length > 0 ? (currentQuestionIndex / questionBank.length) * 100 : 0) + '%';
     
     hideFeedback();
     
@@ -753,16 +1209,35 @@ function loadQuestion() {
             
             document.getElementById('draw-container')?.classList.remove('border-green-500', 'border-red-400');
             document.getElementById('kb-container')?.classList.remove('border-green-500', 'border-red-400');
-            
-            ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn'].forEach(id => {
+            document.getElementById('camera-container')?.classList.remove('border-green-500', 'border-red-400');
+
+            ['undo-btn', 'clear-btn', 'recognize-btn', 'kb-recognize-btn', 'kb-clear-btn', 'camera-open-btn'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.disabled = false;
             });
-            
-            const kbInput = document.getElementById('keyboard-math-input');
-            if (kbInput) kbInput.value = ""; 
 
-            switchInputMode('keyboard');
+            const kbInput = document.getElementById('keyboard-math-input');
+            if (kbInput) kbInput.value = "";
+
+            // 重置相機區 + 銷毀 Cropper 實例（避免記憶體洩漏）
+            if (window._cropperInstance) {
+                try { window._cropperInstance.destroy(); } catch(_){}
+                window._cropperInstance = null;
+            }
+            const camPreview = document.getElementById('camera-preview');
+            const camPlaceholder = document.getElementById('camera-placeholder');
+            const camRecBtn = document.getElementById('camera-recognize-btn');
+            const camRetakeBtn = document.getElementById('camera-retake-btn');
+            const camOpenBtn2 = document.getElementById('camera-open-btn');
+            const camFileInput = document.getElementById('camera-file-input');
+            if (camPreview) { camPreview.src = ''; camPreview.classList.add('hidden'); }
+            if (camPlaceholder) camPlaceholder.classList.remove('hidden');
+            if (camRecBtn) { camRecBtn.classList.add('hidden'); camRecBtn.disabled = false; }
+            if (camRetakeBtn) { camRetakeBtn.classList.add('hidden'); camRetakeBtn.disabled = false; }
+            if (camOpenBtn2) { camOpenBtn2.classList.remove('hidden'); camOpenBtn2.disabled = false; }
+            if (camFileInput) camFileInput.value = '';
+
+            switchInputMode('draw'); // 👈 🌟 修改這裡：改為預設手寫模式
             setTimeout(() => { resizeCanvas(); initCanvas(); }, 50);
         }
     } else {
@@ -792,6 +1267,7 @@ function handleAnswer(selectedOption, buttonElement) {
     let q = questionBank[currentQuestionIndex];
 
     if (selectedOption.isCorrect) {
+        if (attemptsCount === 1 && dailyCorrectCount < 10) { q.scoreVal = 15; }
         addIntegrityEvent('mcq', q, true);
         const skipBtns = document.querySelectorAll('.skip-action-btn');
         skipBtns.forEach(btn => {
@@ -807,15 +1283,16 @@ function handleAnswer(selectedOption, buttonElement) {
                 spanEl.classList.replace('text-slate-500', 'text-white');
             }
         }
-        
-        if (attemptsCount === 1) { 
-            score += (q.scoreVal || 10); 
-            if (topicScores[q.topic]) {
-                topicScores[q.topic].earned += (q.scoreVal || 10);
-            }
-            updateScoreDisplay(); 
+
+        if (attemptsCount === 1) {
+            score += (q.scoreVal || 10);
+            if (topicScores[q.topic]) { topicScores[q.topic].earned += (q.scoreVal || 10); }
+            dailyCorrectCount++;
+            saveDailyCorrectCount(dailyCorrectCount);
+            updateScoreDisplay();
+            haptic(30);
         }
-        
+
         showFeedback('correct', selectedOption.hint, true);
         disableAllButtons();
     } else {
@@ -838,9 +1315,30 @@ function showFeedback(type, message, showNextBtn) {
     document.getElementById('feedbackArea')?.classList.remove('hidden');
     const fbBox = document.getElementById('feedbackBox');
     if (fbBox) {
-        fbBox.className = type === 'correct' ? 'p-4 rounded-xl border bg-green-50 border-green-200 w-full overflow-hidden shadow-sm' : 'p-4 rounded-xl border bg-orange-50 border-orange-200 w-full overflow-hidden shadow-sm';
+        if (type === 'correct') {
+            fbBox.className = 'p-4 sm:p-5 rounded-2xl border w-full overflow-hidden';
+            fbBox.style.cssText = 'background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-color: #6ee7b7; box-shadow: 0 8px 20px -8px rgba(16,185,129,0.25);';
+            // 短暫脈搏
+            fbBox.animate([
+                { transform: 'scale(0.96)', opacity: 0.6 },
+                { transform: 'scale(1.01)', opacity: 1 },
+                { transform: 'scale(1)', opacity: 1 }
+            ], { duration: 360, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' });
+        } else {
+            fbBox.className = 'p-4 sm:p-5 rounded-2xl border w-full overflow-hidden';
+            fbBox.style.cssText = 'background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border-color: #fda4af; box-shadow: 0 8px 20px -8px rgba(244,63,94,0.2);';
+            // 短暫搖晃
+            fbBox.animate([
+                { transform: 'translateX(0)' },
+                { transform: 'translateX(-6px)' },
+                { transform: 'translateX(5px)' },
+                { transform: 'translateX(-3px)' },
+                { transform: 'translateX(2px)' },
+                { transform: 'translateX(0)' }
+            ], { duration: 380, easing: 'ease-out' });
+        }
     }
-    
+
     const fbMsg = document.getElementById('feedbackMessage');
     if (fbMsg) fbMsg.innerHTML = message;
     
@@ -998,6 +1496,52 @@ function setupCanvasEvents() {
     });
     document.getElementById('kb-recognize-btn')?.addEventListener('click', startKeyboardRecognitionPhase);
 
+    document.getElementById('camera-file-input')?.addEventListener('change', function() {
+        const file = this.files && this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('camera-preview');
+            const placeholder = document.getElementById('camera-placeholder');
+            const camRecBtn = document.getElementById('camera-recognize-btn');
+            const camRetakeBtn = document.getElementById('camera-retake-btn');
+            const camOpenBtn = document.getElementById('camera-open-btn');
+
+            if (placeholder) placeholder.classList.add('hidden');
+            if (camOpenBtn) camOpenBtn.classList.add('hidden');
+            if (camRecBtn) { camRecBtn.classList.remove('hidden'); camRecBtn.disabled = false; }
+            if (camRetakeBtn) { camRetakeBtn.classList.remove('hidden'); camRetakeBtn.disabled = false; }
+            document.getElementById('camera-container')?.classList.remove('border-green-500', 'border-red-400');
+
+            if (!preview) return;
+            // 銷毀舊 Cropper 實例避免記憶體洩漏
+            if (window._cropperInstance) {
+                try { window._cropperInstance.destroy(); } catch(_){}
+                window._cropperInstance = null;
+            }
+            preview.classList.remove('hidden');
+            preview.src = e.target.result;
+            // 等 image 完整載入後再啟動 Cropper（getCroppedCanvas 才能正確輸出）
+            preview.onload = function() {
+                if (typeof Cropper === 'undefined') return;
+                window._cropperInstance = new Cropper(preview, {
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    background: false,
+                    movable: true,
+                    rotatable: false,
+                    scalable: false,
+                    zoomable: true,
+                    responsive: true,
+                    checkOrientation: true
+                });
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+
+    document.getElementById('camera-recognize-btn')?.addEventListener('click', startCameraRecognitionPhase);
+
     window.addEventListener('resize', resizeCanvas);
 }
 
@@ -1073,15 +1617,14 @@ async function startRecognitionPhase() {
         let existingWarning = document.getElementById('model-warning-ocr');
         if (existingWarning) existingWarning.remove();
 
-        if (result.usedModel && result.usedModel !== "gemini-2.5-pro") {
+// 🌟 更新：將 mathpix-v3 加入白名單，成功使用時不再顯示降級警告
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro" && result.usedModel !== "mathpix-v3") {
             const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 text-left block mt-1">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
-            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：Gemini 2.5 Pro 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：AI 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
             if (mathDiv) mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
         }
 
-        if (mathDiv) mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
-        if (confirmUI) confirmUI.classList.remove('hidden');
-        renderMath();
+        showHwConfirmUI();
         
     } catch (err) {
         console.error(err);
@@ -1140,9 +1683,7 @@ async function startKeyboardRecognitionPhase() {
             if (mathDiv) mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
         }
 
-        if (mathDiv) mathDiv.innerHTML = `\\( \\displaystyle ${currentRecognizedLaTeX} \\)`;
-        if (confirmUI) confirmUI.classList.remove('hidden');
-        renderMath();
+        showHwConfirmUI();
         
     } catch (err) {
         console.error(err);
@@ -1153,14 +1694,131 @@ async function startKeyboardRecognitionPhase() {
     }
 }
 
+// 📷 處理「相機拍照」辨識
+// 🔄 重新拍攝：銷毀 Cropper、清空 file input、恢復 placeholder
+window.retakeCameraPhoto = function() {
+    if (window._cropperInstance) {
+        try { window._cropperInstance.destroy(); } catch(_){}
+        window._cropperInstance = null;
+    }
+    const preview = document.getElementById('camera-preview');
+    const placeholder = document.getElementById('camera-placeholder');
+    const camRecBtn = document.getElementById('camera-recognize-btn');
+    const camRetakeBtn = document.getElementById('camera-retake-btn');
+    const camOpenBtn = document.getElementById('camera-open-btn');
+    const fileInput = document.getElementById('camera-file-input');
+
+    if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (camRecBtn) camRecBtn.classList.add('hidden');
+    if (camRetakeBtn) camRetakeBtn.classList.add('hidden');
+    if (camOpenBtn) camOpenBtn.classList.remove('hidden');
+    if (fileInput) fileInput.value = '';
+    document.getElementById('camera-container')?.classList.remove('border-green-500', 'border-red-400');
+};
+
+async function startCameraRecognitionPhase() {
+    const cropper = window._cropperInstance;
+    if (!cropper) { alert("請先拍攝或選擇一張相片！"); return; }
+
+    const camRecBtn = document.getElementById('camera-recognize-btn');
+    const camOpenBtn = document.getElementById('camera-open-btn');
+    const camRetakeBtn = document.getElementById('camera-retake-btn');
+    const loadingDiv = document.getElementById('global-loading');
+    const loadingText = document.getElementById('global-loading-text');
+
+    if (camRecBtn) camRecBtn.disabled = true;
+    if (camOpenBtn) camOpenBtn.disabled = true;
+    if (camRetakeBtn) camRetakeBtn.disabled = true;
+    if (loadingText) loadingText.innerHTML = "AI 正在辨識你的相片...<br><span class='text-sm font-normal text-slate-500'>傳送至 Mathpix 雲端處理中</span>";
+    if (loadingDiv) loadingDiv.classList.remove('hidden');
+    document.getElementById('camera-container')?.classList.remove('border-green-500', 'border-red-400');
+
+    try {
+        // 1️⃣ 取出使用者剪裁後的 Canvas
+        const croppedCanvas = cropper.getCroppedCanvas({
+            maxWidth: 1600,
+            maxHeight: 1600,
+            fillColor: '#ffffff',
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        });
+        if (!croppedCanvas) throw new Error("剪裁失敗，請重新拍攝。");
+
+        // 2️⃣ 進一步壓縮至最大 800px 寬度（與畫板辨識保持一致）
+        const base64Image = await new Promise((resolve) => {
+            const MAX_WIDTH = 800;
+            let w = croppedCanvas.width, h = croppedCanvas.height;
+            if (w > MAX_WIDTH) { h = Math.round(h * MAX_WIDTH / w); w = MAX_WIDTH; }
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w; tempCanvas.height = h;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(croppedCanvas, 0, 0, w, h);
+            resolve(tempCanvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+        });
+
+        const formData = new URLSearchParams();
+        formData.append('action', 'ai_ocr');
+        formData.append('image', base64Image);
+
+        const result = await fetchWithRetry(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+        if (!result.success) throw new Error(result.message);
+        if (result.latex === undefined) throw new Error("後台未回傳數式！請確認 Google Apps Script 已部署最新代碼。");
+
+        currentRecognizedLaTeX = result.latex;
+        if (loadingDiv) loadingDiv.classList.add('hidden');
+
+        const confirmUI = document.getElementById('hw-confirm-ui');
+        const mathDiv = document.getElementById('hw-confirm-math');
+        let existingWarning = document.getElementById('model-warning-ocr');
+        if (existingWarning) existingWarning.remove();
+
+        if (result.usedModel && result.usedModel !== "gemini-2.5-pro" && result.usedModel !== "mathpix-v3") {
+            const debugText = result.debugInfo ? `<br><span class="text-xs font-normal text-red-500 text-left block mt-1">🔍 偵錯紀錄: ${result.debugInfo}</span>` : "";
+            const warningHtml = `<div id="model-warning-ocr" class="w-full max-w-sm bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-3 text-sm font-bold shadow-sm">⚠️ 注意：AI 呼叫失敗，已降級使用「${result.usedModel}」。${debugText}</div>`;
+            if (mathDiv) mathDiv.insertAdjacentHTML('beforebegin', warningHtml);
+        }
+
+        showHwConfirmUI();
+
+    } catch (err) {
+        console.error(err);
+        alert(`⚠️ 辨識失敗！\n\n詳細錯誤：${err.message}`);
+        if (loadingDiv) loadingDiv.classList.add('hidden');
+        if (camRecBtn) camRecBtn.disabled = false;
+        if (camOpenBtn) camOpenBtn.disabled = false;
+        if (camRetakeBtn) camRetakeBtn.disabled = false;
+    }
+}
+
 window.rewriteHandwriting = function() {
     document.getElementById('hw-confirm-ui')?.classList.add('hidden');
-    initCanvas(); 
-    const btns = ['recognize-btn', 'clear-btn', 'undo-btn', 'kb-recognize-btn', 'kb-clear-btn'];
+    initCanvas();
+    const btns = ['recognize-btn', 'clear-btn', 'undo-btn', 'kb-recognize-btn', 'kb-clear-btn', 'camera-open-btn'];
     btns.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = false;
     });
+    // 重置相機預覽狀態 + 銷毀 Cropper（避免記憶體洩漏）
+    if (window._cropperInstance) {
+        try { window._cropperInstance.destroy(); } catch(_){}
+        window._cropperInstance = null;
+    }
+    const preview = document.getElementById('camera-preview');
+    const placeholder = document.getElementById('camera-placeholder');
+    const camRecBtn = document.getElementById('camera-recognize-btn');
+    const camRetakeBtn = document.getElementById('camera-retake-btn');
+    const camOpenBtn = document.getElementById('camera-open-btn');
+    const fileInput = document.getElementById('camera-file-input');
+    if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+    if (placeholder) placeholder.classList.remove('hidden');
+    if (camRecBtn) { camRecBtn.classList.add('hidden'); camRecBtn.disabled = false; }
+    if (camRetakeBtn) { camRetakeBtn.classList.add('hidden'); camRetakeBtn.disabled = false; }
+    if (camOpenBtn) { camOpenBtn.classList.remove('hidden'); camOpenBtn.disabled = false; }
+    if (fileInput) fileInput.value = '';
+    document.getElementById('camera-container')?.classList.remove('border-green-500', 'border-red-400');
 };
 
 window.confirmAndGrade = async function() {
@@ -1216,13 +1874,15 @@ window.confirmAndGrade = async function() {
         let finalHint = feedbackHtml + correctOpt.hint;
 
         if (result.isCorrect) {
+            if (attemptsCount === 1 && dailyCorrectCount < 10) { q.scoreVal = 15; }
             addIntegrityEvent('hw', q, true);
-            if (attemptsCount === 1) { 
-                score += (q.scoreVal || 10); 
-                if (topicScores[q.topic]) {
-                    topicScores[q.topic].earned += (q.scoreVal || 10);
-                }
-                updateScoreDisplay(); 
+            if (attemptsCount === 1) {
+                score += (q.scoreVal || 10);
+                if (topicScores[q.topic]) { topicScores[q.topic].earned += (q.scoreVal || 10); }
+                dailyCorrectCount++;
+                saveDailyCorrectCount(dailyCorrectCount);
+                updateScoreDisplay();
+                haptic(30);
             }
             showFeedback('correct', finalHint, true);
             document.getElementById('draw-container')?.classList.add('border-green-500');
@@ -1280,25 +1940,65 @@ window.giveUpHandwriting = function() {
 // ==========================================
 function showEndScreen() {
     document.getElementById('appContainer')?.classList.add('hidden');
-    document.getElementById('endScreen')?.classList.remove('hidden');
+    showScreen('endScreen');
+    haptic([40, 30, 60]);
     
     // 🌟 結算作答時間 (秒)
     quizTimeTaken = Math.floor((Date.now() - quizStartTime) / 1000);
     
     let totalPossibleScore = questionBank.reduce((sum, q) => sum + (q.scoreVal || 10), 0);
-    
+    let ratio = totalPossibleScore > 0 ? score / totalPossibleScore : 0;
+
     const fScore = document.getElementById('finalScore');
-    if (fScore) fScore.textContent = score;
+    if (fScore) {
+        // 數字滾動動畫
+        const t0 = performance.now();
+        const tick = (now) => {
+            const p = Math.min(1, (now - t0) / 1400);
+            const eased = 1 - Math.pow(1 - p, 3);
+            fScore.textContent = Math.round(score * eased);
+            if (p < 1) requestAnimationFrame(tick);
+            else fScore.textContent = score;
+        };
+        requestAnimationFrame(tick);
+    }
     const tQs = document.getElementById('totalQuestions');
     if (tQs) tQs.textContent = totalPossibleScore;
-    
-    const subtitle = document.getElementById('endSubtitle');
-    if (subtitle) {
-        let ratio = score / totalPossibleScore;
-        if (ratio >= 0.8) subtitle.textContent = "AI 分析顯示你對這個單元的概念掌握得非常出色！";
-        else if (ratio >= 0.5) subtitle.textContent = "AI 分析顯示你對這個單元的概念掌握得不錯！";
-        else subtitle.textContent = "AI 分析顯示你還需要多加練習，不要灰心，繼續努力！";
+
+    // 圓環動畫填充
+    const ring = document.getElementById('scoreRingFill');
+    if (ring) {
+        const circumference = 2 * Math.PI * 44; // ~276.46
+        ring.setAttribute('stroke-dasharray', circumference);
+        ring.setAttribute('stroke-dashoffset', circumference);
+        // 顏色依表現切換
+        const stops = ratio >= 0.8 ? ['#10b981', '#059669']
+                    : ratio >= 0.5 ? ['#6366f1', '#8b5cf6']
+                    : ['#f43f5e', '#fb7185'];
+        const grad = document.querySelector('#ringGradient');
+        if (grad) {
+            const s = grad.querySelectorAll('stop');
+            if (s.length >= 2) { s[0].setAttribute('stop-color', stops[0]); s[1].setAttribute('stop-color', stops[1]); }
+        }
+        setTimeout(() => { ring.setAttribute('stroke-dashoffset', circumference * (1 - ratio)); }, 100);
     }
+
+    // 表現徽章
+    const ratingBadge = document.getElementById('endRatingBadge');
+    if (ratingBadge) {
+        let rating;
+        if (ratio >= 0.95)      rating = { label: '🌟 完美表現', bg: '#fef3c7', border: '#fde68a', text: '#92400e' };
+        else if (ratio >= 0.8)  rating = { label: '🏆 優秀', bg: '#ecfdf5', border: '#a7f3d0', text: '#065f46' };
+        else if (ratio >= 0.6)  rating = { label: '👍 良好', bg: '#eef2ff', border: '#c7d2fe', text: '#3730a3' };
+        else if (ratio >= 0.4)  rating = { label: '💪 合格', bg: '#f0f9ff', border: '#bae6fd', text: '#075985' };
+        else                    rating = { label: '🌱 加油', bg: '#fff1f2', border: '#fecdd3', text: '#9f1239' };
+        ratingBadge.textContent = rating.label;
+        ratingBadge.style.background = rating.bg;
+        ratingBadge.style.borderColor = rating.border;
+        ratingBadge.style.color = rating.text;
+    }
+
+    // endSubtitle 改為顯示心靈雞湯（隨機 quote），具體文字於下方 quote pool 段落填充
 
     const trackerUI = document.getElementById('topicDetailsTracker');
     const listUI = document.getElementById('topicDetailsList');
@@ -1311,17 +2011,23 @@ function showEndScreen() {
             for (let t in topicScores) {
                 let s = topicScores[t];
                 let pct = s.total > 0 ? Math.round((s.earned / s.total) * 100) : 0;
-                let barColor = pct >= 80 ? 'bg-green-500' : (pct >= 50 ? 'bg-amber-400' : 'bg-red-500');
-                let icon = pct >= 80 ? '✅' : (pct >= 50 ? '⚠️' : '❌');
-                
+                let badge, barGrad;
+                if (pct >= 90)      { badge = { label: '完美', bg: '#fef3c7', text: '#92400e' }; barGrad = 'linear-gradient(90deg, #fbbf24, #f59e0b)'; }
+                else if (pct >= 75) { badge = { label: '優秀', bg: '#ecfdf5', text: '#065f46' }; barGrad = 'linear-gradient(90deg, #10b981, #059669)'; }
+                else if (pct >= 50) { badge = { label: '合格', bg: '#eef2ff', text: '#3730a3' }; barGrad = 'linear-gradient(90deg, #6366f1, #8b5cf6)'; }
+                else                { badge = { label: '加油', bg: '#fff1f2', text: '#9f1239' }; barGrad = 'linear-gradient(90deg, #f43f5e, #fb7185)'; }
+
                 trackerHtml += `
                 <div>
-                    <div class="flex justify-between text-sm sm:text-base font-bold text-slate-600 mb-1">
-                        <span>${t}</span>
-                        <span>${s.earned} / ${s.total} (${pct}%) ${icon}</span>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-sm sm:text-base font-black text-slate-800">${t}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-slate-500 tabular-nums">${s.earned}/${s.total}</span>
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-full" style="background: ${badge.bg}; color: ${badge.text};">${badge.label}</span>
+                        </div>
                     </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2.5 shadow-inner">
-                        <div class="${barColor} h-2.5 rounded-full transition-all" style="width: ${pct}%"></div>
+                    <div class="w-full bg-white/60 rounded-full h-2 overflow-hidden border border-slate-100">
+                        <div class="h-2 rounded-full transition-all duration-1000 ease-out" style="width: ${pct}%; background: ${barGrad};"></div>
                     </div>
                 </div>`;
             }
@@ -1341,6 +2047,9 @@ function showEndScreen() {
     }
     const mQuote = document.getElementById('motivationalQuote');
     if (mQuote) mQuote.textContent = selectedQuote.text;
+    // 將心靈雞湯填入 Hero Card 的 endSubtitle 位置
+    const heroQuote = document.getElementById('endSubtitle');
+    if (heroQuote) heroQuote.textContent = selectedQuote.text;
     
     const savedClass = String(getStoredData('dse_className')).toUpperCase().trim();
     const savedNum = String(getStoredData('dse_classNumber')).trim();
@@ -1357,26 +2066,42 @@ function showEndScreen() {
     if (rewardContainer) {
         rewardContainer.classList.remove('hidden');
         rewardContainer.innerHTML = `
-            <div id="rewardZone" class="w-full bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-sm relative overflow-hidden transition-all duration-500 text-left">
+            <div id="rewardZone" class="w-full bg-white border border-slate-200 rounded-2xl p-5 sm:p-7 shadow-sm relative overflow-hidden transition-all duration-500 text-left">
                 <div id="progressUI" class="block transition-opacity duration-500">
                     <div class="flex justify-between items-center mb-4">
                         <span class="font-bold text-slate-700 text-lg flex items-center gap-2">🎁 刮刮卡解鎖進度</span>
-                        <span class="text-sm font-bold text-indigo-800 bg-indigo-100 px-3 py-1 rounded-lg" id="progressTextUI">${currentProgress} / 100</span>
+                        <span class="text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg tabular-nums" id="progressTextUI">${currentProgress} / 100</span>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-4 mb-3 overflow-hidden shadow-inner relative">
-                        <div id="progressBarFill" class="bg-indigo-500 h-4 rounded-full transition-all duration-1000 ease-out relative" style="width: ${currentProgress}%"></div>
+                        <div id="progressBarFill" class="grad-primary h-4 rounded-full transition-all duration-1000 ease-out relative" style="width: ${currentProgress}%"></div>
                     </div>
                     <div class="text-sm text-slate-500 text-center font-medium" id="progressHint">
-                        還差 <span class="text-indigo-600 font-bold">${nextThresholdDist} 分</span> 即可獲得抽獎機會！傳送成績後更新進度。
+                        ${nextThresholdDist <= 30 ? '🔥 距離' : '💎 距離'}下一張刮刮卡還差
+                        <span class="text-indigo-600 font-black tabular-nums">${nextThresholdDist} 分</span>
+                        ${nextThresholdDist <= 30 ? '，加油就在眼前！' : '，繼續刷題累積！'}
                     </div>
                 </div>
 
                 <div id="scratchUI" class="hidden opacity-0 transition-opacity duration-500">
-                    <div class="relative w-full h-20 sm:h-24 rounded-xl overflow-hidden border-2 border-amber-200 shadow-sm" style="touch-action:none;">
-                        <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-amber-50 to-orange-50 text-orange-600 font-bold px-4 text-center text-sm sm:text-base">🎁 <span id="rewardTextDisplay"></span></div>
+                    <!-- 🎯 大型刮刮卡：高度從 h-20/h-24 → h-44/h-52（翻倍）-->
+                    <div id="scratchFrame" class="relative w-full h-44 sm:h-52 rounded-2xl overflow-hidden shadow-xl border-2 border-amber-300 diamond-pattern" style="touch-action:none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);">
+                        <!-- 獎勵內容層 -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+                            <div class="text-amber-600 text-[11px] sm:text-xs font-bold tracking-[0.3em] mb-2 sm:mb-3 uppercase">🎁 你 的 獎 勵</div>
+                            <div id="rewardTextDisplay" class="text-3xl sm:text-4xl font-black text-grad-gold leading-tight" style="text-shadow: 0 2px 6px rgba(180, 83, 9, 0.18);"></div>
+                            <div class="text-amber-500 text-xs sm:text-sm font-bold tracking-widest mt-2 sm:mt-3">★ ★ ★</div>
+                        </div>
+                        <!-- 刮刮塗層 -->
                         <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full z-10 cursor-pointer"></canvas>
+                        <!-- 揭曉時的光環容器 -->
+                        <div id="rewardBurstContainer" class="absolute inset-0 z-20 pointer-events-none"></div>
                     </div>
-                    <div class="text-xs sm:text-sm text-amber-600 mt-3 text-center font-bold animate-pulse">✨ 恭喜達成滿百目標，快刮開上方塗層看看！✨</div>
+                    <!-- 提示文字 -->
+                    <div class="text-sm sm:text-base text-amber-700 mt-4 text-center font-bold flex items-center justify-center gap-2">
+                        <span class="inline-block animate-pulse text-lg">✨</span>
+                        <span>恭喜達成滿百目標，快用手指刮開驚喜！</span>
+                        <span class="inline-block animate-pulse text-lg">✨</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -1394,7 +2119,40 @@ function showEndScreen() {
 
 function updateScoreDisplay() {
     const sd = document.getElementById('scoreDisplay');
-    if (sd) sd.textContent = score; 
+    if (sd) {
+        const prev = parseInt(sd.textContent) || 0;
+        if (prev !== score) {
+            // 數字滾動動畫（300ms）
+            const start = prev, diff = score - prev, t0 = performance.now();
+            const ease = (t) => 1 - Math.pow(1 - t, 3);
+            const tick = (now) => {
+                const p = Math.min(1, (now - t0) / 380);
+                sd.textContent = Math.round(start + diff * ease(p));
+                if (p < 1) requestAnimationFrame(tick);
+                else sd.textContent = score;
+            };
+            requestAnimationFrame(tick);
+            // 短暫高亮
+            sd.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            sd.style.transform = 'scale(1.18)';
+            setTimeout(() => { sd.style.transform = 'scale(1)'; }, 260);
+        } else {
+            sd.textContent = score;
+        }
+    }
+    const bi = document.getElementById('dailyBonusIndicator');
+    if (bi) {
+        if (dailyCorrectCount < 10) {
+            bi.innerHTML = `<span class="coin-drop">🎁</span> 獎勵題 <span class="tabular-nums">${dailyCorrectCount}/10</span>`;
+            bi.classList.remove('hidden');
+            // 第 9 題後即將達成，加 ping 提示
+            if (dailyCorrectCount >= 7) bi.classList.add('ping-soft');
+            else bi.classList.remove('ping-soft');
+        } else {
+            bi.innerHTML = `✅ 今日獎勵已達標`;
+            bi.classList.remove('hidden', 'ping-soft');
+        }
+    }
 }
 
 function resetIntegrityState() {
@@ -1562,7 +2320,7 @@ function submitToGoogleSheet() {
                         }
                     }, 1500);
                 } else {
-                    if (hint) hint.innerHTML = `還差 <span class="text-indigo-600 font-bold">${pointsNeeded} 分</span> 即可獲得抽獎機會！傳送成績後更新進度。`;
+                    if (hint) hint.innerHTML = `${pointsNeeded <= 30 ? '🔥 距離' : '💎 距離'}下一張刮刮卡還差 <span class="text-indigo-600 font-black tabular-nums">${pointsNeeded} 分</span>${pointsNeeded <= 30 ? '，加油就在眼前！' : '，繼續刷題累積！'}`;
                     statusText.innerHTML = `${data.message}<br>📊 目前總分：${backendNewTotal} 分 (今日已交：${backendPlayCount} 次)。`;
                 }
                 
@@ -1591,6 +2349,13 @@ function renderScratchCard() {
     const canvas = document.getElementById('scratchCanvas');
     if (!canvas) return;
 
+    // 啟動「即將解鎖」鋪陳：外框光暈脈衝 1.4 秒
+    const frame = document.getElementById('scratchFrame');
+    if (frame) {
+        frame.classList.add('glow-pulse');
+        setTimeout(() => { frame.classList.remove('glow-pulse'); }, 1400);
+    }
+
     // 重置可見性
     canvas.style.opacity = '1';
     canvas.style.display = 'block';
@@ -1600,44 +2365,103 @@ function renderScratchCard() {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
-    // 🌟 漸變金箔覆蓋層
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#fde68a');
-    gradient.addColorStop(0.35, '#f59e0b');
-    gradient.addColorStop(0.7, '#d97706');
-    gradient.addColorStop(1, '#92400e');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const W = canvas.width, H = canvas.height;
 
-    // 金箔光澤紋理
-    for (let i = 0; i < 45; i++) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.18})`;
+    // 🌟 漸變金箔覆蓋層（更豐富的色階）
+    const gradient = ctx.createLinearGradient(0, 0, W, H);
+    gradient.addColorStop(0,    '#fef3c7');
+    gradient.addColorStop(0.25, '#fbbf24');
+    gradient.addColorStop(0.55, '#f59e0b');
+    gradient.addColorStop(0.8,  '#d97706');
+    gradient.addColorStop(1,    '#92400e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, W, H);
+
+    // 對角線光澤條紋（金屬質感）
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    for (let i = -H; i < W + H; i += 22) {
+        const stripeGrad = ctx.createLinearGradient(i, 0, i + 14, H);
+        stripeGrad.addColorStop(0,   'rgba(255,255,255,0)');
+        stripeGrad.addColorStop(0.5, 'rgba(255,255,255,0.85)');
+        stripeGrad.addColorStop(1,   'rgba(255,255,255,0)');
+        ctx.fillStyle = stripeGrad;
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i + 14, 0);
+        ctx.lineTo(i + 14 + H, H);
+        ctx.lineTo(i + H, H);
+        ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // 金箔光斑紋理（密度提升至 70 + 大小變化更廣）
+    for (let i = 0; i < 70; i++) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.22})`;
         ctx.beginPath();
         ctx.arc(
-            Math.random() * canvas.width,
-            Math.random() * canvas.height,
-            Math.random() * 6 + 1,
+            Math.random() * W,
+            Math.random() * H,
+            Math.random() * 9 + 1,
             0, Math.PI * 2
         );
         ctx.fill();
     }
 
-    // 中央提示文字
-    ctx.font = 'bold 17px sans-serif';
-    ctx.fillStyle = '#fff';
+    // 點綴小星星
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+    for (let i = 0; i < 8; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const s = Math.random() * 3 + 2;
+        ctx.beginPath();
+        for (let j = 0; j < 5; j++) {
+            const a = (Math.PI * 2 * j) / 5 - Math.PI / 2;
+            const px = x + Math.cos(a) * s;
+            const py = y + Math.sin(a) * s;
+            if (j === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            const a2 = a + Math.PI / 5;
+            ctx.lineTo(x + Math.cos(a2) * s * 0.45, y + Math.sin(a2) * s * 0.45);
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // 中央提示文字（字體放大至 28px，加雙重描邊與更深陰影）
+    const isMobile = W < 380;
+    const fontSize = isMobile ? 22 : 28;
+    ctx.font = `900 ${fontSize}px 'Inter', 'Noto Sans HK', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(120, 53, 15, 0.6)';
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetY = 1;
-    ctx.fillText('✨ 用手指刮開驚喜 ✨', canvas.width / 2, canvas.height / 2);
+
+    const cx = W / 2, cy = H / 2;
+    const mainText = '✨ 用手指刮開驚喜 ✨';
+
+    // 深色描邊
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(120, 53, 15, 0.7)';
+    ctx.lineJoin = 'round';
+    ctx.strokeText(mainText, cx, cy);
+
+    // 主體文字（白色 + 陰影）
+    ctx.shadowColor = 'rgba(120, 53, 15, 0.7)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(mainText, cx, cy);
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
+
+    // 副提示文字（小字）
+    ctx.font = `700 ${isMobile ? 11 : 13}px 'Inter', 'Noto Sans HK', sans-serif`;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.fillText('SCRATCH TO REVEAL', cx, cy + fontSize * 0.95);
 
     // 設置刮除模式
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.lineWidth = 38;
+    ctx.lineWidth = 44;
     ctx.globalCompositeOperation = 'destination-out';
 
     let isDrawing = false;
@@ -1672,15 +2496,50 @@ function renderScratchCard() {
         if (navigator.vibrate) {
             try { navigator.vibrate([80, 40, 80, 40, 200]); } catch (e) {}
         }
-        canvas.style.transition = 'opacity 0.7s ease-out';
+        // 1. 金箔淡出
+        canvas.style.transition = 'opacity 0.6s ease-out';
         canvas.style.opacity = '0';
+
+        // 2. 光環擴散（從中心爆發）
+        const burstContainer = document.getElementById('rewardBurstContainer');
+        if (burstContainer) {
+            burstContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const ring = document.createElement('div');
+                ring.className = 'ring-burst';
+                ring.style.animationDelay = (i * 0.12) + 's';
+                burstContainer.appendChild(ring);
+            }
+            setTimeout(() => { burstContainer.innerHTML = ''; }, 1300);
+        }
+
+        // 3. 獎勵文字彈跳浮現
+        const rewardText = document.getElementById('rewardTextDisplay');
+        if (rewardText) {
+            rewardText.classList.remove('reveal-bounce');
+            void rewardText.offsetWidth;
+            rewardText.classList.add('reveal-bounce');
+        }
+
+        // 4. 卡框金色光暈強化
+        const frame = document.getElementById('scratchFrame');
+        if (frame) {
+            frame.style.transition = 'box-shadow 0.6s ease-out, border-color 0.6s ease-out';
+            frame.style.boxShadow = '0 0 0 4px rgba(251, 191, 36, 0.4), 0 18px 50px -8px rgba(245, 158, 11, 0.55)';
+            frame.style.borderColor = '#f59e0b';
+        }
+
+        // 5. 彩屑爆發
         spawnConfetti();
+
+        // 6. 整個區塊輕微縮放彈跳
         const rewardZone = document.getElementById('rewardZone');
         if (rewardZone) {
-            rewardZone.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            rewardZone.style.transform = 'scale(1.04)';
-            setTimeout(() => { rewardZone.style.transform = 'scale(1)'; }, 450);
+            rewardZone.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            rewardZone.style.transform = 'scale(1.03)';
+            setTimeout(() => { rewardZone.style.transform = 'scale(1)'; }, 550);
         }
+
         setTimeout(() => { canvas.style.display = 'none'; }, 800);
     }
 
@@ -1724,11 +2583,11 @@ function renderScratchCard() {
     };
 }
 
-// 🎉 刮刮卡完全揭開時的彩屑爆發效果
+// 🎉 刮刮卡完全揭開時的彩屑爆發效果（升級：更多顆粒 + 三種形狀 + 雙波次）
 function spawnConfetti() {
     const container = document.getElementById('rewardZone');
     if (!container) return;
-    const colors = ['#fbbf24', '#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#a855f7', '#ec4899', '#facc15'];
+    const colors = ['#fbbf24', '#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#a855f7', '#ec4899', '#facc15', '#06b6d4'];
     const scratchUI = document.getElementById('scratchUI');
     const containerRect = container.getBoundingClientRect();
     let originX = container.offsetWidth / 2;
@@ -1738,37 +2597,56 @@ function spawnConfetti() {
         originX = sRect.left - containerRect.left + sRect.width / 2;
         originY = sRect.top - containerRect.top + sRect.height / 2;
     }
-    for (let i = 0; i < 45; i++) {
-        const piece = document.createElement('div');
-        const w = 6 + Math.random() * 6;
-        piece.style.cssText = `
-            position: absolute;
-            width: ${w}px;
-            height: ${w * 0.4}px;
-            background: ${colors[Math.floor(Math.random() * colors.length)]};
-            top: ${originY}px;
-            left: ${originX}px;
-            border-radius: 1px;
-            pointer-events: none;
-            z-index: 50;
-            transform: translate(-50%, -50%);
-        `;
-        container.appendChild(piece);
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 70 + Math.random() * 200;
-        const tx = Math.cos(angle) * distance;
-        const ty = Math.sin(angle) * distance + 60;
-        const rotation = (Math.random() - 0.5) * 1080;
-        piece.animate([
-            { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
-            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rotation}deg)`, opacity: 0 }
-        ], {
-            duration: 1400 + Math.random() * 700,
-            easing: 'cubic-bezier(0.15, 0.55, 0.35, 1)',
-            fill: 'forwards'
-        });
-        setTimeout(() => piece.remove(), 2300);
+
+    function makeBatch(count, delay, sizeMul) {
+        setTimeout(() => {
+            for (let i = 0; i < count; i++) {
+                const piece = document.createElement('div');
+                const shape = Math.random();
+                const baseW = (6 + Math.random() * 7) * sizeMul;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                let extra = '';
+                if (shape < 0.5) {
+                    // 長條形彩帶
+                    extra = `width:${baseW}px;height:${baseW * 0.35}px;background:${color};border-radius:1px;`;
+                } else if (shape < 0.85) {
+                    // 圓點
+                    extra = `width:${baseW * 0.7}px;height:${baseW * 0.7}px;background:${color};border-radius:50%;`;
+                } else {
+                    // 星形（用 clip-path）
+                    extra = `width:${baseW}px;height:${baseW}px;background:${color};clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);`;
+                }
+                piece.style.cssText = `
+                    position: absolute;
+                    top: ${originY}px;
+                    left: ${originX}px;
+                    pointer-events: none;
+                    z-index: 50;
+                    transform: translate(-50%, -50%);
+                    ${extra}
+                `;
+                container.appendChild(piece);
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 80 + Math.random() * 240;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance + 80;
+                const rotation = (Math.random() - 0.5) * 1440;
+                piece.animate([
+                    { transform: 'translate(-50%, -50%) rotate(0deg) scale(1)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rotation}deg) scale(0.6)`, opacity: 0 }
+                ], {
+                    duration: 1500 + Math.random() * 900,
+                    easing: 'cubic-bezier(0.15, 0.55, 0.35, 1)',
+                    fill: 'forwards'
+                });
+                setTimeout(() => piece.remove(), 2500);
+            }
+        }, delay);
     }
+
+    // 雙波次彩屑：第一波大量爆發，第二波輕量補充
+    makeBatch(60, 0,   1.0);
+    makeBatch(25, 220, 0.75);
 }
 
 function renderMath() {
@@ -1821,13 +2699,41 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchConfig(); 
     setInterval(() => fetchConfig(true), 30000);
     
-    // 將 localStorage 暫存資料預填到登入框 (僅班別與學號，密碼為求安全不預填)
+    // 🌟 從 sessionStorage 預填登入欄位 + 靜默自動登入
     setTimeout(() => {
         const savedClass = getStoredData('dse_className');
-        const savedNum = getStoredData('dse_classNumber');
+        const savedNum   = getStoredData('dse_classNumber');
+        const savedPwd   = getStoredData('dse_password');
 
         const loginClassEl = document.getElementById('loginClass'); if (loginClassEl && savedClass) loginClassEl.value = savedClass;
-        const loginNumEl = document.getElementById('loginNum'); if (loginNumEl && savedNum) loginNumEl.value = savedNum;
+        const loginNumEl   = document.getElementById('loginNum');   if (loginNumEl   && savedNum)   loginNumEl.value   = savedNum;
+        const loginPwdEl   = document.getElementById('loginPwd');   if (loginPwdEl   && savedPwd)   loginPwdEl.value   = savedPwd;
+
+        // ⌨️ Enter 鍵直接觸發登入
+        ['loginClass', 'loginNum', 'loginPwd'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && !el.dataset.enterBound) {
+                el.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        if (typeof loginApp === 'function') loginApp();
+                    }
+                });
+                el.dataset.enterBound = '1';
+            }
+        });
+
+        // 🚀 三值齊全 → 靜默自動登入（學校電腦關 Tab 後 sessionStorage 已清空，故不會誤觸）
+        if (savedClass && savedNum && savedPwd) {
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "自動登入中...";
+            }
+            if (typeof loginApp === 'function') {
+                loginApp();
+            }
+        }
     }, 100);
 
     setupCanvasEvents();
