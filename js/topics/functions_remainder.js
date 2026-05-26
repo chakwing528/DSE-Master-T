@@ -3,9 +3,9 @@
 // ==========================================
 // 函數與餘式定理專屬錯誤提示訊息
 // ==========================================
-const msgRemSign = `<div class="text-red-600 font-bold text-lg mb-1">❗ 代入正負號錯誤</div><div class="text-sm text-slate-500 mb-2">當除式為 \( x+a \) 時，應代入 \( x = -a \)；若除式為 \( ax-b \)，應代入 \( x = \frac{b}{a} \)。</div>`;
-const msgRemFactor = `<div class="text-red-600 font-bold text-lg mb-1">❗ 因式定理概念錯誤</div><div class="text-sm text-slate-500 mb-2">若某式為多項式的因式，則表示其餘數必定為 0，即 \( f(a) = 0 \)。</div>`;
-const msgRemFuncExp = `<div class="text-red-600 font-bold text-lg mb-1">❗ 函數展開與正負號錯誤</div><div class="text-sm text-slate-500 mb-2">計算時請注意負號分配，以及完全平方公式 \( (x \pm y)^2 \) 的正確展開。</div>`;
+const msgRemSign = `<div class="text-red-600 font-bold text-lg mb-1">❗ 代入正負號錯誤</div><div class="text-sm text-slate-500 mb-2">當除式為 \\( x+a \\) 時，應代入 \\( x = -a \\)；若除式為 \\( ax-b \\)，應代入 \\( x = \\frac{b}{a} \\)。</div>`;
+const msgRemFactor = `<div class="text-red-600 font-bold text-lg mb-1">❗ 因式定理概念錯誤</div><div class="text-sm text-slate-500 mb-2">若某式為多項式的因式，則表示其餘數必定為 0，即 \\( f(a) = 0 \\)。</div>`;
+const msgRemFuncExp = `<div class="text-red-600 font-bold text-lg mb-1">❗ 函數展開與正負號錯誤</div><div class="text-sm text-slate-500 mb-2">計算時請注意負號分配，以及完全平方公式 \\( (x \\pm y)^2 \\) 的正確展開。</div>`;
 const msgRemTwoStep = `<div class="text-red-600 font-bold text-lg mb-1">❗ 未完成兩步計算</div><div class="text-sm text-slate-500 mb-2">請仔細閱讀題目，找出未知數後，記得將其代回原式以求出最終的函數值或餘數。</div>`;
 const msgSimul = `<div class="text-red-600 font-bold text-lg mb-1">❗ 聯立方程解法錯誤</div><div class="text-sm text-slate-500 mb-2">當有兩個未知數時，必須利用兩個條件建立兩條方程式，再透過加減消元法或代入法求解。</div>`;
 
@@ -73,21 +73,21 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let ans = Math.pow(m, 3) + a * Math.pow(m, 2) + b * m + c;
                 let wrongAnsSign = Math.pow(-m, 3) + a * Math.pow(-m, 2) + b * (-m) + c; 
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)。當 \( f(x) \) 除以 \( ${divisor} \) 時，餘數為</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)。當 \\( f(x) \\) 除以 \\( ${divisor} \\) 時，餘數為</div>`;
                 steps = [
-                    { text: `根據餘式定理，當除以 \( ${divisor} \) 時，餘數為 \( f(${m}) \)。`, hide: false },
-                    { text: `\( f(${m}) = (${m})^3 + ${a}(${m})^2 + ${b}(${m}) + (${c}) \)`, hide: true },
-                    { text: `\( = ${ans} \)`, hide: false }
+                    { text: `根據餘式定理，當除以 \\( ${divisor} \\) 時，餘數為 \\( f(${m}) \\)。`, hide: false },
+                    { text: `\\( f(${m}) = (${m})^3 + ${a}(${m})^2 + ${b}(${m}) + (${c}) \\)`, hide: true },
+                    { text: `\\( = ${ans} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${ans} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${wrongAnsSign} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${ans + 2} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${ans - 2} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) }
+                    { text: `\\( ${ans} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${wrongAnsSign} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${ans + 2} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${ans - 2} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) }
                 ];
                 let w3 = ans + 4; let w4 = ans - 4;
-                options[2].text = `\( ${ans === wrongAnsSign ? w3 : ans + (Math.random()>0.5?2:3)} \)`;
-                options[3].text = `\( ${ans === wrongAnsSign ? w4 : ans - (Math.random()>0.5?2:3)} \)`;
+                options[2].text = `\\( ${ans === wrongAnsSign ? w3 : ans + (Math.random()>0.5?2:3)} \\)`;
+                options[3].text = `\\( ${ans === wrongAnsSign ? w4 : ans - (Math.random()>0.5?2:3)} \\)`;
                 
             } else if (subType === 1) {
                 // Type 1: 除以 ax-b (分數餘式定理)
@@ -105,20 +105,20 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let wrongM = -m;
                 let wrongAns = coef2 * (wrongM*wrongM) + coef1 * wrongM + coef0;
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)。當 \( f(x) \) 除以 \( ${divisor} \) 時，餘數為</div>`;
-                let fracStr = b > 0 ? `\frac{1}{2}` : `-\frac{1}{2}`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)。當 \\( f(x) \\) 除以 \\( ${divisor} \\) 時，餘數為</div>`;
+                let fracStr = b > 0 ? `\\frac{1}{2}` : `-\\frac{1}{2}`;
                 steps = [
-                    { text: `令 \( ${divisor} = 0 \implies x = ${fracStr} \)。根據餘式定理，餘數為 \( f(${fracStr}) \)。`, hide: false },
-                    { text: `\( f(${fracStr}) = ${coef2}(${fracStr})^2 + ${coef1}(${fracStr}) + (${coef0}) \)`, hide: true },
-                    { text: `\( = ${coef2}(\frac{1}{4}) + ${coef1 * m} + (${coef0}) = ${ans} \)`, hide: false }
+                    { text: `令 \\( ${divisor} = 0 \\implies x = ${fracStr} \\)。根據餘式定理，餘數為 \\( f(${fracStr}) \\)。`, hide: false },
+                    { text: `\\( f(${fracStr}) = ${coef2}(${fracStr})^2 + ${coef1}(${fracStr}) + (${coef0}) \\)`, hide: true },
+                    { text: `\\( = ${coef2}(\\frac{1}{4}) + ${coef1 * m} + (${coef0}) = ${ans} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${ans} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${wrongAns} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${ans + 1} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${ans - 2} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) }
+                    { text: `\\( ${ans} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${wrongAns} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${ans + 1} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${ans - 2} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) }
                 ];
-                if(ans === wrongAns) options[1].text = `\( ${ans + 3} \)`;
+                if(ans === wrongAns) options[1].text = `\\( ${ans + 3} \\)`;
                 
             } else {
                 // Type 2: 函數記號直接代值
@@ -133,19 +133,19 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let ans = a * m * m + b * m + c;
                 let wrongAns = a * (-m) * (-m) + b * (-m) + c; // 代成正數
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">若 \( f(x) = ${polyStr} \)，則 \( f(${m}) = \)</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">若 \\( f(x) = ${polyStr} \\)，則 \\( f(${m}) = \\)</div>`;
                 steps = [
-                    { text: `將 \( x = ${m} \) 直接代入函數中。`, hide: false },
-                    { text: `\( f(${m}) = ${a}(${m})^2 + ${b}(${m}) + (${c}) \)`, hide: true },
-                    { text: `\( = ${a * m * m} + ${b * m} + (${c}) = ${ans} \)`, hide: false }
+                    { text: `將 \\( x = ${m} \\) 直接代入函數中。`, hide: false },
+                    { text: `\\( f(${m}) = ${a}(${m})^2 + ${b}(${m}) + (${c}) \\)`, hide: true },
+                    { text: `\\( = ${a * m * m} + ${b * m} + (${c}) = ${ans} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${ans} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${wrongAns} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${ans + 2} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${ans - 4} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) }
+                    { text: `\\( ${ans} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${wrongAns} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${ans + 2} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${ans - 4} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) }
                 ];
-                if(ans === wrongAns) options[1].text = `\( ${ans + 5} \)`;
+                if(ans === wrongAns) options[1].text = `\\( ${ans + 5} \\)`;
             }
 
         } else if (levelType === '2') {
@@ -162,20 +162,20 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let polyStr = formatPolynomial([1, a, 0, c]).replace("x^2", "x^2 + kx").replace(" + +", " + ").replace("- +", "- ");
                 if(a===0) polyStr = `x^3 + kx ${c>0?'+ '+c:'- '+Math.abs(c)}`;
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">若 \( k \) 為一常數使得 \( ${polyStr} \) 可被 \( ${divisor} \) 整除，則 \( k = \)</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">若 \\( k \\) 為一常數使得 \\( ${polyStr} \\) 可被 \\( ${divisor} \\) 整除，則 \\( k = \\)</div>`;
                 steps = [
-                    { text: `設 \( f(x) = ${polyStr} \)。根據因式定理，\( f(${m}) = 0 \)。`, hide: false },
-                    { text: `\( (${m})^3 + ${a}(${m})^2 + k(${m}) + (${c}) = 0 \)`, hide: true },
-                    { text: `\( ${Math.pow(m,3)} + ${a*m*m} + ${m}k + (${c}) = 0 \implies k = ${k} \)`, hide: false }
+                    { text: `設 \\( f(x) = ${polyStr} \\)。根據因式定理，\\( f(${m}) = 0 \\)。`, hide: false },
+                    { text: `\\( (${m})^3 + ${a}(${m})^2 + k(${m}) + (${c}) = 0 \\)`, hide: true },
+                    { text: `\\( ${Math.pow(m,3)} + ${a*m*m} + ${m}k + (${c}) = 0 \\implies k = ${k} \\)`, hide: false }
                 ];
                 let wrongK1 = (Math.pow(m, 3) + a * Math.pow(m, 2) + c) / m;
                 options = [
-                    { text: `\( ${k} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${wrongK1} \)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) },
-                    { text: `\( ${k + 2} \)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) },
-                    { text: `\( ${k - 3} \)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) }
+                    { text: `\\( ${k} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${wrongK1} \\)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) },
+                    { text: `\\( ${k + 2} \\)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) },
+                    { text: `\\( ${k - 3} \\)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) }
                 ];
-                if(k === wrongK1) options[1].text = `\( ${k + 4} \)`;
+                if(k === wrongK1) options[1].text = `\\( ${k + 4} \\)`;
                 
             } else if (subType === 1) {
                 // Type 1: x-m 是因式(求k)，再求除以 x-n 的餘數
@@ -191,20 +191,20 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 
                 let ans = Math.pow(n, 3) + k * n + c;
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)，其中 \( k \) 為一常數。若 \( f(x) \) 可被 \( ${divisor} \) 整除，求當 \( f(x) \) 除以 \( ${divisor2} \) 時的餘數。</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)，其中 \\( k \\) 為一常數。若 \\( f(x) \\) 可被 \\( ${divisor} \\) 整除，求當 \\( f(x) \\) 除以 \\( ${divisor2} \\) 時的餘數。</div>`;
                 steps = [
-                    { text: `第一步：利用 \( f(${m}) = 0 \) 求 \( k \)。`, hide: false },
-                    { text: `\( (${m})^3 + k(${m}) + (${c}) = 0 \implies ${m}k = ${-(Math.pow(m,3)+c)} \implies k = ${k} \)`, hide: true },
-                    { text: `第二步：求 \( f(${n}) \)。`, hide: true },
-                    { text: `\( f(${n}) = (${n})^3 + (${k})(${n}) + (${c}) = ${ans} \)`, hide: false }
+                    { text: `第一步：利用 \\( f(${m}) = 0 \\) 求 \\( k \\)。`, hide: false },
+                    { text: `\\( (${m})^3 + k(${m}) + (${c}) = 0 \\implies ${m}k = ${-(Math.pow(m,3)+c)} \\implies k = ${k} \\)`, hide: true },
+                    { text: `第二步：求 \\( f(${n}) \\)。`, hide: true },
+                    { text: `\\( f(${n}) = (${n})^3 + (${k})(${n}) + (${c}) = ${ans} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${ans} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${k} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
-                    { text: `\( ${ans + 4} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
-                    { text: `\( ${ans - 2} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }
+                    { text: `\\( ${ans} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${k} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
+                    { text: `\\( ${ans + 4} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
+                    { text: `\\( ${ans - 2} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }
                 ];
-                if (ans === k) options[1].text = `\( ${ans + 5} \)`;
+                if (ans === k) options[1].text = `\\( ${ans + 5} \\)`;
                 
             } else {
                 // Type 2: ax-b 是因式 (分數根)，求 k
@@ -212,7 +212,7 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let b = Math.random() > 0.5 ? 1 : -1;
                 let m = b / a; 
                 let divisor = b > 0 ? `2x - 1` : `2x + 1`;
-                let fracStr = b > 0 ? `\frac{1}{2}` : `-\frac{1}{2}`;
+                let fracStr = b > 0 ? `\\frac{1}{2}` : `-\\frac{1}{2}`;
                 
                 let coef2 = 4; // 避免分數計算太複雜
                 let coef0 = Math.floor(Math.random() * 5) - 2;
@@ -221,20 +221,20 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 
                 let polyStr = `4x^3 + kx^2 ${coef0>0?'+ '+coef0:(coef0<0?'- '+Math.abs(coef0):'')}`;
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">若 \( k \) 為一常數使得 \( ${polyStr} \) 可被 \( ${divisor} \) 整除，則 \( k = \)</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">若 \\( k \\) 為一常數使得 \\( ${polyStr} \\) 可被 \\( ${divisor} \\) 整除，則 \\( k = \\)</div>`;
                 steps = [
-                    { text: `根據因式定理，代入 \( x = ${fracStr} \) 使函數值為 0。`, hide: false },
-                    { text: `\( 4(${fracStr})^3 + k(${fracStr})^2 + (${coef0}) = 0 \)`, hide: true },
-                    { text: `\( 4(\frac{${b}}{8}) + k(\frac{1}{4}) + (${coef0}) = 0 \)`, hide: true },
-                    { text: `同乘 4：\( 2 + k + (${4*coef0}) = 0 \implies k = ${k} \)`, hide: false }
+                    { text: `根據因式定理，代入 \\( x = ${fracStr} \\) 使函數值為 0。`, hide: false },
+                    { text: `\\( 4(${fracStr})^3 + k(${fracStr})^2 + (${coef0}) = 0 \\)`, hide: true },
+                    { text: `\\( 4(\\frac{${b}}{8}) + k(\\frac{1}{4}) + (${coef0}) = 0 \\)`, hide: true },
+                    { text: `同乘 4：\\( 2 + k + (${4*coef0}) = 0 \\implies k = ${k} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${k} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${-k} \)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
-                    { text: `\( ${k + 2} \)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) },
-                    { text: `\( ${k - 4} \)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) }
+                    { text: `\\( ${k} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${-k} \\)`, isCorrect: false, hint: wrapHint(msgRemSign, buildEq(steps)) },
+                    { text: `\\( ${k + 2} \\)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) },
+                    { text: `\\( ${k - 4} \\)`, isCorrect: false, hint: wrapHint(msgRemFactor, buildEq(steps)) }
                 ];
-                if (k === -k) options[1].text = `\( ${k + 6} \)`;
+                if (k === -k) options[1].text = `\\( ${k + 6} \\)`;
             }
 
         } else if (levelType === '3') {
@@ -247,25 +247,25 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let c = (Math.floor(Math.random() * 5) + 1) * (Math.random()>0.5?1:-1);
                 let polyStr = formatPolynomial([a, b, c]);
                 let coefAns = 4*a + 2*b;
-                let ans = coefAns === 1 ? `\beta` : (coefAns === -1 ? `-\beta` : `${coefAns}\beta`);
+                let ans = coefAns === 1 ? `\\beta` : (coefAns === -1 ? `-\\beta` : `${coefAns}\\beta`);
                 if (coefAns === 0) ans = "0";
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)。 若 \( \beta \) 為一常數，則 \( f(1+\beta) - f(1-\beta) = \)</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)。 若 \\( \\beta \\) 為一常數，則 \\( f(1+\\beta) - f(1-\\beta) = \\)</div>`;
                 steps = [
-                    { text: `\( f(1+\beta) = ${a}(1+\beta)^2 + ${b}(1+\beta) ${c>0?'+ '+c:c} \)`, hide: false },
-                    { text: `\( = ${a}(1 + 2\beta + \beta^2) + ${b} + ${b}\beta ${c>0?'+ '+c:c} \)`, hide: true },
-                    { text: `\( = ${a} + ${2*a}\beta + ${a}\beta^2 + ${b} + ${b}\beta ${c>0?'+ '+c:c} \)`, hide: true },
-                    { text: `同理 \( f(1-\beta) = ${a} - ${2*a}\beta + ${a}\beta^2 + ${b} - ${b}\beta ${c>0?'+ '+c:c} \)`, hide: true },
-                    { text: `兩式相減：\( (${2*a}\beta + ${b}\beta) - (-${2*a}\beta - ${b}\beta) = ${coefAns}\beta \)`, hide: false }
+                    { text: `\\( f(1+\\beta) = ${a}(1+\\beta)^2 + ${b}(1+\\beta) ${c>0?'+ '+c:c} \\)`, hide: false },
+                    { text: `\\( = ${a}(1 + 2\\beta + \\beta^2) + ${b} + ${b}\\beta ${c>0?'+ '+c:c} \\)`, hide: true },
+                    { text: `\\( = ${a} + ${2*a}\\beta + ${a}\\beta^2 + ${b} + ${b}\\beta ${c>0?'+ '+c:c} \\)`, hide: true },
+                    { text: `同理 \\( f(1-\\beta) = ${a} - ${2*a}\\beta + ${a}\\beta^2 + ${b} - ${b}\\beta ${c>0?'+ '+c:c} \\)`, hide: true },
+                    { text: `兩式相減：\\( (${2*a}\\beta + ${b}\\beta) - (-${2*a}\\beta - ${b}\\beta) = ${coefAns}\\beta \\)`, hide: false }
                 ];
                 let wrongCoef1 = 4*a; 
                 let wrongCoef2 = 2*b; 
-                let fmtAns = (cf) => { if (cf===0) return "0"; if (cf===1) return "\beta"; if (cf===-1) return "-\beta"; return `${cf}\beta`; };
+                let fmtAns = (cf) => { if (cf===0) return "0"; if (cf===1) return "\\beta"; if (cf===-1) return "-\\beta"; return `${cf}\\beta`; };
                 options = [
-                    { text: `\( ${ans} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${fmtAns(wrongCoef1)} \)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
-                    { text: `\( ${fmtAns(wrongCoef2)} \)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
-                    { text: `\( ${fmtAns(coefAns + 4)} \)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) }
+                    { text: `\\( ${ans} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${fmtAns(wrongCoef1)} \\)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
+                    { text: `\\( ${fmtAns(wrongCoef2)} \\)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
+                    { text: `\\( ${fmtAns(coefAns + 4)} \\)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) }
                 ];
 
             } else if (subType === 1) {
@@ -275,12 +275,12 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let d = (Math.floor(Math.random() * 5) + 1) * (Math.random()>0.5?1:-1);
                 let polyStr = formatPolynomial([a, b, -a, d]); // ax^3 + bx^2 - ax + d
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)。 若 \( c \) 為一常數，則 \( f(c) + f(-c) = \)</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)。 若 \\( c \\) 為一常數，則 \\( f(c) + f(-c) = \\)</div>`;
                 steps = [
-                    { text: `\( f(c) = ${a}c^3 + ${b}c^2 - ${a}c + ${d} \)`, hide: false },
-                    { text: `代入負數注意次方：\( f(-c) = ${a}(-c)^3 + ${b}(-c)^2 - ${a}(-c) + ${d} = -${a}c^3 + ${b}c^2 + ${a}c + ${d} \)`, hide: true },
+                    { text: `\\( f(c) = ${a}c^3 + ${b}c^2 - ${a}c + ${d} \\)`, hide: false },
+                    { text: `代入負數注意次方：\\( f(-c) = ${a}(-c)^3 + ${b}(-c)^2 - ${a}(-c) + ${d} = -${a}c^3 + ${b}c^2 + ${a}c + ${d} \\)`, hide: true },
                     { text: `將兩式相加，奇數次方項會剛好互相抵消 (對消)。`, hide: true },
-                    { text: `\( f(c) + f(-c) = 2(${b}c^2) + 2(${d}) = ${2*b}c^2 ${2*d>0?'+ '+2*d:2*d} \)`, hide: false }
+                    { text: `\\( f(c) + f(-c) = 2(${b}c^2) + 2(${d}) = ${2*b}c^2 ${2*d>0?'+ '+2*d:2*d} \\)`, hide: false }
                 ];
                 
                 let ansStr = `${2*b}c^2 ${2*d>0?'+ '+2*d:2*d}`;
@@ -289,10 +289,10 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let w3 = `${b}c^2 ${2*d>0?'+ '+2*d:2*d}`; // 平方忘了乘2
                 
                 options = [
-                    { text: `\( ${ansStr} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${w1} \)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
-                    { text: `\( ${w2} \)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
-                    { text: `\( ${w3} \)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) }
+                    { text: `\\( ${ansStr} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${w1} \\)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
+                    { text: `\\( ${w2} \\)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) },
+                    { text: `\\( ${w3} \\)`, isCorrect: false, hint: wrapHint(msgRemFuncExp, buildEq(steps)) }
                 ];
                 
             } else {
@@ -303,20 +303,20 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 // 根據推導: h = p - q
                 let h = p - q; 
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = (x+h)(x-${p}) + k \)，其中 \( h \) 及 \( k \) 均為常數。若 \( f(0) = f(${q}) = ${V} \)，求 \( h \)。</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = (x+h)(x-${p}) + k \\)，其中 \\( h \\) 及 \\( k \\) 均為常數。若 \\( f(0) = f(${q}) = ${V} \\)，求 \\( h \\)。</div>`;
                 steps = [
-                    { text: `這題只需利用 \( f(0) = f(${q}) \) 即可消去 \( k \) 和 \( V \)。`, hide: false },
-                    { text: `\( f(0) = (0+h)(0-${p}) + k = -${p}h + k \)`, hide: true },
-                    { text: `\( f(${q}) = (${q}+h)(${q}-${p}) + k = ${q-p}(${q}+h) + k = ${q*(q-p)} + ${q-p}h + k \)`, hide: true },
-                    { text: `兩式相等：\( -${p}h + k = ${q*(q-p)} + ${q-p}h + k \)`, hide: true },
-                    { text: `消去 \( k \) 並移項：\( -${p}h - ${q-p}h = ${q*(q-p)} \implies -${q}h = ${q*(q-p)} \implies h = ${-(q-p)} = ${h} \)`, hide: false }
+                    { text: `這題只需利用 \\( f(0) = f(${q}) \\) 即可消去 \\( k \\) 和 \\( V \\)。`, hide: false },
+                    { text: `\\( f(0) = (0+h)(0-${p}) + k = -${p}h + k \\)`, hide: true },
+                    { text: `\\( f(${q}) = (${q}+h)(${q}-${p}) + k = ${q-p}(${q}+h) + k = ${q*(q-p)} + ${q-p}h + k \\)`, hide: true },
+                    { text: `兩式相等：\\( -${p}h + k = ${q*(q-p)} + ${q-p}h + k \\)`, hide: true },
+                    { text: `消去 \\( k \\) 並移項：\\( -${p}h - ${q-p}h = ${q*(q-p)} \\implies -${q}h = ${q*(q-p)} \\implies h = ${-(q-p)} = ${h} \\)`, hide: false }
                 ];
                 
                 options = [
-                    { text: `\( ${h} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${-h} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
-                    { text: `\( ${p+q} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
-                    { text: `\( ${h-2} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }
+                    { text: `\\( ${h} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${-h} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
+                    { text: `\\( ${p+q} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
+                    { text: `\\( ${h-2} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }
                 ];
             }
 
@@ -336,19 +336,19 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 if (targetX === Math.abs(m)) targetX += 1; 
                 let ans = a_val * Math.pow(targetX, 3) + b * a_val * Math.pow(targetX, 2) + c;
                 
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( g(x) = ${polyStr} \)，其中 \( a \) 為一常數。若 \( ${divisor} \) 為 \( g(x) \) 的因式，則 \( g(${targetX}) = \)</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( g(x) = ${polyStr} \\)，其中 \\( a \\) 為一常數。若 \\( ${divisor} \\) 為 \\( g(x) \\) 的因式，則 \\( g(${targetX}) = \\)</div>`;
                 steps = [
-                    { text: `第一步：求常數 \( a \)。因為 \( ${divisor} \) 為因式，所以 \( g(${m}) = 0 \)。`, hide: false },
-                    { text: `\( a(${m})^3 + ${b}a(${m})^2 + (${c}) = 0 \implies ${Math.pow(m,3) + b*Math.pow(m,2)}a = ${-c} \implies a = ${a_val} \)`, hide: true },
-                    { text: `第二步：代回求 \( g(${targetX}) \)。`, hide: true },
-                    { text: `\( g(${targetX}) = ${a_val}(${targetX})^3 + (${b*a_val})(${targetX})^2 + (${c}) = ${ans} \)`, hide: false }
+                    { text: `第一步：求常數 \\( a \\)。因為 \\( ${divisor} \\) 為因式，所以 \\( g(${m}) = 0 \\)。`, hide: false },
+                    { text: `\\( a(${m})^3 + ${b}a(${m})^2 + (${c}) = 0 \\implies ${Math.pow(m,3) + b*Math.pow(m,2)}a = ${-c} \\implies a = ${a_val} \\)`, hide: true },
+                    { text: `第二步：代回求 \\( g(${targetX}) \\)。`, hide: true },
+                    { text: `\\( g(${targetX}) = ${a_val}(${targetX})^3 + (${b*a_val})(${targetX})^2 + (${c}) = ${ans} \\)`, hide: false }
                 ];
                 let wrongAns2 = a_val; 
                 options = [
-                    { text: `\( ${ans} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${wrongAns2} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep + "<div class='text-sm text-slate-500'>提示：這只是常數 a 的值，題目要求的是 g(x)。</div>", buildEq(steps)) },
-                    { text: `\( ${ans + 12} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
-                    { text: `\( ${ans - 8} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }
+                    { text: `\\( ${ans} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${wrongAns2} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep + "<div class='text-sm text-slate-500'>提示：這只是常數 a 的值，題目要求的是 g(x)。</div>", buildEq(steps)) },
+                    { text: `\\( ${ans + 12} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) },
+                    { text: `\\( ${ans - 8} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }
                 ];
                 
             } else if (subType === 1) {
@@ -362,20 +362,20 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let R = -1 + a - b + c_val;
                 
                 let polyStr = `x^3 + ax^2 + bx + ${c_val}`;
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)。若 \( f(x) \) 可被 \( x - 1 \) 整除，且當 \( f(x) \) 除以 \( x + 1 \) 時的餘數為 \( ${R} \)，求 \( a \)。</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)。若 \\( f(x) \\) 可被 \\( x - 1 \\) 整除，且當 \\( f(x) \\) 除以 \\( x + 1 \\) 時的餘數為 \\( ${R} \\)，求 \\( a \\)。</div>`;
                 steps = [
-                    { text: `根據因式定理，\( f(1) = 0 \implies 1 + a + b + ${c_val} = 0 \implies a + b = ${-(1+c_val)} \)  --- (1)`, hide: false },
-                    { text: `根據餘式定理，\( f(-1) = ${R} \implies -1 + a - b + ${c_val} = ${R} \implies a - b = ${R + 1 - c_val} \)  --- (2)`, hide: true },
-                    { text: `兩式相加：\( (a+b) + (a-b) = ${-(1+c_val)} + ${R + 1 - c_val} \)`, hide: true },
-                    { text: `\( 2a = ${-(1+c_val) + R + 1 - c_val} \implies a = ${a} \)`, hide: false }
+                    { text: `根據因式定理，\\( f(1) = 0 \\implies 1 + a + b + ${c_val} = 0 \\implies a + b = ${-(1+c_val)} \\)  --- (1)`, hide: false },
+                    { text: `根據餘式定理，\\( f(-1) = ${R} \\implies -1 + a - b + ${c_val} = ${R} \\implies a - b = ${R + 1 - c_val} \\)  --- (2)`, hide: true },
+                    { text: `兩式相加：\\( (a+b) + (a-b) = ${-(1+c_val)} + ${R + 1 - c_val} \\)`, hide: true },
+                    { text: `\\( 2a = ${-(1+c_val) + R + 1 - c_val} \\implies a = ${a} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${a} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${b} \)`, isCorrect: false, hint: wrapHint(msgSimul + "<div class='text-sm text-slate-500'>提示：這是 b 的值，小心看錯題目要求的未知數。</div>", buildEq(steps)) },
-                    { text: `\( ${a+2} \)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) },
-                    { text: `\( ${a-1} \)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) }
+                    { text: `\\( ${a} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${b} \\)`, isCorrect: false, hint: wrapHint(msgSimul + "<div class='text-sm text-slate-500'>提示：這是 b 的值，小心看錯題目要求的未知數。</div>", buildEq(steps)) },
+                    { text: `\\( ${a+2} \\)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) },
+                    { text: `\\( ${a-1} \\)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) }
                 ];
-                if(a === b) options[1].text = `\( ${a+3} \)`;
+                if(a === b) options[1].text = `\\( ${a+3} \\)`;
 
             } else {
                 // Type 2: 隱藏兩條件 (被 x^2 - m^2 整除)
@@ -386,21 +386,21 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
                 let b = Math.floor(Math.random() * 5) - 2;
                 
                 let polyStr = `2x^3 + ax^2 + bx ${c_val>0?'+ '+c_val:(c_val<0?'- '+Math.abs(c_val):'')}`;
-                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \( f(x) = ${polyStr} \)。若 \( f(x) \) 可被 \( x^2 - ${m2} \) 整除，求 \( a \)。</div>`;
+                qObj.question = `<div class="mb-4 text-base sm:text-lg text-slate-600">設 \\( f(x) = ${polyStr} \\)。若 \\( f(x) \\) 可被 \\( x^2 - ${m2} \\) 整除，求 \\( a \\)。</div>`;
                 steps = [
-                    { text: `\( x^2 - ${m2} = (x - ${m})(x + ${m}) \)，這表示 \( x-${m} \) 和 \( x+${m} \) 都是 \( f(x) \) 的因式。`, hide: false },
-                    { text: `由 \( f(${m}) = 0 \implies 2(${m})^3 + a(${m})^2 + b(${m}) + (${c_val}) = 0 \implies ${2*Math.pow(m,3)} + ${m2}a + ${m}b + (${c_val}) = 0 \)`, hide: true },
-                    { text: `由 \( f(-${m}) = 0 \implies -${2*Math.pow(m,3)} + ${m2}a - ${m}b + (${c_val}) = 0 \)`, hide: true },
-                    { text: `將兩式相加，奇數次方的項互消：\( 2(${m2}a) + 2(${c_val}) = 0 \)`, hide: true },
-                    { text: `\( ${2*m2}a = ${-2*c_val} \implies a = ${a} \)`, hide: false }
+                    { text: `\\( x^2 - ${m2} = (x - ${m})(x + ${m}) \\)，這表示 \\( x-${m} \\) 和 \\( x+${m} \\) 都是 \\( f(x) \\) 的因式。`, hide: false },
+                    { text: `由 \\( f(${m}) = 0 \\implies 2(${m})^3 + a(${m})^2 + b(${m}) + (${c_val}) = 0 \\implies ${2*Math.pow(m,3)} + ${m2}a + ${m}b + (${c_val}) = 0 \\)`, hide: true },
+                    { text: `由 \\( f(-${m}) = 0 \\implies -${2*Math.pow(m,3)} + ${m2}a - ${m}b + (${c_val}) = 0 \\)`, hide: true },
+                    { text: `將兩式相加，奇數次方的項互消：\\( 2(${m2}a) + 2(${c_val}) = 0 \\)`, hide: true },
+                    { text: `\\( ${2*m2}a = ${-2*c_val} \\implies a = ${a} \\)`, hide: false }
                 ];
                 options = [
-                    { text: `\( ${a} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( ${-a} \)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) },
-                    { text: `\( ${b} \)`, isCorrect: false, hint: wrapHint(msgSimul + "<div class='text-sm text-slate-500'>提示：這是 b 的值，請重新檢視聯立相消的步驟。</div>", buildEq(steps)) },
-                    { text: `\( ${a+3} \)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) }
+                    { text: `\\( ${a} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( ${-a} \\)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) },
+                    { text: `\\( ${b} \\)`, isCorrect: false, hint: wrapHint(msgSimul + "<div class='text-sm text-slate-500'>提示：這是 b 的值，請重新檢視聯立相消的步驟。</div>", buildEq(steps)) },
+                    { text: `\\( ${a+3} \\)`, isCorrect: false, hint: wrapHint(msgSimul, buildEq(steps)) }
                 ];
-                if(a === b || -a === b) options[2].text = `\( ${a+4} \)`;
+                if(a === b || -a === b) options[2].text = `\\( ${a+4} \\)`;
             }
         }
         
@@ -408,7 +408,7 @@ function generateFunctionsRemainderQuestions(num, levelPref) {
         options = [...new Map(options.map(item => [item.text, item])).values()];
         let loopProtect = 1;
         while(options.length < 4) { 
-            options.push({ text: `\( ${loopProtect * 7 - 2} \)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }); 
+            options.push({ text: `\\( ${loopProtect * 7 - 2} \\)`, isCorrect: false, hint: wrapHint(msgRemTwoStep, buildEq(steps)) }); 
             loopProtect++;
             options = [...new Map(options.map(item => [item.text, item])).values()];
         }

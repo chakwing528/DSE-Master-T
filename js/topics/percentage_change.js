@@ -101,10 +101,10 @@ function generatePercentageQuestions(num, levelPref) {
                 ];
 
                 options = [
-                    { text: `\( \\displaystyle ${netStr} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${(inc - dec)}% \)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) },
-                    { text: `\( \\displaystyle -${(inc * dec / 100)}% \)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) },
-                    { text: `\( \\displaystyle -${Math.abs(netChange) + 5}% \)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) }
+                    { text: `\\( \\displaystyle ${netStr} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${(inc - dec)}% \\)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) },
+                    { text: `\\( \\displaystyle -${(inc * dec / 100)}% \\)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) },
+                    { text: `\\( \\displaystyle -${Math.abs(netChange) + 5}% \\)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) }
                 ];
             } else {
                 // 題型 2: 已知百分比差距與總數求數量 (參照 2014 Q9)
@@ -121,10 +121,10 @@ function generatePercentageQuestions(num, levelPref) {
                 ];
 
                 options = [
-                    { text: `\( \\displaystyle ${d.M} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.F} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError + "<div class='text-sm text-slate-500'>提示：這是女工的人數，題目要求的是男工人數。</div>", buildEq(steps)) },
-                    { text: `\( \\displaystyle ${Math.round(d.N * (1 - d.p/100))} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError + "<div class='text-sm text-slate-500'>提示：不能直接用總人數乘以百分比，因為基準值是女工人數。</div>", buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.M - 20} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) }
+                    { text: `\\( \\displaystyle ${d.M} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.F} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError + "<div class='text-sm text-slate-500'>提示：這是女工的人數，題目要求的是男工人數。</div>", buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${Math.round(d.N * (1 - d.p/100))} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError + "<div class='text-sm text-slate-500'>提示：不能直接用總人數乘以百分比，因為基準值是女工人數。</div>", buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.M - 20} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) }
                 ];
             }
 
@@ -148,10 +148,10 @@ function generatePercentageQuestions(num, levelPref) {
                 ];
 
                 options = [
-                    { text: `\( \\displaystyle $${d.P} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( \\displaystyle $${d.M} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError + `<div class='text-sm text-slate-500'>提示：這是${d.name2}的月薪。</div>`, buildEq(steps)) },
-                    { text: `\( \\displaystyle $${Math.round(d.H * (1 - d.p1/100 + d.p2/100))} \)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) },
-                    { text: `\( \\displaystyle $${d.H} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) }
+                    { text: `\\( \\displaystyle $${d.P} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( \\displaystyle $${d.M} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError + `<div class='text-sm text-slate-500'>提示：這是${d.name2}的月薪。</div>`, buildEq(steps)) },
+                    { text: `\\( \\displaystyle $${Math.round(d.H * (1 - d.p1/100 + d.p2/100))} \\)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd, buildEq(steps)) },
+                    { text: `\\( \\displaystyle $${d.H} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) }
                 ];
             } else {
                 // 題型 2: 長方形二維面積百分變化求未知數 (參照 2012SP Q12)
@@ -171,10 +171,10 @@ function generatePercentageQuestions(num, levelPref) {
                 ];
 
                 options = [
-                    { text: `\( \\displaystyle ${d.x} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.b - d.a} \)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd + "<div class='text-sm text-slate-500'>提示：不能直接把百分比加減！面積改變是長和闊改變的乘積。</div>", buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.x + 5} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.x - 5} \)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) }
+                    { text: `\\( \\displaystyle ${d.x} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.b - d.a} \\)`, isCorrect: false, hint: wrapHint(msgPctDirectAdd + "<div class='text-sm text-slate-500'>提示：不能直接把百分比加減！面積改變是長和闊改變的乘積。</div>", buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.x + 5} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.x - 5} \\)`, isCorrect: false, hint: wrapHint(msgPctBaseError, buildEq(steps)) }
                 ];
             }
 
@@ -203,10 +203,10 @@ function generatePercentageQuestions(num, levelPref) {
                 ];
 
                 options = [
-                    { text: `\( \\displaystyle ${d.ans}% \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${( (malePct + d.w)/2 )}% \)`, isCorrect: false, hint: wrapHint(msgPctWeightedError + "<div class='text-sm text-slate-500'>提示：不能直接將男已婚率和女已婚率直接取平均數，因為男女員工的比例不相等。</div>", buildEq(steps)) },
-                    { text: `\( \\displaystyle ${(d.ans - 5)}% \)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${(d.ans + 5)}% \)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) }
+                    { text: `\\( \\displaystyle ${d.ans}% \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${( (malePct + d.w)/2 )}% \\)`, isCorrect: false, hint: wrapHint(msgPctWeightedError + "<div class='text-sm text-slate-500'>提示：不能直接將男已婚率和女已婚率直接取平均數，因為男女員工的比例不相等。</div>", buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${(d.ans - 5)}% \\)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${(d.ans + 5)}% \\)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) }
                 ];
             } else {
                 // 題型 2: 二維表格逆向求解男生超重率 (參照 2021 Q9)
@@ -225,10 +225,10 @@ function generatePercentageQuestions(num, levelPref) {
                 ];
 
                 options = [
-                    { text: `\( \\displaystyle ${d.x} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${Math.round((d.T - d.w))} \)`, isCorrect: false, hint: wrapHint(msgPctWeightedError + "<div class='text-sm text-slate-500'>提示：百分比不可直接相減得到群組百分比。</div>", buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.x + 10} \)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) },
-                    { text: `\( \\displaystyle ${d.x - 5} \)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) }
+                    { text: `\\( \\displaystyle ${d.x} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${Math.round((d.T - d.w))} \\)`, isCorrect: false, hint: wrapHint(msgPctWeightedError + "<div class='text-sm text-slate-500'>提示：百分比不可直接相減得到群組百分比。</div>", buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.x + 10} \\)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) },
+                    { text: `\\( \\displaystyle ${d.x - 5} \\)`, isCorrect: false, hint: wrapHint(msgPctWeightedError, buildEq(steps)) }
                 ];
             }
 
@@ -253,10 +253,10 @@ function generatePercentageQuestions(num, levelPref) {
             ];
 
             options = [
-                { text: `\( \\displaystyle ${d.beta} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                { text: `\( \\displaystyle ${d.beta - 10} \)`, isCorrect: false, hint: wrapHint(msgPctEquationError, buildEq(steps)) },
-                { text: `\( \\displaystyle ${d.beta + 15} \)`, isCorrect: false, hint: wrapHint(msgPctEquationError, buildEq(steps)) },
-                { text: `\( \\displaystyle ${Math.round(100 - d.beta)} \)`, isCorrect: false, hint: wrapHint(msgPctEquationError, buildEq(steps)) }
+                { text: `\\( \\displaystyle ${d.beta} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${d.beta - 10} \\)`, isCorrect: false, hint: wrapHint(msgPctEquationError, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${d.beta + 15} \\)`, isCorrect: false, hint: wrapHint(msgPctEquationError, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${Math.round(100 - d.beta)} \\)`, isCorrect: false, hint: wrapHint(msgPctEquationError, buildEq(steps)) }
             ];
         }
 

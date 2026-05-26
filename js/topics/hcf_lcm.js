@@ -82,15 +82,15 @@ function generateHcfLcmQuestions(num, levelPref) {
             let ansStr = fmtTerm(ansC, 'x', ansX, 'y', ansY, 'z', ansZ);
             
             qObj.question = `
-                <div class="mb-4 text-base sm:text-lg text-slate-600">\( ${t1} \) 、 \( ${t2} \) 及 \( ${t3} \) 的 H.C.F. 為</div>
+                <div class="mb-4 text-base sm:text-lg text-slate-600">\\( ${t1} \\) 、 \\( ${t2} \\) 及 \\( ${t3} \\) 的 H.C.F. 為</div>
             `;
 
             steps = [
-                { text: `數字部分的 H.C.F.：\( \gcd(${c1}, ${c2}, ${c3}) = ${ansC} \)`, hide: false },
-                { text: `變數 x 取最低次數：\( \min(${p1[0]}, ${p1[1]}, ${p1[2]}) = ${ansX} \)`, hide: true },
-                { text: `變數 y 取最低次數：\( \min(${p2[0]}, ${p2[1]}, ${p2[2]}) = ${ansY} \)`, hide: true },
-                { text: `變數 z 取最低次數：\( \min(${p3[0]}, ${p3[1]}, ${p3[2]}) = ${ansZ} \)`, hide: true },
-                { text: `因此，H.C.F. = \( ${ansStr} \)`, hide: false }
+                { text: `數字部分的 H.C.F.：\\( \\gcd(${c1}, ${c2}, ${c3}) = ${ansC} \\)`, hide: false },
+                { text: `變數 x 取最低次數：\\( \\min(${p1[0]}, ${p1[1]}, ${p1[2]}) = ${ansX} \\)`, hide: true },
+                { text: `變數 y 取最低次數：\\( \\min(${p2[0]}, ${p2[1]}, ${p2[2]}) = ${ansY} \\)`, hide: true },
+                { text: `變數 z 取最低次數：\\( \\min(${p3[0]}, ${p3[1]}, ${p3[2]}) = ${ansZ} \\)`, hide: true },
+                { text: `因此，H.C.F. = \\( ${ansStr} \\)`, hide: false }
             ];
 
             let wrongC = lcm3(c1, c2, c3);
@@ -104,10 +104,10 @@ function generateHcfLcmQuestions(num, levelPref) {
             let opt4 = fmtTerm(wrongC, 'x', wrongX, 'y', wrongY, 'z', Math.max(1, wrongZ)); // 全錯 (求了LCM)
 
             options = [
-                { text: `\( \displaystyle ${opt1} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                { text: `\( \displaystyle ${opt2} \)`, isCorrect: false, hint: wrapHint(msgHcfPower, buildEq(steps)) },
-                { text: `\( \displaystyle ${opt3} \)`, isCorrect: false, hint: wrapHint(msgNumFactor, buildEq(steps)) },
-                { text: `\( \displaystyle ${opt4} \)`, isCorrect: false, hint: wrapHint(msgHcfPower + msgNumFactor, buildEq(steps)) }
+                { text: `\\( \\displaystyle ${opt1} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${opt2} \\)`, isCorrect: false, hint: wrapHint(msgHcfPower, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${opt3} \\)`, isCorrect: false, hint: wrapHint(msgNumFactor, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${opt4} \\)`, isCorrect: false, hint: wrapHint(msgHcfPower + msgNumFactor, buildEq(steps)) }
             ];
 
         } else if (levelType === '2') {
@@ -131,14 +131,14 @@ function generateHcfLcmQuestions(num, levelPref) {
             let ansStr = fmtTerm(ansC, 'a', ansA, 'b', ansB, 'c', 0);
             
             qObj.question = `
-                <div class="mb-4 text-base sm:text-lg text-slate-600">\( ${t1} \) 、 \( ${t2} \) 及 \( ${t3} \) 的 L.C.M. 為</div>
+                <div class="mb-4 text-base sm:text-lg text-slate-600">\\( ${t1} \\) 、 \\( ${t2} \\) 及 \\( ${t3} \\) 的 L.C.M. 為</div>
             `;
 
             steps = [
-                { text: `數字部分的 L.C.M.：\( \text{lcm}(${c[0]}, ${c[1]}, ${c[2]}) = ${ansC} \)`, hide: false },
-                { text: `變數 a 取最高次數：\( \max(${p1[0]}, ${p1[1]}, ${p1[2]}) = ${ansA} \)`, hide: true },
-                { text: `變數 b 取最高次數：\( \max(${p2[0]}, ${p2[1]}, ${p2[2]}) = ${ansB} \)`, hide: true },
-                { text: `因此，L.C.M. = \( ${ansStr} \)`, hide: false }
+                { text: `數字部分的 L.C.M.：\\( \\text{lcm}(${c[0]}, ${c[1]}, ${c[2]}) = ${ansC} \\)`, hide: false },
+                { text: `變數 a 取最高次數：\\( \\max(${p1[0]}, ${p1[1]}, ${p1[2]}) = ${ansA} \\)`, hide: true },
+                { text: `變數 b 取最高次數：\\( \\max(${p2[0]}, ${p2[1]}, ${p2[2]}) = ${ansB} \\)`, hide: true },
+                { text: `因此，L.C.M. = \\( ${ansStr} \\)`, hide: false }
             ];
 
             let wrongC = gcd3(c[0], c[1], c[2]);
@@ -151,10 +151,10 @@ function generateHcfLcmQuestions(num, levelPref) {
             let opt4 = fmtTerm(wrongC, 'a', wrongA, 'b', wrongB, 'c', 0); // 全錯 (求了HCF)
 
             options = [
-                { text: `\( \displaystyle ${opt1} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                { text: `\( \displaystyle ${opt2} \)`, isCorrect: false, hint: wrapHint(msgLcmPower, buildEq(steps)) },
-                { text: `\( \displaystyle ${opt3} \)`, isCorrect: false, hint: wrapHint(msgNumFactor, buildEq(steps)) },
-                { text: `\( \displaystyle ${opt4} \)`, isCorrect: false, hint: wrapHint(msgLcmPower + msgNumFactor, buildEq(steps)) }
+                { text: `\\( \\displaystyle ${opt1} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${opt2} \\)`, isCorrect: false, hint: wrapHint(msgLcmPower, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${opt3} \\)`, isCorrect: false, hint: wrapHint(msgNumFactor, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${opt4} \\)`, isCorrect: false, hint: wrapHint(msgLcmPower + msgNumFactor, buildEq(steps)) }
             ];
 
         } else if (levelType === '3') {
@@ -175,7 +175,7 @@ function generateHcfLcmQuestions(num, levelPref) {
             let lcm = fmtTerm(1, 'x', lX, 'y', lY, 'z', lZ);
 
             qObj.question = `
-                <div class="mb-4 text-base sm:text-lg text-slate-600">三個數式的 H.C.F. 及 L.C.M. 分別為 \( ${hcf} \) 及 \( ${lcm} \)。若第一個數式及第二個數式分別為 \( ${t1} \) 及 \( ${t2} \) ，則第三個數式為</div>
+                <div class="mb-4 text-base sm:text-lg text-slate-600">三個數式的 H.C.F. 及 L.C.M. 分別為 \\( ${hcf} \\) 及 \\( ${lcm} \\)。若第一個數式及第二個數式分別為 \\( ${t1} \\) 及 \\( ${t2} \\) ，則第三個數式為</div>
             `;
             
             // 構建解題步驟
@@ -188,7 +188,7 @@ function generateHcfLcmQuestions(num, levelPref) {
                 { text: explainX, hide: true },
                 { text: explainY, hide: true },
                 { text: explainZ, hide: true },
-                { text: `第三個數式為 \( ${t3} \)`, hide: false }
+                { text: `第三個數式為 \\( ${t3} \\)`, hide: false }
             ];
 
             // 錯誤選項設計：改變某個關鍵次數 (例如把最高變最低，或把確定次數變其他)
@@ -197,17 +197,17 @@ function generateHcfLcmQuestions(num, levelPref) {
             let w3 = fmtTerm(1, 'x', pX[2], 'y', pY[2], 'z', pZ[2]===hZ ? lZ : hZ);
 
             options = [
-                { text: `\( \displaystyle ${t3} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                { text: `\( \displaystyle ${w1} \)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) },
-                { text: `\( \displaystyle ${w2} \)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) },
-                { text: `\( \displaystyle ${w3} \)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) }
+                { text: `\\( \\displaystyle ${t3} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${w1} \\)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${w2} \\)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${w3} \\)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) }
             ];
             
             // 去重補足
             let allTexts = new Set(options.map(o => o.text));
             while(options.length < 4 || allTexts.size < 4) {
                 let rw = fmtTerm(1, 'x', Math.random()>0.5?hX:lX, 'y', Math.random()>0.5?hY:lY, 'z', Math.random()>0.5?hZ:lZ);
-                let rt = `\( \displaystyle ${rw} \)`;
+                let rt = `\\( \\displaystyle ${rw} \\)`;
                 if(!allTexts.has(rt)) {
                     options.push({ text: rt, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) });
                     allTexts.add(rt);
@@ -244,7 +244,7 @@ function generateHcfLcmQuestions(num, levelPref) {
             let lcm = fmtTerm(cs.L, 'a', lA, 'b', lB, 'c', lC);
 
             qObj.question = `
-                <div class="mb-4 text-base sm:text-lg text-slate-600">三個數式的 H.C.F. 及 L.C.M. 分別為 \( ${hcf} \) 及 \( ${lcm} \)。若第一個數式及第二個數式分別為 \( ${t1} \) 及 \( ${t2} \) ，則第三個數式為</div>
+                <div class="mb-4 text-base sm:text-lg text-slate-600">三個數式的 H.C.F. 及 L.C.M. 分別為 \\( ${hcf} \\) 及 \\( ${lcm} \\)。若第一個數式及第二個數式分別為 \\( ${t1} \\) 及 \\( ${t2} \\) ，則第三個數式為</div>
             `;
             
             steps = [
@@ -252,7 +252,7 @@ function generateHcfLcmQuestions(num, levelPref) {
                 { text: `對於 a：次數為 ${pA[0]} 和 ${pA[1]}。H.C.F(最低)=${hA}, L.C.M(最高)=${lA}。第三式 a 次數為 ${pA[2]}。`, hide: true },
                 { text: `對於 b：次數為 ${pB[0]} 和 ${pB[1]}。H.C.F(最低)=${hB}, L.C.M(最高)=${lB}。第三式 b 次數為 ${pB[2]}。`, hide: true },
                 { text: `對於 c：次數為 ${pC[0]} 和 ${pC[1]}。H.C.F(最低)=${hC}, L.C.M(最高)=${lC}。第三式 c 次數為 ${pC[2]}。`, hide: true },
-                { text: `第三個數式為 \( ${t3} \)`, hide: false }
+                { text: `第三個數式為 \\( ${t3} \\)`, hide: false }
             ];
 
             let w1 = fmtTerm(cs.C3, 'a', pA[2]===hA?lA:hA, 'b', pB[2], 'c', pC[2]);
@@ -260,16 +260,16 @@ function generateHcfLcmQuestions(num, levelPref) {
             let w3 = fmtTerm(cs.C2, 'a', pA[2], 'b', pB[2], 'c', pC[2]===hC?lC:hC); // 數字干擾
 
             options = [
-                { text: `\( \displaystyle ${t3} \)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
-                { text: `\( \displaystyle ${w1} \)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) },
-                { text: `\( \displaystyle ${w2} \)`, isCorrect: false, hint: wrapHint(msgNumFactor + "<br>" + msgReverseLogic, buildEq(steps)) },
-                { text: `\( \displaystyle ${w3} \)`, isCorrect: false, hint: wrapHint(msgNumFactor + "<br>" + msgReverseLogic, buildEq(steps)) }
+                { text: `\\( \\displaystyle ${t3} \\)`, isCorrect: true, hint: wrapHint(msgCorrect, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${w1} \\)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${w2} \\)`, isCorrect: false, hint: wrapHint(msgNumFactor + "<br>" + msgReverseLogic, buildEq(steps)) },
+                { text: `\\( \\displaystyle ${w3} \\)`, isCorrect: false, hint: wrapHint(msgNumFactor + "<br>" + msgReverseLogic, buildEq(steps)) }
             ];
             
             // 去重
             options = [...new Map(options.map(item => [item.text, item])).values()];
             while(options.length < 4) {
-                 options.push({ text: `\( \displaystyle ${fmtTerm(cs.C3 === 1 ? 2 : 1, 'a', pA[2], 'b', lB, 'c', hC)} \)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) });
+                 options.push({ text: `\\( \\displaystyle ${fmtTerm(cs.C3 === 1 ? 2 : 1, 'a', pA[2], 'b', lB, 'c', hC)} \\)`, isCorrect: false, hint: wrapHint(msgReverseLogic, buildEq(steps)) });
             }
             options = options.slice(0, 4);
         }
