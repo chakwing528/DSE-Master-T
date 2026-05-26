@@ -151,6 +151,22 @@
         .katex .mathrm { font-style: normal; }
 
         /* ===========================================
+           📐 統一題目區內所有數式字體大小
+           （新舊課題的 inline / display 數式皆放大至一致尺寸）
+           =========================================== */
+        #questionText { font-size: 1.05rem; line-height: 1.7; }
+        #questionText .katex { font-size: 1.25em !important; }
+        #questionText .katex-display { margin: 0.8em 0 !important; font-size: 1.35em !important; }
+        @media (min-width: 640px) {
+            #questionText { font-size: 1.125rem; }
+            #questionText .katex { font-size: 1.3em !important; }
+            #questionText .katex-display { font-size: 1.45em !important; }
+        }
+        /* 確認彈窗 / 反饋區的 KaTeX 也同步放大 */
+        #hw-confirm-math .katex,
+        #feedbackMessage .katex { font-size: 1.15em !important; }
+
+        /* ===========================================
            🌊 通用工具類
            =========================================== */
 
